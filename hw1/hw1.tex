@@ -1,0 +1,210 @@
+%!TEX program = xelatex
+\documentclass{article}
+
+% HW information
+\title{MTH 9821 Numerical Methods for Finance -- Homework 1}
+\author{Wenli Dong, Bledar Kulemani, Avinash Oza, Bingcheng Wang, Xinlu Xiao}
+\date{\today}
+\makeatletter
+\let\newtitle\@title
+\let\newauthor\@author
+\let\newdate\@date
+\makeatother
+
+% insert code
+\usepackage{listings}
+\usepackage{fontspec}
+\newfontfamily\monaco{Monaco}
+\usepackage{xcolor}
+\lstset{
+% line number
+numbers=left,
+% background frame
+framexleftmargin=10mm,
+frame=none,
+% background color
+%backgroundcolor=\color[rgb]{1,1,0.76},
+backgroundcolor=\color[RGB]{245,245,244},
+% style
+%keywordstyle=\bf\color{blue},
+keywordstyle=\monaco\bf,
+identifierstyle=\monaco\bf,
+numberstyle=\monaco\color[RGB]{0,192,192},
+commentstyle=\monaco\color[RGB]{0,96,96},
+stringstyle=\monaco\color[RGB]{128,0,0},
+% show space
+showstringspaces=false,
+% basic font
+basicstyle=\monaco
+}
+
+% set size and margins
+\usepackage[a4paper, top=1in, bottom=1in, left=1in, right=1in]{geometry}
+\usepackage{amsmath, bm, amssymb} % math
+	\DeclareMathOperator{\E}{\mathbb{E}}
+	\DeclareMathOperator{\1}{\mathit{1}}
+\usepackage{fontspec} % font
+	\newfontfamily\menlo{Menlo}
+\usepackage[colorlinks, linkcolor=red, anchorcolor=blue, citecolor=red]{hyperref} % hyperlink
+\usepackage{fancyhdr} % header and footer
+    \pagestyle{fancy}
+    \lhead{\newtitle}
+    \chead{}
+    \rhead{}
+    \lfoot{}
+    \cfoot{}
+    \rfoot{\thepage}
+    \renewcommand{\headrulewidth}{0.4pt}
+    \renewcommand{\footrulewidth}{0.4pt}
+\usepackage{enumitem} % enumerate package
+\usepackage[framemethod=TikZ]{mdframed} % frame text
+\usepackage{amsthm}
+    % R Language Output
+    \newcounter{Rop}[section]\setcounter{Rop}{0}
+    \renewcommand{\theRop}{\arabic{Rop}}
+    \newenvironment{Rop}[2][]{%
+    \refstepcounter{Rop}%
+    \ifstrempty{#1}%
+    {\mdfsetup{%
+    frametitle={%
+    \tikz[baseline=(current bounding box.east),outer sep=0pt]
+    \node[anchor=east,rectangle,fill=blue!20]
+    {\strut R~Output~\theRop};}}
+    }%
+    {\mdfsetup{%
+    frametitle={%
+    \tikz[baseline=(current bounding box.east),outer sep=0pt]
+    \node[anchor=east,rectangle,fill=blue!20]
+    {\strut R~Output~\theRop:~#1};}}%
+    }%
+    \mdfsetup{innertopmargin=10pt,linecolor=blue!20,%
+    linewidth=2pt,topline=true,%
+    frametitleaboveskip=\dimexpr-\ht\strutbox\relax
+    }
+    \begin{mdframed}[font=\menlo]\relax%
+    \label{#2}}{\end{mdframed}}
+% \renewcommand{\thefigure}{\thesection.\arabic{n}} % figure number
+\numberwithin{figure}{section} %figure number
+\pdfstringdefDisableCommands{% necessary when there are bm and hyperref
+    \renewcommand*{\bm}[1]{#1}%
+}
+
+%\setlength{\parindent}{0pt} %indent
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\maketitle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Question 1}
+
+\subsection{Subquestion i} \label{sec:1}
+
+Let $L_1$ and $L_2$ be nonsingular lower triangular matrices and let $U_1$ and $U_2$ be nonsingular upper triangular matrices. If $L_1U_1 = L_2U_2$, show that there exists a nonsingular diagonal matrix D such that 
+\begin{equation} \label{eq:1}
+L_1 = L_2D \qquad \mathrm{and} \qquad U_1 = D^{-1}U_2
+\end{equation}
+
+\section{Question 2}
+
+The sample correlation matrix of the daily percentage returns is
+	\[
+	\begin{bmatrix}
+	1 & 0.879 & 0.829 & 0.598 & 0.912 & 0.944 & 0.921 & 0.697 & 0.518\\
+0.879 & 1 & 0.802 & 0.744 & 0.943 & 0.963 & 0.969 & 0.68 & 0.523\\
+0.829 & 0.802 & 1 & 0.581 & 0.814 & 0.853 & 0.823 & 0.506 & 0.468\\
+0.598 & 0.744 & 0.581 & 1 & 0.711 & 0.717 & 0.728 & 0.507 & 0.432\\
+0.912 & 0.943 & 0.814 & 0.711 & 1 & 0.982 & 0.974 & 0.789 & 0.565\\
+0.944 & 0.963 & 0.853 & 0.717 & 0.982 & 1 & 0.993 & 0.726 & 0.529\\
+0.921 & 0.969 & 0.823 & 0.728 & 0.974 & 0.993 & 1 & 0.713 & 0.514\\
+0.697 & 0.68 & 0.506 & 0.507 & 0.789 & 0.726 & 0.713 & 1 & 0.466\\
+0.518 & 0.523 & 0.468 & 0.432 & 0.565 & 0.529 & 0.514 & 0.466 & 1
+	\end{bmatrix}
+	\]
+	
+\section{Question 3}
+\subsection{Subquestion i}
+As is shown in \ref{sec:1}, we have already had equation \eqref{eq:1}. And we can see from Table \ref{tab:Parameters_of_Star} and Figure \ref{hist_McD} that blablablabla.
+
+	\begin{table}[hbtp]
+	\centering
+    \caption{\label{tab:Parameters_of_Star}%
+    Initial Properties of the External Star.}
+    \small
+    \begin{tabular}{r|rrrrrrrr}
+    \hline\hline
+    NO. & $d_e$ (g/$\mathrm{cm}^3$) & $m_e$ ($\mathrm{M}_\odot$) & $x$ (AU) & $y$ (AU) & $z$ (AU) & $v_x$ (km/s) & $v_y$ (km/s) & $v_z$ (km/s) \\ 
+    \hline
+    1 & 1 & 1 & 100 & 254.558 & 0 & 0 & -2 & 0 \\
+    2 & 1 & 1 & 100 & -254.558 & 0 & 0 & 2 & 0 \\
+    3 & 1 & 1 & 100 & 254.558 & 0 & 0 & -3 & 0 \\
+    4 & 1 & 1 & 100 & -254.558 & 0 & 0 & 3 & 0 \\
+    5 & 1 & 1 & 200 & 509.117 & 0 & 0 & -2 & 0 \\
+    6 & 1 & 1 & 200 & -509.117 & 0 & 0 & 2 & 0 \\
+    7 & 1 & 0.5 & 100 & 254.558 & 0 & 0 & -3 & 0 \\
+    8 & 1 & 0.5 & 100 & -254.558 & 0 & 0 & 3 & 0 \\
+    \hline\hline
+    \end{tabular}
+    \end{table}
+
+
+\begin{figure}[htbp]
+    \begin{center}
+    \includegraphics[width=0.7\textwidth]{hist_McD.pdf}
+    \caption{Histogram of log return of McDonald’s}
+    \label{hist_McD}
+    \end{center}
+\end{figure}
+
+\subsection{Subquestion ii}
+The output is shown in Output \ref{Rop:SWtest}. 
+\begin{Rop}[Shapiro–Wilk tests]{Rop:SWtest}
+\begin{verbatim}
+	Shapiro-Wilk normality test
+
+data:  logR[, i]
+W = 0.95384, p-value < 2.2e-16
+
+	Shapiro-Wilk normality test
+
+data:  logR[, i]
+W = 0.95537, p-value < 2.2e-16
+
+	Shapiro-Wilk normality test
+
+data:  logR[, i]
+W = 0.98203, p-value = 1.574e-14
+
+	Shapiro-Wilk normality test
+
+data:  logR[, i]
+W = 0.97994, p-value = 1.754e-15
+\end{verbatim}
+\end{Rop}
+
+\subsection{Subquestion iii}
+
+The R code is like
+
+\begin{lstlisting} [language = R]
+data = read.csv("MCD_PriceDaily.csv") # import data
+adjPrice = data[ ,7] # get the adjusted price of McDonald’s
+LogRet = diff(log(adjPrice)) # get the log return of the adjusted price
+library(MASS) # import library MASS
+library(fGarch) # import library fGarch
+# Maximum-likelihood fitting of t-distribution
+fit.T = fitdistr(LogRet, "t") 
+params.T = fit.T$estimate # get the estimator value
+mean.T = params.T[1] # get the mean of t-dist
+# get the UNBIASED standard deviation of t-dist
+sd.T = params.T[2] * sqrt(params.T[3] / (params.T[3] - 2)) 
+# get the degrees of freedom
+nu.T = params.T[3]
+
+# plot the histogram of lor return and the fitting desity of t-distribution
+x = seq(-0.04, 0.04, by = 0.0001)
+hist(LogRet, 80, freq = FALSE)
+lines(x, dstd(x, mean = mean.T, sd = sd.T, nu = nu.T),
+         lwd = 2, lty = 2, col = "red")
+\end{lstlisting}
+
+
+\end{document}
