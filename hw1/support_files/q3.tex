@@ -115,13 +115,15 @@ Attempt to do the LU decomposition and show division by U(2,2) cannot be done.
     \]
 We calculate the first column of L as:
     \[
-        L(k,1) = \frac{A(k,1)}{U(1,1)}, \forall k = 1:n \\ 
+        L(k,1) = \frac{A(k,1)}{U(1,1)}, \forall k = 1:n 
     \]
 
 Then,
-    \[
-        L(1,1) = \frac{2}{2} = 1, L(2,1) = \frac{-2}{2} = -1, L(3,1) = \frac{4}{2}
-    \]
+    \begin{align*}
+        L(1,1) &= \frac{2}{2} = 1 \\
+        L(2,1) &= \frac{-2}{2} = -1 \\
+        L(3,1) &= \frac{4}{2} = 0.5 \\
+    \end{align*}
 The current LU decomposition is:
     \[
         L = 
@@ -191,83 +193,152 @@ Now,
     \]
 which causes the LU decomposition to breakdown with division by zero.
 
+%%%%%%Part iii
+\subsection{Subsection iii}
+Show that the matrix A is nonsingular.
 
+\textbf{Solution}: We find the determinant of A as -16 $\neq$ 0.
 
-Let $L_1$ and $L_2$ be nonsingular lower triangular matrices and let $U_1$ and $U_2$ be nonsingular upper triangular matrices. If $L_1U_1 = L_2U_2$, show that there exists a nonsingular diagonal matrix D such that 
-\begin{equation} \label{eq:1}
-L_1 = L_2D \qquad \mathrm{and} \qquad U_1 = D^{-1}U_2
-\end{equation}
+To find the LU decomposition with row pivoting, we look for matrices P, A, L and U such that:
+    \[
+        PA = LU
+    \]
+with
+    \[
+        A = 
+        \begin{bmatrix}
+            2 & -1 & 1 \\
+            -2 & 1 & 3 \\
+            4 & 0 & -1 \\
+        \end{bmatrix},
+        L=
+        \begin{bmatrix}
+            1 & 0 & 0 \\
+            L(2,1) & 1 & 0 \\
+            L(3,1) & L(3,2) & 1 \\
+        \end{bmatrix},
+        U =
+        \begin{bmatrix}
+            U(1,1) & U(1,2) & U(1,3) \\
+            0 & U(2,2) & U(2,3) \\
+            0 & 0 & U(3,2) \\
+        \end{bmatrix},
+        P = I
+    \]
 
-\section{Question 2}
-
-The sample correlation matrix of the daily percentage returns is
-	\[
-	\begin{bmatrix}
-	1 & 0.879 & 0.829 & 0.598 & 0.912 & 0.944 & 0.921 & 0.697 & 0.518\\
-0.879 & 1 & 0.802 & 0.744 & 0.943 & 0.963 & 0.969 & 0.68 & 0.523\\
-0.829 & 0.802 & 1 & 0.581 & 0.814 & 0.853 & 0.823 & 0.506 & 0.468\\
-0.598 & 0.744 & 0.581 & 1 & 0.711 & 0.717 & 0.728 & 0.507 & 0.432\\
-0.912 & 0.943 & 0.814 & 0.711 & 1 & 0.982 & 0.974 & 0.789 & 0.565\\
-0.944 & 0.963 & 0.853 & 0.717 & 0.982 & 1 & 0.993 & 0.726 & 0.529\\
-0.921 & 0.969 & 0.823 & 0.728 & 0.974 & 0.993 & 1 & 0.713 & 0.514\\
-0.697 & 0.68 & 0.506 & 0.507 & 0.789 & 0.726 & 0.713 & 1 & 0.466\\
-0.518 & 0.523 & 0.468 & 0.432 & 0.565 & 0.529 & 0.514 & 0.466 & 1
-	\end{bmatrix}
-	\]
-	
-\section{Question 3}
-\subsection{Subquestion i}
-As is shown in \ref{sec:1}, we have already had equation \eqref{eq:1}. And we can see from Table \ref{tab:Parameters_of_Star} and Figure 1 that blablablabla.
-
-	\begin{table}[hbtp]
-	\centering
-    \caption{\label{tab:Parameters_of_Star}%
-    Initial Properties of the External Star.}
-    \small
-    \begin{tabular}{r|rrrrrrrr}
-    \hline\hline
-    NO. & $d_e$ (g/$\mathrm{cm}^3$) & $m_e$ ($\mathrm{M}_\odot$) & $x$ (AU) & $y$ (AU) & $z$ (AU) & $v_x$ (km/s) & $v_y$ (km/s) & $v_z$ (km/s) \\ 
-    \hline
-    1 & 1 & 1 & 100 & 254.558 & 0 & 0 & -2 & 0 \\
-    2 & 1 & 1 & 100 & -254.558 & 0 & 0 & 2 & 0 \\
-    3 & 1 & 1 & 100 & 254.558 & 0 & 0 & -3 & 0 \\
-    4 & 1 & 1 & 100 & -254.558 & 0 & 0 & 3 & 0 \\
-    5 & 1 & 1 & 200 & 509.117 & 0 & 0 & -2 & 0 \\
-    6 & 1 & 1 & 200 & -509.117 & 0 & 0 & 2 & 0 \\
-    7 & 1 & 0.5 & 100 & 254.558 & 0 & 0 & -3 & 0 \\
-    8 & 1 & 0.5 & 100 & -254.558 & 0 & 0 & 3 & 0 \\
-    \hline\hline
-    \end{tabular}
-    \end{table}
-
-
-\subsection{Subquestion ii}
-The output is shown in Output 
-\subsection{Subquestion iii}
-
-The R code is like
-
-\begin{lstlisting} [language = R]
-data = read.csv("MCD_PriceDaily.csv") # import data
-adjPrice = data[ ,7] # get the adjusted price of McDonald’s
-LogRet = diff(log(adjPrice)) # get the log return of the adjusted price
-library(MASS) # import library MASS
-library(fGarch) # import library fGarch
-# Maximum-likelihood fitting of t-distribution
-fit.T = fitdistr(LogRet, "t") 
-params.T = fit.T$estimate # get the estimator value
-mean.T = params.T[1] # get the mean of t-dist
-# get the UNBIASED standard deviation of t-dist
-sd.T = params.T[2] * sqrt(params.T[3] / (params.T[3] - 2)) 
-# get the degrees of freedom
-nu.T = params.T[3]
-
-# plot the histogram of lor return and the fitting desity of t-distribution
-x = seq(-0.04, 0.04, by = 0.0001)
-hist(LogRet, 80, freq = FALSE)
-lines(x, dstd(x, mean = mean.T, sd = sd.T, nu = nu.T),
-         lwd = 2, lty = 2, col = "red")
-\end{lstlisting}
-
+We find the largest entry in the first column of A at row 3. We swap rows 1 and 3 of A and P to have:
+    \[
+        A =
+        \begin{bmatrix}
+            4 & 0 & -1 \\
+            -2 & 1 & 3 \\
+            2 & -1 & 1 \\
+        \end{bmatrix},
+        P = 
+            \begin{bmatrix}
+                3 \\
+                2 \\
+                1 \\
+            \end{bmatrix}
+    \]
+We then compute
+    \[
+        U(1,1) = A(1,1) = 4, U(1,2) = A(1,2) =0, U(1,3) = A(1,3) = 1
+    \]
+Then,
+    \[
+        L(2,1) = \frac{A(2,1)}{U(1,1)} = \frac{-2}{4} = -0.5 \\
+        L(3,1) = \frac{2}{4)} = 0.5
+    \]
+Current state
+    \[
+        L=
+            \begin{bmatrix}
+                1 & 0 & 0 \\
+                -0.5 & 1 & 0 \\
+                0.5 & L(3,2) & 1 \\
+            \end{bmatrix},
+        U =
+            \begin{bmatrix}
+                4 & 0 & 1 \\
+                0 & U(2,2) & U(2,3) \\
+                0 & 0 & U(3,2) \\
+            \end{bmatrix}
+    \]
+We now update the matrix A by removing the first row and column of A, L and U:
+    \[
+        \begin{aligned}
+            UpdatedA &= 
+                \begin{bmatrix}
+                    1 & 3 \\
+                    -1 & 1 \\
+                \end{bmatrix} -
+                \begin{bmatrix}
+                    -0.5 \\
+                    0.5 \\
+                \end{bmatrix}
+                \begin{bmatrix}
+                    0 & 1 \\
+                \end{bmatrix}
+            &=
+                \begin{bmatrix}
+                    1 & 3 \\
+                    -1 & 1 \\
+                \end{bmatrix} -
+                \begin{bmatrix}
+                    0 & -0.5 \\
+                    0 & 0.5 \\
+                \end{bmatrix} 
+            &=
+                \begin{bmatrix}
+                    1 & 3.5 \\
+                    1 & 0.5 \\
+                \end{bmatrix} 
+        \end{aligned}
+    \]
+Since the largest entry in the first column is in the first row, no pivoting is required. We calculate
+    \begin{align*}
+        U(2,2) &= UpdatedA(1,1) = 1 \\
+        U(2,3) &= UpdatedA(1,2) = 3.5 \\
+        L(3,2) &= \frac{-1}{1} = -1 \\
+    \end{align*}
+Then,
+    \[
+        L = 
+        \begin{bmatrix}
+            1 & 0 \\
+            -1 & 1 \\
+        \end{bmatrix} ,
+        U =
+        \begin{bmatrix}
+            1 & 3.5 \\
+            0 & U(3,3) \\
+        \end{bmatrix} 
+    \]
+We take out 1 row and 1 column of UpdatedA, L, and U to have
+    \[
+        0.5 - (-1)(3.5) = 4.
+    \]
+We find U(3,3) = 4 and the LU decomposition is:
+    \[
+        P =
+            \begin{bmatrix}
+                0 & 0 & 1 \\
+                1 & 0 & 0 \\
+                0 & 1 & 0 \\
+            \end{bmatrix},
+        L =
+        \begin{bmatrix}
+            1 & 0 & 0 \\
+            -0.5 & 1 & 0 \\
+            0.5 & -1 & 1 \\
+        \end{bmatrix},
+        U =
+        \begin{bmatrix}
+            4 & 0 & 1 \\
+            0 & 1 & 3.5 \\
+            0 & 0 & 4 \\
+        \end{bmatrix}
+    \]
 
 \end{document}
