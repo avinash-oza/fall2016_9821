@@ -1,0 +1,355 @@
+%!TEX program = xelatex
+\documentclass{article}
+
+% HW information
+\title{MTH 9821 Numerical Methods for Finance -- Homework 2}
+\author{Wenli Dong, Bledar Kulemani, Avinash Oza, Bingcheng Wang, Xinlu Xiao}
+\date{\today}
+\makeatletter
+\let\newtitle\@title
+\let\newauthor\@author
+\let\newdate\@date
+\makeatother
+
+% insert code
+\usepackage{listings}
+\usepackage{fontspec}
+\newfontfamily\monaco{Monaco}
+\usepackage{xcolor}
+\definecolor{listinggray}{gray}{0.9}
+\definecolor{lbcolor}{rgb}{0.9,0.9,0.9}
+\lstset{
+backgroundcolor=\color{lbcolor},
+    tabsize=4,    
+%   rulecolor=,
+    language=[GNU]C++,
+        basicstyle=\scriptsize,
+        upquote=true,
+        aboveskip={1.5\baselineskip},
+        columns=fixed,
+        showstringspaces=false,
+        extendedchars=false,
+        breaklines=true,
+        prebreak = \raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}},
+        frame=single,
+        numbers=left,
+        showtabs=false,
+        showspaces=false,
+        showstringspaces=false,
+        identifierstyle=\ttfamily,
+        keywordstyle=\color[rgb]{0,0,1},
+        commentstyle=\color[rgb]{0.026,0.112,0.095},
+        stringstyle=\color[rgb]{0.627,0.126,0.941},
+        numberstyle=\color[rgb]{0.205, 0.142, 0.73},
+%       \lstdefinestyle{C++}{language=C++,style=numbers}’.
+}
+\lstset{
+    backgroundcolor=\color{lbcolor},
+    tabsize=4,
+  language=C++,
+  captionpos=b,
+  tabsize=3,
+  frame=lines,
+  numbers=left,
+  numberstyle=\tiny,
+  numbersep=5pt,
+  breaklines=true,
+  showstringspaces=false,
+  basicstyle=\footnotesize,
+%  identifierstyle=\color{magenta},
+  keywordstyle=\color[rgb]{0,0,1},
+  commentstyle=\color{Darkgreen},
+  stringstyle=\color{red}
+  }
+
+% set size and margins
+\usepackage[a4paper, top=1in, bottom=1in, left=1in, right=1in]{geometry}
+\usepackage{amsmath, bm, amssymb} % math
+	\DeclareMathOperator{\E}{\mathbb{E}}
+	\DeclareMathOperator{\1}{\mathit{1}}
+\usepackage{fontspec} % font
+	\newfontfamily\menlo{Menlo}
+\usepackage[colorlinks, linkcolor=red, anchorcolor=blue, citecolor=red]{hyperref} % hyperlink
+\usepackage{fancyhdr} % header and footer
+    \pagestyle{fancy}
+    \lhead{\newtitle}
+    \chead{}
+    \rhead{}
+    \lfoot{}
+    \cfoot{}
+    \rfoot{\thepage}
+    \renewcommand{\headrulewidth}{0.4pt}
+    \renewcommand{\footrulewidth}{0.4pt}
+\usepackage{enumitem} % enumerate package
+\usepackage[framemethod=TikZ]{mdframed} % frame text
+\usepackage{amsthm}
+    % R Language Output
+    \newcounter{Rop}[section]\setcounter{Rop}{0}
+    \renewcommand{\theRop}{\arabic{Rop}}
+    \newenvironment{Rop}[2][]{%
+    \refstepcounter{Rop}%
+    \ifstrempty{#1}%
+    {\mdfsetup{%
+    frametitle={%
+    \tikz[baseline=(current bounding box.east),outer sep=0pt]
+    \node[anchor=east,rectangle,fill=blue!20]
+    {\strut R~Output~\theRop};}}
+    }%
+    {\mdfsetup{%
+    frametitle={%
+    \tikz[baseline=(current bounding box.east),outer sep=0pt]
+    \node[anchor=east,rectangle,fill=blue!20]
+    {\strut R~Output~\theRop:~#1};}}%
+    }%
+    \mdfsetup{innertopmargin=10pt,linecolor=blue!20,%
+    linewidth=2pt,topline=true,%
+    frametitleaboveskip=\dimexpr-\ht\strutbox\relax
+    }
+    \begin{mdframed}[font=\menlo]\relax%
+    \label{#2}}{\end{mdframed}}
+\pdfstringdefDisableCommands{% necessary when there are bm and hyperref
+    \renewcommand*{\bm}[1]{#1}%
+}
+
+% \renewcommand{\thefigure}{\thesection.\arabic{n}} % figure number
+\numberwithin{figure}{section} %figure number
+\numberwithin{table}{section}
+
+%\setlength{\parindent}{0pt} %indent
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\maketitle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Ch 8 \#3}
+\subsection{Subquestion i}
+
+The mid prices of the options are shown in Table \ref{tab:midPrice}.
+
+	\begin{table}[hbtp]
+	\centering
+    \caption{\label{tab:midPrice}%
+    Mid Prices of Options}
+    \small
+    \begin{tabular}{ccc}
+    \hline\hline
+    \bf{Strike} & \bf{Mid Prices Call} & \bf{Mid Prices Put}\\ 
+    \hline
+1450 & 432.8 & 9.55\\
+1500 & 385.75 & 12.35\\
+1550 & 339.55 & 16.05\\
+1600 & 294.5 & 20.85\\
+1675 & 229.7 & 30.55\\
+1700 & 208.8 & 34.55\\
+1750 & 168.8 & 44.45\\
+1775 & 150.1 & 50.45\\
+1800 & 131.7 & 57.3\\
+1825 & 114.25 & 64.65\\
+1850 & 97.7 & 73.05\\
+1875 & 82.35 & 82.45\\
+1900 & 68.05 & 93.3\\
+1925 & 55.05 & 105.05\\
+1975 & 33.65 & 133.55\\
+2000 & 25.2 & 150.55\\
+2050 & 13 & 188.3\\
+2100 & 6.05 & 231.2\\
+    \hline\hline
+    \end{tabular}
+    \end{table}
+    
+The OLS formula is
+	\begin{equation*}
+	y = PVF - disc \times K
+	\end{equation*}
+where $y = C - P$, $C$ is the mid prices of the call options, $P$ is the mid prices of the put options, and $K$ is the strike price. By using OLS, we get
+	\begin{equation*}
+	y = 1869.4031 - 0.9972K
+	\end{equation*}
+	
+Thus $PVF = 1869.4031$, $disc = 0.9972$.
+
+\subsection{Subquestion ii}
+
+The original Black-Scholes Formula is
+	\begin{align*}
+	C_{BS}(S, K, T, \sigma, r, q) &= Se^{-qT}N(d_1) - Ke^{-rT}N(d_2) \\
+	P_{BS}(S, K, T, \sigma, r, q) &= -Se^{-qT}N(-d_1) + Ke^{-rT}N(-d_2)
+	\end{align*}
+where $S$ is the spot price of the index corresponding to these options, $q$ is the dividend rate, $r$ is the risk-free rate. The function $N(\cdot)$ is the standard normal cdf, and
+	\begin{align*}
+	d_1 &= \frac{\log (S/K) + (r-q+\sigma^2/2)T}{\sigma\sqrt{T}} \\
+	d_2 &= \frac{\log (S/K) + (r-q-\sigma^2/2)T}{\sigma\sqrt{T}}
+	\end{align*}
+
+We can rewrite Black-Scholes formula using $PVF$ and $disc$, then
+	\begin{align*}
+	C_{BS} &= PVF\cdot N(d_1) - K\cdot disc\cdot N(d_2) \\
+	P_{BS} &= -PVF\cdot N(-d_1) + K\cdot disc\cdot N(-d_2) 
+	\end{align*}
+and
+	\begin{align*}
+	d_1 & =  \frac{\log \left( \frac{PVF}{K\cdot disc}\right)}{\sigma\sqrt{T}} + \frac{\sigma\sqrt{T}}{2} \\
+	d_2 & =  \frac{\log \left( \frac{PVF}{K\cdot disc}\right)}{\sigma\sqrt{T}} - \frac{\sigma\sqrt{T}}{2} 
+	\end{align*}
+	
+Let $C_{BS}$ and $P_{BS}$ be the mid prices of the call and put options. We can use Newton's method to calculate $\sigma$, which will be the implied volatility. The implied volatility is shown in Table \ref{tab:impVol}.
+
+	\begin{table}[hbtp]
+	\centering
+    \caption{\label{tab:impVol}%
+    Implied Volatility}
+    \small
+    \begin{tabular}{ccc}
+    \hline\hline
+    $\mathbf{K}$ & $\mathbf{\sigma^2_{imp,~c}}$ & $\mathbf{\sigma^2_{imp,~p}}$\\ 
+    \hline
+1450 & 0.0473548237418695 & 0.047763472746148\\
+1500 & 0.0431902618976051 & 0.043488616065135\\
+1550 & 0.039308491461635 & 0.0395996294773441\\
+1600 & 0.0357431718481531 & 0.0359616052698727\\
+1675 & 0.0307945166866716 & 0.0307075462798457\\
+1700 & 0.0290614122800266 & 0.0289593032638681\\
+1750 & 0.0258423104463723 & 0.0257818527826046\\
+1775 & 0.0244890865947133 & 0.0242987325201529\\
+1800 & 0.0229048005647355 & 0.0229011137326154\\
+1825 & 0.0214286123535537 & 0.0213593275657909\\
+1850 & 0.0199790343583373 & 0.0199229868497235\\
+1875 & 0.0186480463469214 & 0.018513108797099\\
+1900 & 0.0173158231345902 & 0.0172811093183057\\
+1925 & 0.016049424826671 & 0.015938192074204\\
+1975 & 0.0138591431080441 & 0.0137615241485985\\
+2000 & 0.0128711121494107 & 0.0130099516032848\\
+2050 & 0.0112692419430679 & 0.0114918512531617\\
+2100 & 0.0101438878456743 & 0.0104521034753514\\
+    \hline\hline
+    \end{tabular}
+    \end{table}
+
+From Table \ref{tab:impVol} we can see that under the same strike price, the implied volatilities of calls and puts are very close.
+
+\section{Ch 8 \#7}
+\subsection{Subquestion i}
+
+By using OLS regression, we get
+	\begin{equation*}
+	T_{3,LR} = 0.0123 + 0.1272T_2 + 0.3340T_5 + 0.5298T_{10}
+	\end{equation*}
+
+The approximation error
+	\begin{equation*}
+	\mathrm{error}_{LR} = ||T_3 - T_{3,LR} || = 0.04301298
+	\end{equation*}
+
+\subsection{Subquestion ii}
+By using linear interpolation, we get $T_{3, linear_interp} = $ [4.650000, 4.770000, 4.773333, 4.783333, 4.783333, 4.796667, 4.780000, 4.786667, 4.810000
+4.790000, 4.803333, 4.800000, 4.783333, 4.760000, 4.763333].
+
+Thus the approximation error
+	\begin{equation*}
+	\mathrm{error}_{linear_interp} = ||T_3 - T_{3,linear_interp} || = 0.2066129
+	\end{equation*}
+	
+\subsection{Subquestion iii}
+By using cubic spline interpolation, we get $T_{3, cubic_interp} = $ [4.641333, 4.762000, 4.765889, 4.780889, 4.781222, 4.789111, 4.773667, 4.781778, 4.805667, 4.786000, 
+4.799556, 4.795333, 4.779556, 4.756333, 4.758222].
+
+Thus the approximation error
+	\begin{equation*}
+	\mathrm{error}_{cubic_interp} = ||T_3 - T_{3,cubic_interp} || = 0.1864353
+	\end{equation*}
+
+\subsection{Subquestion iv}
+The OLS regression has the least approximation error, and the linear interpolation has the approximation error. That is because OLS estimator is BLUE. It has very little residual, while linear interpolation is very rough.
+
+\section{Ch 8 \#8}
+\subsection{Subquestion i}
+
+The weekly percentage returns of these stocks are listed in Table \ref{tab:weekly_ret}.
+
+	\begin{table}[hbtp]
+	\centering
+    \caption{\label{tab:weekly_ret}%
+    Weekly returns of some stocks}
+    \small
+    \begin{tabular}{cccccccccc}
+    \hline\hline
+\bf{date} & \bf{JPM} & \bf{GS} & \bf{MS} & \bf{BAC} & \bf{RBS} & \bf{CS} & \bf{UBS} & \bf{RY} & \bf{BCS}\\
+    \hline
+2012-01-23 & 0.0359 & 0.13 & 0.119 & 0.103 & 0.183 & 0.183 & 0.178 & 0.0391 & 0.139\\
+2012-01-30 & 0.0289 & 0.0515 & 0.0944 & 0.0758 & 0.0436 & 0.0441 & 0.0438 & 0.0248 & 0.0718\\
+2012-02-06 & -0.0176 & -0.029 & -0.0317 & 0.0294 & -0.0352 & -0.0768 & -0.0523 & -0.00343 & -0.019\\
+2012-02-13 & 0.0231 & 0.0157 & -0.0256 & -0.00622 & 0.00912 & 0.0422 & 0.0305 & -0.00134 & 0.0704\\
+2012-02-20 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+2012-02-27 & 0.0561 & 0.0381 & -0.0152 & 0.015 & -0.00226 & 0.017 & -0.0324 & 0.0689 & 0.0316\\
+2012-03-05 & 0.00981 & -0.0223 & -0.0261 & -0.00986 & -0.0668 & -0.0303 & -0.0284 & 0.00501 & -0.0625\\
+2012-03-12 & 0.0862 & 0.0481 & 0.063 & 0.217 & 0.091 & 0.116 & 0.0719 & 0.0214 & 0.0667\\
+2012-03-19 & 0.0133 & 0.0264 & 0.0407 & 0.00512 & -0.00222 & -0.014 & -0.014 & -0.00872 & -0.0212\\
+2012-03-26 & 0.0181 & -0.0143 & -0.0337 & -0.0275 & -0.0145 & -0.0238 & -0.0149 & -0.000352 & -0.0421\\
+2012-04-02 & -0.0294 & -0.0513 & -0.0636 & -0.0356 & -0.0939 & -0.0655 & -0.0655 & -0.0137 & -0.0827\\
+2012-04-09 & -0.0254 & -0.0246 & -0.0608 & -0.0597 & -0.0187 & -0.0342 & -0.0477 & -0.0212 & -0.0218\\
+2012-04-16 & -0.0113 & -0.023 & 0.0117 & -0.037 & -0.0267 & 0.0133 & 0.00162 & 0.0283 & 0.00446\\
+2012-04-23 & 0.0145 & 0.0175 & -0.0276 & -0.0132 & 0.0392 & -0.0549 & 0.0161 & 0.0186 & 0.0636\\
+2012-04-30 & -0.0368 & -0.0474 & -0.0557 & -0.062 & -0.00881 & -0.0883 & -0.0214 & -0.0506 & -0.0709\\
+2012-05-07 & -0.115 & -0.063 & -0.0659 & -0.0246 & -0.0698 & -0.0277 & -0.0114 & -0.0229 & -0.0404\\
+2012-05-14 & -0.094 & -0.065 & -0.107 & -0.0704 & -0.145 & -0.0707 & -0.0755 & -0.0606 & -0.134\\
+2012-05-21 & 0.000303 & 0.0127 & -0.00752 & 0.0186 & 0.0399 & 0.00715 & 0.0266 & -0.0356 & 0.0243\\
+2012-05-28 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+2012-06-04 & 0.00546 & -0.0176 & 0.0348 & 0.0589 & 0.0706 & 0.0264 & 0.013 & 0.00352 & 0.0431\\
+2012-06-11 & 0.0401 & 0.0118 & 0.0425 & 0.045 & 0.122 & -0.0697 & 0.0239 & 0.0243 & 0.0649\\
+2012-06-18 & 0.0273 & -0.0212 & -0.0105 & 0.00507 & -0.0268 & -0.00425 & -0.00334 & 0.0101 & -0.00713\\
+2012-06-25 & -0.00734 & 0.0238 & 0.0312 & 0.0303 & -0.108 & -0.0245 & -0.0201 & 0.0102 & -0.183\\
+2012-07-02 & -0.0432 & -0.00409 & -0.0303 & -0.0636 & -0.0779 & -0.0262 & -0.0589 & 0.0124 & -0.00293\\
+2012-07-09 & 0.0642 & 0.0205 & -0.00639 & 0.0209 & 0.0319 & -0.0213 & -0.0299 & -0.00234 & -0.00294\\
+2012-07-16 & -0.0603 & -0.0335 & -0.0907 & -0.096 & -0.0124 & -0.0287 & -0.0505 & 0 & -0.0324\\
+2012-07-23 & 0.0883 & 0.0795 & 0.0597 & 0.034 & 0.0814 & 0.0543 & 0.0798 & 0.00665 & 0.066\\
+2012-07-30 & -0.0216 & -0.00652 & 0.0215 & 0.0164 & -0.0145 & -0.0364 & -0.0173 & -0.000194 & 0.0105\\
+2012-08-06 & 0.0243 & 0.0202 & 0.0602 & 0.0418 & 0.0338 & 0.0221 & 0.0121 & 0.00369 & 0.0858\\
+2012-08-13 & 0.000272 & 0.00565 & -0.00137 & 0.0336 & 0.0355 & 0.0381 & 0.0128 & 0.0557 & 0.0477\\
+2012-08-20 & 0.00518 & 0.0131 & -0.00206 & 0.02 & -0.0274 & 0.0526 & 0.0145 & -0.00623 & -0.0174\\
+2012-08-27 & -0.000813 & 0.0117 & 0.0302 & -0.0209 & 0.0141 & 0.0026 & -0.00446 & 0.033 & -0.0194\\
+2012-09-03 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+2012-09-10 & 0.119 & 0.148 & 0.216 & 0.197 & 0.253 & 0.2 & 0.209 & 0.0318 & 0.273\\
+2012-09-17 & -0.0167 & -0.0382 & -0.0636 & -0.0461 & -0.0111 & -0.00995 & -0.0415 & -0.00658 & -0.0263\\
+2012-09-24 & -0.00986 & -0.026 & -0.0199 & -0.0307 & -0.0662 & -0.0756 & -0.0573 & 0 & -0.0381\\
+2012-10-01 & 0.0381 & 0.0495 & 0.0454 & 0.0555 & 0.0168 & 0.0671 & 0.0509 & 0.0223 & 0.0454\\
+2012-10-08 & -0.00216 & 0.00746 & -0.0109 & -0.0215 & 0.0213 & -0.0062 & -0.0148 & -0.0123 & 0.0193\\
+2012-10-15 & 0.0168 & 0.0285 & 0.0127 & 0.0351 & 0.0347 & 0.0473 & 0.0349 & 0.0162 & 0.0088\\
+    \hline\hline
+    \end{tabular}
+    \end{table}
+    
+\subsection{Subquestion ii}
+
+By using OLS regression, we get
+
+	\begin{multline*}
+	JPM =     -0.003222    +    0.755635~ GS      -0.064294~ MS   +    0.302755~ BAC    +    0.227142~  RBS \\
+     -0.094029~ CS     -0.398494~ UBS   +    0.147026~ RY    +   0.010758~ BCS
+	\end{multline*}
+where those tickers represent the weekly returns of the corresponding tickers.	
+	
+The approximation error is 0.1319426.
+
+\subsection{Subquestion iii}
+
+By using OLS regression, we get
+
+	\begin{equation*}
+	JPM =     -0.001105 +     0.614013~GS    -0.067123~MS+     0.251915~BAC
+	\end{equation*}
+	where those tickers represent the weekly returns of the corresponding tickers.
+	
+The approximation error is 0.1514875.
+
+\subsection{Subquestion iv}
+
+	\begin{multline*}
+	JPM =     8.83982    +    0.05480~ GS      -0.06069~ MS   +    1.46197~ BAC    +    0.93938~  RBS \\
+     0.85709~ CS     -2.24728~ UBS   +    0.28110~ RY    -   0.07965~ BCS
+	\end{multline*}
+where those tickers represent the prices of the corresponding tickers.	
+	
+The approximation error is 6.443954. Compared to subquestion ii, the approximation error is much larger.
+
+
+\end{document}
