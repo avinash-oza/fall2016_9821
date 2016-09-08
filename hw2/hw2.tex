@@ -63,7 +63,7 @@ backgroundcolor=\color{lbcolor},
   }
 
 % set size and margins
-\usepackage[a4paper, top=1in, bottom=1in, left=1in, right=1in]{geometry}
+\usepackage[a4paper, top=2cm, bottom=2cm, left=2cm, right=2cm]{geometry}
 \usepackage{amsmath, bm, amssymb} % math
 	\DeclareMathOperator{\E}{\mathbb{E}}
 	\DeclareMathOperator{\1}{\mathit{1}}
@@ -119,8 +119,219 @@ backgroundcolor=\color{lbcolor},
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 \maketitle
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%%%%%%55Bledar's problems%%%%%%%%%%%%%%%%%%%
+\section{Problem 6.7} 
+Let \(B_N\) be the N x N  tridiagonal symmetric positive matrix be given by (1). 
+
+% Creating the matrix Bn
+\begin{equation}
+	\mathbf{B_N} = \left(
+	\begin{array}{cccc}
+	2 & -1 & \ldots & 0\\
+	-1 & \ddots & \ddots & \vdots \\
+	\vdots & \ddots & \ddots & -1 \\
+	0 & \ldots & -1 & 2
+	\end{array} \right)
+\end{equation}
+and let \(U_N\) be the Cholesky factor  of the matrix \(B_N\) be given by:
+\begin{equation}
+	U_N(i,i) = \sqrt{\frac{i+1}{i}}
+\end{equation}
+
+\begin{equation}
+	U_N(i,i+1) = -\sqrt{\frac{i}{i+1}}
+\end{equation}
+
+(\(i)\) Show that the solution to a linear system \(B_N*x\) = b, where b and x are the N x 1 column vectors can be obtained by using the explicit pseudocode below:\\\\
+	\indent \hspace{5 cm} Function Call:\\
+	\indent \hspace{5 cm} x = linear\_solve\_cholesky\_B\_N(b)\\\\
+	\indent \hspace{5 cm} Input:\\
+	\indent \hspace{5 cm} b = N x 1 column vector \\\\
+	\indent \hspace{5 cm} Output:\\
+	\indent \hspace{5 cm} x = solution to \(B_N*x\) = b\\\\
+	\indent \hspace{5 cm} y(1)= \(\frac{b(1)}{\sqrt{2}}\) \\
+	\indent \hspace{5 cm} for \(i\)=2:\(N\) \\
+	\indent \hspace{5 cm} \indent y(\(i\)) = \(\frac{b(i)-y(i-1)*\sqrt{\frac{i-1}{i}}}{\sqrt{\frac{i+1}{i}}}\) \\
+	\indent \hspace{5 cm} end \\\\
+	\indent \hspace{5 cm} x(\(N\)) = \(\frac{y(N) * \sqrt{N}}{\sqrt{N+1}}\)\\
+	\indent \hspace{5 cm} for \(i\)=2:\(N\) \\
+	\indent \hspace{5 cm} \indent y(\(i\)) = \(\frac{y(i)+x(i+1)*\sqrt{\frac{i}{i+1}}}{\sqrt{\frac{i+1}{i}}}\) \\
+	\indent \hspace{5 cm} end \\\\
+	
+(\(ii)\) What is the operation count for the pseudocode above, and how does it compare to \(8n\)+\(O(1)\), the operation count for the optimal linear solver for the tridiagonal symmetric definite matrices? \\\\
+
+\underline{\textbf {Proof}} \\
+\((i)\)
+\par We know that \(U_N^T  U_N  x = b\). If we let \(U_N x = y\), then we have \(U_N^T y = b\). Note that \(U_N^T\) is a lower triangular matrix. Therefore, this can be solved using the forward substitution(L,b) algorithm. Its implementation is as follows:\\
+\indent \(y(1) = \frac{b(1)}{U_N^T(1,1)} = \frac{b(1)}{\sqrt{B_N(1,1)}} = \frac{b(1)}{\sqrt{2}}\) \\\\
+Then, equation (2) becomes:\\
+\begin{equation}
+	U_N(i,i) = \sqrt{\frac{i+1}{i}} \hspace{1 cm} for \hspace{2 mm} every \hspace{2 mm} i=2:N
+\end{equation}
+
+and equation (3) becomes: \\
+\begin{equation}
+	U_N(i,i+1) = -\sqrt{\frac{i-1}{i}} \hspace{1 cm} for \hspace{2 mm} every \hspace{2 mm} i=2:N
+\end{equation}
+
+Note that to move from equation (3) to equation (5) we just let \(i=i-1\).
+We then use the forward\_subst\_bidiag(L,b) to find the vector y.\\\\
+\indent y(1)= \(\frac{b(1)}{\sqrt{2}}\) \\\\
+\indent for \(i\)=2:\(N\) \\
+\indent \hspace{1 cm} \(y(i)= \frac{b(i)-y(i-1)L(i,i-1)}{L(i,i)} = \frac{b(i)-y(i-1)U(i-1,i)}{L(i,i)} = \frac{b(i)+y(i-1) \sqrt{\frac{i-1}{i}}}{\sqrt{\frac{i+i}{i}}}\) \indent Note that \(L(i,j)=U(j,i)\)\\ 
+\indent end \\
+\par Now that we have the vector \(y\), we can use it to find vector \(x\) in \(U_Bx=y\). To solve for x, we use the backward substitution algorithm for bidiagonal matrices. The algorithm is shown in Table 2.4 of the book.\\\\
+\indent \( x(N)=\frac{y(N)}{U_N(N,N)} = \frac{y(N)}{\sqrt{\frac{N+1}{N}}} = \frac{y(N)\sqrt{N}}{\sqrt{N+1}} \)\\
+\indent for \(i\)=2:\(N\) \\
+\indent \hspace{1 cm} \(y(i) = \frac{y(i)-x(i+1)U(i,i+1)}{U(i,i)} = \frac{y(i)-x(i+1)*(-\sqrt{\frac{i}{i+1}})}{\sqrt{\frac{i+1}{i}}} = \frac{y(i)+x(i+1)*\sqrt{\frac{i}{i+1}}}{\sqrt{\frac{i+1}{i}}}\) \\
+\indent end \\
+If we put these two loops together, then we see that the explicit pseudocode solves the system \(B_Nx=y\).\\\\
+\((ii)\) \\
+The loop that runs from 2:N has:\\
+\indent a) \((N-2)+1\) iterations\\ 
+\indent b) 9 operations per iteration.\\\\
+The loop that runs from N-1:1 has:\\
+\indent a) \((N-1)-1+1\) iterations\\
+\indent b) 9 operations per iterations\\\\
+Additionally, there are 2 operations needed to calculate \(y(1)\) and 5 operations to calculate \(x(N)\). Therefore, the total no. of ops. is \(18(N-1) + 7 = 18n +O(1)\).\\
+
+\newpage{}
+\section {Problem 6.8} 
+\par Let \(B_N\) be the \(NxN\) tridiagonal symmetric positive definite matrix given in problem 7. Show that the L and U factors of the matrix  \(B_N\) are the lower triangular bidiagonal matrix and the upper triangular bidiagonal matrix given by:\\
+\indent \(L(i,i) = 1\) for every \(i=1:N\) and \(L(i+1,i) = -\frac{i}{i+1}\) for every \(i=1:(N-1)\)\\ 
+\indent\(U(i,i) = \frac{i+1}{i}\) for every \(i=1:N\) and \(U(i,i+1) = -1\) for every \(i=1:(N-1)\)\\\\
+\underline{\textbf {Proof}} 
+\par It is important to notice that the leading principal minors of the matrix \(B_N\) are non-zero. Therefore, we can apply the lu\_no\_pivoting\_tridiag(A) algorithm provided in the Table 2.7. We first initialize the lower triangular matrix L to Identity matrix and the upper triangular matrix U to the Zero matrix, i.e.\\\\
+\indent \hspace{5 cm} \(L=\textbf{I}_{NxN}\)\\
+\indent \hspace{5 cm} \(U=\textbf{0}_{NxN}\)\\\\
+\indent \hspace{5 cm}for \(i=1:(N-1)\)\\
+\indent \hspace{5 cm} \indent \(L(i,i) = 1\)\\
+\indent \hspace{5 cm} \indent \(L(i+1,i) = \frac{A(i+1,i)}{A(i,i)}\)\\
+\indent \hspace{5 cm} \indent \(U(i,i) = A(i,i)\)\\
+\indent \hspace{5 cm} \indent \(U(i+1,i+1) = A(i,i+1)\)\\
+\indent \hspace{5 cm} \indent \(A(i+1,i+1) = A(i+1,i+1)-L(i+1,i)*U(i,i+1)\)\\
+\indent \hspace{5 cm} end\\
+\indent \hspace{5 cm} \(L(n,n) = 1; \indent U(n,n) = A(n,n)\)\\\\
+\indent To prove the claim, we will use induction.\\\\
+Basis: \(i=1\)\\
+Using the algorithm above, we have:\\\\
+\indent \(L(1,1)=1\)\\
+\indent \(L(2,1)= \frac{A(2,1)}{A(1,1)}= \frac{-1}{2}\) and \\\\
+\indent \(U(1,1)= A(1,1) = 2\)\\
+\indent \(U(1,2)=A(1,2)=-1\)\\\\
+As we can see from the basis step, the case when \(i=1\) is true. Let's assume that the claim is true for \(i=k\), i.e.\\
+\indent \(L(k,k)=1\)\\
+\indent \(L(k+1,k)= \frac{-k}{k+1}\) and \\\\
+\indent \(U(k,k)= \frac{k+1}{k}\)\\
+\indent \(U(k,k+1)=-1\)\\\\
+Then, we need to check whether the claim is true for \(i=k+1\), i.e.\\ 
+\indent \(L(k+1,k+1)=1\)\\
+\indent \(L(k+2,k+1)= \frac{-(k+1)}{k+2}\) and \\\\
+\indent \(U(k+1,k+1)= \frac{k+2}{k+1}\)\\
+\indent \(U(k+1,k+2)=-1\)\\\\
+After step k, the LU decomposition without row pivoting updates the block of A that is on the bottom right corner of element with index (k,k), i.e. \\\\
+\indent \(A(k+1:n,k+1:n) = A(k+1:n,k+1:n) - L(k+1:n,k)*U(k,k+1:n) \)\\\\
+Particularly,\\
+\indent \(A(k+1,k+1)= A(k+1,k+1) - L(k+1,k)*U(k,k+1)\)\\
+\indent \(A(k+1,k+1)= 2 - \frac{-k}{k+1} *(-1)\) \indent\indent (by induction hypothesis)\\
+\indent \(A(k+1,k+1)= \frac{k+2}{k+1} \)\\\\
+Additionally, \\
+\indent \(A(k+1,k+2)= A(k+1,k+2) - L(k+2,k)*U(k,k+2)\)\\
+\indent \(A(k+1,k+1)= -1 - \frac{A(k+2,k)}{U(k,k)}*U(k,k+2) \) \indent (by induction hypothesis)\\
+\indent \(A(k+1,k+1)= -1 \) \indent  (since \(A(k+2,k)=0)\)\\\\
+Therefore we have:\\
+\indent \(U(k+1,k+1) = A(k+1,k+1) = \frac{k+2}{k+1}\)\\
+\indent \(U(k+1,k+2)=A(k+1,k+2) = -1\) \indent and \\\\
+\indent \(L(k+2,k+1) = \frac{A(k+2,k+1)}{A(k+1,k+1)}\)\\
+\indent \(L(k+2,k+1) = \frac{A(k+1,k+2)}{A(k+1,k+1)}\) \indent (by symmetry)\\
+\indent \(L(k+2,k+1) = \frac{-1}{\frac{k+2}{k+1}} = -\frac{k+1}{k+2}\)\\
+\indent \(L(k+1,k+1)=1 \)\indent (since L is a LU factor)\\\\
+Then, by induction, the proof follows. Note that the operation count is \(3n + O(1).\)
+
+\newpage{}
+\section{Problem 6.9}
+\par Let \(B_N\) be the \(NxN\) tridiagonal symmetric positive definite matrix given in problem 7, and let L and U be the LU factors of the matrix  \(B_N\) given in problem 8.\\
+\((i)\) Show that the solution to a linear system \(B_N*x=b\) where \(b\) and \(x\) are the \(Nx1\) column vectors can be obtained by using the pseudocode below:\\\\
+			\indent \hspace{5 cm}	Function Call:\\
+			\indent \hspace{5 cm}	x = linear\_solve\_LU\_B\_N(b)\\\\
+			\indent \hspace{5 cm}	Input:\\
+			\indent \hspace{5 cm}	b = N x 1 column vector \\\\
+			\indent \hspace{5 cm}	Output:\\
+			\indent \hspace{5 cm}	x = solution to \(B_N*x\) = b\\\\
+			\indent \hspace{5 cm}	y(1)= \(b(1)\) \\
+			\indent \hspace{5 cm}	for \(i\)=2:\(N\) \\
+			\indent \hspace{5 cm}	\indent \(y(i) = b(i) + \frac{(i-1)*y(i-1)}{i}\)\\ 
+			\indent \hspace{5 cm}	end \\\\
+			\indent \hspace{5 cm}	\(x(N) = \frac{N_y(N)}{N+1}\)\\
+			\indent \hspace{5 cm}	for \(i\)=2:\(N\) \\
+			\indent \hspace{5 cm} \indent y(\(i\)) = \(\frac{i*(y(i)+x(i+1))}{i+1}\) \\
+			\indent \hspace{5 cm} end \\\\
+\underline{\textbf {Proof}} \\
+	\indent \(L*U*x=b\)\\
+	\indent \(L*Y=b\)\\\\
+We will first use the forward substitution to find the vector b. \\\\
+\(y(1) = \frac{b(1)}{L(1,1)}\)\\
+for \(i=2:N\)\\
+	\indent \(y(i) = \frac{b(i)-L(i,i-1)*y(i-1)}{L(i,i)}\)\\
+	\indent \(y(i) = \frac{b(i)-(-\frac{i-1}{i})*y(i-1)}{1}\)\\
+	\indent \(y(i) = b(i)+\frac{i-1}{i}*y(i-1)\)\\
+end\\\\
+Then, we can use backward\_subst\_bidiag to solve for the vector x.\\
+\indent \(x(N) = \frac{y(N)}{U(N,N)} = \frac{y(N)}{\frac{N+1}{N}}= \frac{y(N)*N}{N+1}\\\)\\
+for \(i =(n-1):1\)\\
+\indent \(x(i)=\frac{y(i) - U(i,i+1)*x(i+1)}{U(i,i)} = \frac{y(i) + x(i+1)}{\frac{i+1}{i}} = \frac{i*(y(i) + x(i+1))}{i+1}   \)\\
+end\\\\
+After putting these two pieces of code together, we see that the algorithm is produced.
+Operation count:\\
+	\indent First for loop: \(4*(N+1)\)\\
+	\indent Second for loop: \(4*(N+1)\)\\
+	\indent Operation count in calculating \(x(N)\) is 3\\
+	\indent Operation count in calculating \(y(1)\) is 0, since \(y(1)=b(1)\)\\ 
+The total operation count for this algorithm is: \(8*(N-1) + 3 = 8N - 5 = 8n+O(1)\)
+
+\newpage{}
+\section{Problem 6.10}
+
+\par Write an explicit optional pseudocode for solving linear systems corresponding to the same tridiagonal symmetric positive definite matrix. In other words, write a pseudocode for solving p linear systems \(A*x_i = b_i\), for \(i=1:p\) where \(A\) is tridiagonal symmetric positive definite matrix.\\\\
+\underline{\textbf {Solution}} \\
+
+\par An optimal explicit code to solve p linear systems corresponding to the same tridiagonal symmetric positive definite matrix is outlined below:\\
+	\indent - Find the LU decomposition of the matrix\\
+	\indent - Use a "for" loop to solve the system using forward and backward substitutions for each vector \(b_i\)\\\\ 
+
+Input:\\
+A - tridiagonal symmetric positive definite matrix of size n\\
+\(b_i\) - column vector of size n\\\\
+
+Output:\\
+\(x_i\) - solution corresponding to the vector \(b_i\)\\
+for \(i=1:n-1\)\\
+	\indent \(L(i,i) = 1;  \indent L(i+1,i) = \frac{A(i+1,i)}{A(i,i)}\)\\
+	\indent \(U(i,i) = A(i,i);  \indent U(i,i+1) = A(i,i+1)\)\\
+	\indent \(A(i+1,i+1) = A(i+1,i+1)- L(i+1,i)*U(i,i+1) \)\\
+end\\
+
+\(L(n,n)=1\) \indent \(U(n,n)=A(n,n)\)\\
+// At this point we have the LU decomposition, and it will be used by the solvers\\
+for \(i=1:p\)\\
+	\indent \(y(1)=b_i(1)\)\\
+	\indent for \(j=2:n\)\\
+	\indent \hspace{1 cm} \(y(j)=b_i(j)-L(j,j-1)*y(j-1)\) // forward substitution for \(L*y=b_i\)\\
+end\\
+
+	\indent \(x_i(n)=\frac{y(n)}{U(n,n)}\)\\
+	\indent \hspace{1 cm}
+for \(j=(n-1):i\)\\
+	\indent \hspace{1 cm} \(x_i(j)=\frac{y(j)-U(j,j+1)*x_i(j+1)}{U(j,j)}\)\\
+	\indent end	\indent // backward substitution for \(U*x_i=y\)\\
+end\\\\
+Now we calculate the operation count:\\
+\indent For the LU decomposition, there are \(3*(n-1)\). For the forward substitution, there are \(2*n-2\). For the backward substitution, there are \(3*n-2\). The number of operations for the forward and backward substitution is multiplied by p, since the code runs p-times.\\ 
+Therefore, the total number of the ops is: \(p*(3n-2+2n-2)+3n-3\) = \(5*n*p +3*n -4*p -3\)\\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
 \section{Ch 8 \#3}
 \subsection{Subquestion i}
 
@@ -226,7 +437,6 @@ Let $C_{BS}$ and $P_{BS}$ be the mid prices of the call and put options. We can 
     \end{table}
 
 From Table \ref{tab:impVol} we can see that under the same strike price, the implied volatilities of calls and puts are very close.
-
 \section{Ch 8 \#7}
 \subsection{Subquestion i}
 
