@@ -16,8 +16,8 @@
 using namespace Eigen;
 
 
-VectorXd residual_based_solver(const MatrixXd &A, const VectorXd &b, const VectorXd &x0, double tol, IterationMethod &iterMethod)
-{
+VectorXd residual_based_solver(const MatrixXd &A, const VectorXd &b, const VectorXd &x0, double tol, IterationMethod &iterMethod, double w) {
+    //w is only used when it is referred to. Otherwise this value does not matter
     MatrixXd copiedA(A);
     VectorXd x = x0;
     VectorXd r0 = b - copiedA*x;
@@ -35,12 +35,12 @@ VectorXd residual_based_solver(const MatrixXd &A, const VectorXd &b, const Vecto
 
 //    virtual VectorXd calculateBnew(MatrixXd lowerA, MatrixXd upperA, MatrixXd D_inverse, VectorXd b, VectorXd x)=0;
 
-    VectorXd b_new = iterMethod.calculateBnew(lower_A, upper_A, D_inverse, b, x0 ); // calculate b_new
+    VectorXd b_new = iterMethod.calculateBnew(lower_A, upper_A, diagonal_A, D_inverse, b, x0, w); // calculate b_new
 
     int ic = 0; // iteration count
 
     while (residual.norm() > stopIterResidual) {
-        x = iterMethod.calculateIteration(lower_A, upper_A, D_inverse, b_new, x);
+        x = iterMethod.calculateIteration(lower_A, upper_A, diagonal_A, D_inverse, b_new, x, w);
         residual = b - copiedA * x;
         ic += 1;
     }
