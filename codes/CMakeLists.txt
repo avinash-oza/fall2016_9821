@@ -12,6 +12,6 @@ set(SOURCE_FILES
     Main.cpp
     MatrixDecomposition.hpp
     Solvers.hpp
-    Main.cpp)
+    Main.cpp IterativeMethods.hpp)
 
 add_executable(cppcodetest ${SOURCE_FILES})
