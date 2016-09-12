@@ -1,8 +1,10 @@
 #include "Eigen/Dense"
 #include "MatrixDecomposition.hpp"
+#include "IterativeMethods.hpp"
 #include "Solvers.hpp"
 #include <tuple>
 #include <iomanip>
+#include <cmath>
 
 using namespace Eigen;
 using namespace std;
@@ -18,6 +20,8 @@ MatrixXd Some(const MatrixXd& x)
 
 int main()
 {
+    /// Keep this line to make the decimals always print out
+    std::cout << std::fixed << std::setprecision(6);
 	//// Example 1
 	//// Forward substitution for discounting rates
 	//MatrixXd m1(4, 4);
@@ -35,8 +39,8 @@ int main()
 
 	//// Example 2
 	//// LU decomposition without pivotting
-	//MatrixXd m2(4, 4);
-	//m2 << 2,-1,3,0,   -4,5,-7,-2,   -2,10,-4,-7,   4,-14,8,10;
+//	MatrixXd m2(4, 4);
+//	m2 << 2,-1,3,0,   -4,5,-7,-2,   -2,10,-4,-7,   4,-14,8,10;
 	//std::cout << "|-------------------------------------|\n";
 	//std::cout << "|  LU Decomposition Without Pivoting  |\n";
 	//std::cout << "|           Full Matrix               |\n";
@@ -68,7 +72,7 @@ int main()
 	//std::cout << "|-------------------------------------|\n";
 	//std::cout << "The input matrix is\n" << m4 << endl;
 	//std::cout << "The inverse of the matrix is\n" << inverse(m4) << std::endl;
-	//std::cout << "The product of the two matrices is\n" << m4*inverse(m4) << endl;
+	//std::cout << "The product OF the two matrices is\n" << m4*inverse(m4) << endl;
 
 	// Example 5
 	// Finding discounting factors using the LU decomposition
@@ -85,7 +89,39 @@ int main()
 //	std::cout << showpoint << setprecision(8) << "The exponents of the discounting factors are:\n"; std::cout << linear_solve_lu_row_pivoting(m5, v5) << std::endl << std::endl;
 	// Remember, the discounting factos are e^(values returned from the function).
 
-    verifyCholeskyDecomposition();
+
+    // Iterative methods test code (Problem 3 from HW3)
+    Eigen::MatrixXd A=MatrixXd::Zero(14,14);
+    Eigen::VectorXd b=VectorXd::Zero(14);
+    Eigen::VectorXd x_0=VectorXd::Zero(14);
+    double tol=0.000001;
+
+    for(int j=0; j<14; ++j)
+    {
+        b(j)=j*j;
+        x_0(j)=1;
+        for(int k=0; k<14; ++k)
+        {
+            if(j==k)
+                A(j,k)=2;
+
+            else if(j==k+1)
+                A(j,k)=-1;
+            else if(j==k-1)
+                A(j,k)=-1;
+            else
+                continue;
+        }
+    }
+
+    VectorXd res(Jacobi_Iteration(A, b, x_0, std::pow(10,-6)));
+    cout << "ret:\n" << res << std::endl;
+
+    VectorXd res2(Gauss_Siedel_Iteration(A, b, x_0, std::pow(10,-6)));
+    cout << "ret\n" << res2 << std::endl;
+
+    VectorXd res3(SOR_Iteration(A, b, x_0, std::pow(10,-6), 1.15));
+    cout << "ret3\n" << res3 << std::endl;
 
 
 	return 0;
@@ -177,5 +213,32 @@ MatrixXd generateTestBandedMatrix(int matrixSize)
         A(i,i) = 20 + std::rand() % 50;
     }
 
+    return A;
+}
+
+MatrixXd generateTestIterativeMethodMatrix()
+{
+    Eigen::MatrixXd A=Eigen::MatrixXd::Zero(14,14);
+    Eigen::VectorXd b=Eigen::VectorXd::Zero(14);
+    Eigen::VectorXd x_0=Eigen::VectorXd::Zero(14);
+    double tol=0.000001;
+
+    for(int j=0; j<14; ++j)
+    {
+        b(j)=j*j;
+        x_0(j)=1;
+        for(int k=0; k<14; ++k)
+        {
+            if(j==k)
+                A(j,k)=2;
+
+            else if(j==k+1)
+                A(j,k)=-1;
+            else if(j==k-1)
+                A(j,k)=-1;
+            else
+                continue;
+        }
+    }
     return A;
 }
