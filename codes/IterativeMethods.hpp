@@ -13,6 +13,27 @@
 
 using namespace Eigen;
 
+
+
+class IterationMethod{
+    public:
+        virtual VectorXd calculateBnew(MatrixXd lowerA, MatrixXd upperA, MatrixXd Dinverse, VectorXd b, VectorXd x0)=0;
+        virtual VectorXd calculateIteration(MatrixXd lowerA, MatrixXd upperA, MatrixXd Dinverse, VectorXd bNew, VectorXd x)=0;
+
+};
+
+class JacobiIteration: public IterationMethod
+{
+public:
+    VectorXd calculateBnew(MatrixXd lowerA, MatrixXd upperA, MatrixXd D_inverse, VectorXd b, VectorXd x0) {
+        return D_inverse*b;
+    }
+
+    VectorXd calculateIteration(MatrixXd lowerA, MatrixXd upperA, MatrixXd DInverse, VectorXd bNew, VectorXd x){
+        return -1* DInverse * (lowerA * x + upperA * x) + bNew;
+    }
+};
+
 VectorXd Jacobi_Iteration(const MatrixXd &A, const VectorXd &b, const VectorXd &x0, double tol)
 {
     MatrixXd copiedA(A);
