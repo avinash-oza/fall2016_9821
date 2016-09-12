@@ -49,5 +49,41 @@ VectorXd residual_based_solver(const MatrixXd &A, const VectorXd &b, const Vecto
     return x;
 }
 
+VectorXd consecutive_approximation_solver(const MatrixXd &A, const VectorXd &b, const VectorXd &x0, double tol, IterationMethod &iterMethod, double w) {
+    //w is only used when it is referred to. Otherwise this value does not matter
+    MatrixXd copiedA(A);
+    VectorXd xOld(x0);
+    VectorXd xNew;
+    VectorXd diff(x0);
+    diff.setOnes(); //initalize it to all ones
+
+//    VectorXd r0 = b - copiedA*x;
+
+//    VectorXd residual = r0; // start at current residual
+//    double stopIterResidual = tol*residual.norm();
+
+    // Input splitting
+    MatrixXd lower_A = copiedA.triangularView<Eigen::StrictlyLower>();
+    MatrixXd upper_A = copiedA.triangularView<Eigen::StrictlyUpper>();
+    MatrixXd diagonal_A = copiedA.diagonal().asDiagonal();
+
+    // Preparation for calculation
+    MatrixXd D_inverse = diagonal_A.inverse();
+    VectorXd b_new = iterMethod.calculateBnew(lower_A, upper_A, diagonal_A, D_inverse, b, x0, w); // calculate b_new
+
+    int ic = 0; // iteration count
+
+    while (diff.norm() > tol) {
+        xNew = iterMethod.calculateIteration(lower_A, upper_A, diagonal_A, D_inverse, b_new, xOld, w);
+        diff = xNew - xOld;
+        xOld = xNew;
+
+        ic += 1;
+    }
+    std::cout << "Iter count: " << ic << std::endl;
+
+    return xNew;
+}
+
 
 #endif //CPPCODETEST_STOPPINGCRITERIONSOLVERS_HPP

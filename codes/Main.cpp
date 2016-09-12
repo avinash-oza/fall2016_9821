@@ -1,6 +1,7 @@
 #include "Eigen/Dense"
 #include "MatrixDecomposition.hpp"
 #include "IterativeMethods.hpp"
+#include "StoppingCriterionSolvers.hpp"
 #include "Solvers.hpp"
 #include <tuple>
 #include <iomanip>
@@ -114,16 +115,11 @@ int main()
         }
     }
 
-    VectorXd res(Jacobi_Iteration(A, b, x_0, std::pow(10,-6)));
-    cout << "ret:\n" << res << std::endl;
+    SORIteration jacobiIterator;
 
-    VectorXd res2(Gauss_Siedel_Iteration(A, b, x_0, std::pow(10,-6)));
-    cout << "ret\n" << res2 << std::endl;
-
-    VectorXd res3(SOR_Iteration(A, b, x_0, std::pow(10,-6), 1.15));
-    cout << "ret3\n" << res3 << std::endl;
-
-
+    cout << "ret_new:\n" << std::endl;
+    cout << consecutive_approximation_solver(A, b, x_0, std::pow(10, -6), jacobiIterator, 1.15);
+    
 	return 0;
 }
 
