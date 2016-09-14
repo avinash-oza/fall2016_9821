@@ -1,0 +1,155 @@
+%!TEX program = xelatex
+\documentclass{article}
+
+% HW information
+\title{MTH 9821 Numerical Methods for Finance -- Homework 3}
+\author{Wenli Dong, Bledar Kulemani, Avinash Oza, Bingcheng Wang, Xinlu Xiao}
+\date{\today}
+\makeatletter
+\let\newtitle\@title
+\let\newauthor\@author
+\let\newdate\@date
+\makeatother
+
+% insert code
+\usepackage{listings}
+\usepackage{fontspec}
+%\newfontfamily\monaco{Monaco}
+\usepackage{xcolor}
+\definecolor{listinggray}{gray}{0.9}
+\definecolor{lbcolor}{rgb}{0.9,0.9,0.9}
+\lstset{
+backgroundcolor=\color{lbcolor},
+    tabsize=4,    
+%   rulecolor=,
+    language=[GNU]C++,
+        basicstyle=\scriptsize,
+        upquote=true,
+        aboveskip={1.5\baselineskip},
+        columns=fixed,
+        showstringspaces=false,
+        extendedchars=false,
+        breaklines=true,
+        prebreak = \raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}},
+        frame=single,
+        numbers=left,
+        showtabs=false,
+        showspaces=false,
+        showstringspaces=false,
+        identifierstyle=\ttfamily,
+        keywordstyle=\color[rgb]{0,0,1},
+        commentstyle=\color[rgb]{0.026,0.112,0.095},
+        stringstyle=\color[rgb]{0.627,0.126,0.941},
+        numberstyle=\color[rgb]{0.205, 0.142, 0.73},
+%       \lstdefinestyle{C++}{language=C++,style=numbers}’.
+}
+\lstset{
+    backgroundcolor=\color{lbcolor},
+    tabsize=4,
+  language=C++,
+  captionpos=b,
+  tabsize=3,
+  frame=lines,
+  numbers=left,
+  numberstyle=\tiny,
+  numbersep=5pt,
+  breaklines=true,
+  showstringspaces=false,
+  basicstyle=\footnotesize,
+%  identifierstyle=\color{magenta},
+  keywordstyle=\color[rgb]{0,0,1},
+  commentstyle=\color{Darkgreen},
+  stringstyle=\color{red}
+  }
+
+% set size and margins
+\usepackage[a4paper, top=1in, bottom=1in, left=1in, right=1in]{geometry}
+\usepackage{amsmath, bm, amssymb} % math
+	\DeclareMathOperator{\E}{\mathbb{E}}
+	\DeclareMathOperator{\1}{\mathit{1}}
+\usepackage{fontspec} % font
+	\newfontfamily\menlo{Menlo}
+\usepackage[colorlinks, linkcolor=red, anchorcolor=blue, citecolor=red]{hyperref} % hyperlink
+\usepackage{fancyhdr} % header and footer
+    \pagestyle{fancy}
+    \lhead{\newtitle}
+    \chead{}
+    \rhead{}
+    \lfoot{}
+    \cfoot{}
+    \rfoot{\thepage}
+    \renewcommand{\headrulewidth}{0.4pt}
+    \renewcommand{\footrulewidth}{0.4pt}
+\usepackage{enumitem} % enumerate package
+\usepackage[framemethod=TikZ]{mdframed} % frame text
+\usepackage{amsthm}
+    % R Language Output
+    \newcounter{Rop}[section]\setcounter{Rop}{0}
+    \renewcommand{\theRop}{\arabic{Rop}}
+    \newenvironment{Rop}[2][]{%
+    \refstepcounter{Rop}%
+    \ifstrempty{#1}%
+    {\mdfsetup{%
+    frametitle={%
+    \tikz[baseline=(current bounding box.east),outer sep=0pt]
+    \node[anchor=east,rectangle,fill=blue!20]
+    {\strut R~Output~\theRop};}}
+    }%
+    {\mdfsetup{%
+    frametitle={%
+    \tikz[baseline=(current bounding box.east),outer sep=0pt]
+    \node[anchor=east,rectangle,fill=blue!20]
+    {\strut R~Output~\theRop:~#1};}}%
+    }%
+    \mdfsetup{innertopmargin=10pt,linecolor=blue!20,%
+    linewidth=2pt,topline=true,%
+    frametitleaboveskip=\dimexpr-\ht\strutbox\relax
+    }
+    \begin{mdframed}[font=\menlo]\relax%
+    \label{#2}}{\end{mdframed}}
+\pdfstringdefDisableCommands{% necessary when there are bm and hyperref
+    \renewcommand*{\bm}[1]{#1}%
+}
+
+% \renewcommand{\thefigure}{\thesection.\arabic{n}} % figure number
+\numberwithin{figure}{section} %figure number
+\numberwithin{table}{section}
+
+%\setlength{\parindent}{0pt} %indent
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\maketitle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Question 2 by Bingcheng Wang}
+
+Since $\rho(R)\geq 1$, there exists an eigenvalue $\lambda_0$ s.t. $|\lambda_0|\geq 1$. Let $v_0$ be the corresponding eigenvector of $\lambda_0$, i.e.
+	\[
+	Rv_0=\lambda_0v_0
+	\]
+
+Then we have
+	\begin{align*}
+	x_1 &= Rx_0 + c = Rv_0+c\\&
+	 = \lambda_0v_0+c \\
+	x_2 &= Rx_1 + c = \lambda_0Rv_0+Rc+c \\&
+	= \lambda^2v_0+(R+I)c \\
+	&\vdots\\
+	x_n &= Rx_{n-1}+c \\&
+	= \lambda_0^nv_0+(R^{n-1}+R^{n-2}+\cdots + R+I)c
+	\end{align*}
+
+If $|\lambda_0|>1$, let $c=0$, $x_n \to \infty$ as $n \to \infty$, so the iterations do not converge. If $\lambda_0 =-1$, let $c=0$, $x_n$ oscillates but 
+does not converge as $n \to \infty$.
+
+If $\lambda_0 = 1$, let $c=v_0$, then
+\begin{align*}
+ x_n &= v_0+(R^{n-1}+R^{n-2}+\cdots + R+I)v_0 \\
+     &= v_0+(1+1+\cdots +1 + 1)v_0 \\
+     &= (n+1)v_0
+\end{align*}
+does not converge as $n \to \infty$. 
+
+So if $\rho(R)\geq 1$, the iterations do not converge.
+
+\end{document}
