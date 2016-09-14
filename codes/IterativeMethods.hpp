@@ -24,11 +24,11 @@ class IterationMethod{
 class JacobiIteration: public IterationMethod
 {
 public:
-    VectorXd calculateBnew(MatrixXd lowerA, MatrixXd upperA, MatrixXd D_inverse, VectorXd b, VectorXd x0) {
+    VectorXd calculateBnew(MatrixXd lowerA, MatrixXd upperA, MatrixXd diagonalA, MatrixXd D_inverse, VectorXd b, VectorXd x0, double w) {
         return D_inverse*b;
     }
 
-    VectorXd calculateIteration(MatrixXd lowerA, MatrixXd upperA, MatrixXd DInverse, VectorXd bNew, VectorXd x){
+    VectorXd calculateIteration(MatrixXd lowerA, MatrixXd upperA, MatrixXd diagonalA, MatrixXd DInverse, VectorXd bNew, VectorXd x, double w){
         return -1* DInverse * (lowerA * x + upperA * x) + bNew;
     }
 };
