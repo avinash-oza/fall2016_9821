@@ -6,14 +6,25 @@
 #include <tuple>
 #include <iomanip>
 #include <cmath>
+#include <time.h>
 
 using namespace Eigen;
 using namespace std;
 
+#define EIGEN_INITIALIZE_MATRICES_BY_NAN
+
 void verifyCholeskyDecomposition();
 MatrixXd generateTestBandedMatrix(int matrixSize); //defined at end
-
+VectorXd generateBVector(int N, VectorXd xMesh, VectorXd yMesh);
 MatrixXd generateHW3Matrix(int N);
+double f(double x, double y);
+VectorXd get_b(const int N);
+double upperBoundaryCondition(double x);
+double lowerBoundaryCondition(double x);
+double leftBoundaryCondition(double x);
+double rightBoundaryCondition(double x);
+double u(double x, double y);
+
 
 MatrixXd Some(const MatrixXd& x)
 {
@@ -119,7 +130,6 @@ int main() {
 //    cout << "ret_new:\n" << std::endl;
 //    cout << consecutive_approximation_solver(A, b, x_0, std::pow(10, -6), jacobiIterator, 1.15);
 //
-    GaussSiedelIteration iterationMethod;
 
 //    //coordinates for mesh
     double startX = 0;
@@ -128,34 +138,68 @@ int main() {
     //coordinates for y direction
     double startY = 0;
     double endY = 1;
-    int N = 3; // number of points to make on the x axis
-    int M = 3; // number of points on the y axis
+    int N = 16; // number of points to make on the x axis
+    int M = 16; // number of points on the y axis
 
-    double xStepSize = (endX - startX) / N;
-    double yStepSize = (endY - startY) / M;
+    double xStepSize = (endX - startX) / (N + 1); // need to add the end points
+    double yStepSize = (endY - startY) / (M + 1); // need to add the end points
 
-//    VectorXd xCoordinates(N);
-//    for (int i=0; i < N; i++)
-//    {
-//        xCoordinates(i) = startX +i*xStepSize;
-//    }
-//
-//    VectorXd yCoordinates(N-1);
-//    for (int j=0; j < M; j++)
-//    {
-//        yCoordinates(j) = startY +j*yStepSize;
-//    }MatrixXd T;
-    VectorXd b(9);
-    VectorXd x0(9);
+    VectorXd xCoordinates(N);
+    for (int i=0; i < N; i++)
+    {
+        xCoordinates(i) = startX +(i + 1)*xStepSize;
+    }
+
+    VectorXd yCoordinates(N);
+    for (int j=0; j < M; j++)
+    {
+        yCoordinates(j) = startY +(j + 1)*yStepSize;
+    }
+
+    GaussSiedelIteration iterationMethod;
+    VectorXd x0(N*N);
     x0.setZero();
-    b << 25, 50 ,150 ,0,0, 50, 0,0, 25;
-    MatrixXd T = generateHW3Matrix(N);
 
-    std::cout <<"\n" << T << std::endl;
-    std::cout << linear_solve_cholesky(T, b) << std::endl;
+    MatrixXd T = generateHW3Matrix(N);
+    VectorXd b = get_b(N);
+
+    VectorXd uExact(N*N);
+    int vectorLocation = 0;
+
+    for (int yIndex = 0 ; yIndex < N; yIndex++)
+    {
+        for (int xIndex = 0; xIndex < N; xIndex++)
+        {
+            uExact(vectorLocation) = u(xCoordinates(xIndex), yCoordinates(yIndex));
+//            std::cout << "Mesh point is (" << xCoordinates(xIndex) << ", " << yCoordinates(yIndex) << ")" << std::endl;
+            vectorLocation++;
+        }
+    }
+
+//    std::cout <<"T matrix:\n" << T << std::endl;
+//    std::cout << "b: \n" <<  b << std::endl;
+
+//    VectorXd choleskyResult(linear_solve_cholesky(T, b));
+    time_t startTime(time(NULL));
+
+    VectorXd iterativeMethodResult(residual_based_solver(T, b, x0, std::pow(10, -6), iterationMethod, 1.15));
+
+    time_t endTime(time(NULL));
+
+
+//        cout << "Cholesky Solver: \n" << choleskyResult << std::endl;
 
     cout << "ret_new:\n" << std::endl;
-    cout << consecutive_approximation_solver(T, b, x0, std::pow(10, -6), iterationMethod, 1.15);
+    cout << iterativeMethodResult << std::endl;
+
+    cout << "uExact:\n" << uExact << std::endl;
+
+    VectorXd maxApproximationError = iterativeMethodResult - uExact;
+//    double maxApproximationError = choleskyResult - uExact;
+
+    std::cout << "Max error: " <<  std::setprecision(10) << maxApproximationError.cwiseAbs().maxCoeff() << std::endl;
+//    std::cout << "Max error: " << std::abs(maxApproximationError) << std::endl;
+    std::cout << "The time elapsed was " << endTime - startTime << " seconds" << std::endl;
 
 	return 0;
 }
@@ -195,8 +239,7 @@ MatrixXd generateHW3Matrix(int N) {
 
 }
 
-
-double hw3FiniteDifferenceMethod(double x, double y)
+double f(double x, double y)
 {
     double temp1 = (x*x + y*y -2)* (std::sin(x)*std::sin(y));
     double temp2 = 2.0*x*std::cos(x)*std::sin(y);
@@ -204,6 +247,104 @@ double hw3FiniteDifferenceMethod(double x, double y)
 
     return temp1 - temp2 - temp3;
 }
+
+double u(double x, double y)
+{
+    // The u(x, y) function given
+    return 0.5*(y*y + x*x)*std::sin(x)*std::sin(y);
+}
+
+   // Get the b vector
+VectorXd get_b(const int N)
+{
+    // Get the h and xi=(i-1)h, yi=(i-1)h
+    double h = 1.0 / (N + 1);
+
+    Eigen::VectorXd x_i(N);
+    Eigen::VectorXd y_i(N);
+    for (int i = 0; i < N; ++i)
+    {
+        x_i(i) = (i + 1)*h;	// x2=h, here x2 is x_i(0), 1st element
+        y_i(i) = (i + 1)*h;
+    }
+
+    // Generate f_vector to compute bj
+    Eigen::VectorXd f_vec(N);
+
+
+    Eigen::MatrixXd b_all(N,N);	// Using matrix to store all N bj
+
+    // Get the 1st column of b_all
+    for (int j = 0; j < N; ++j)
+    {
+        for (int k = 0; k < N; ++k)
+        {
+            f_vec(k) = f(x_i(k), y_i(0));
+        }
+        //b_all(j, (N - 1)) = ((N + 1)*(N + 1))*f_vec(j) + u(x_i(j), 1);		// y(N+2)=1
+        // correction of b
+        b_all(j, 0) = (h*h)*f_vec(j) + u(x_i(j), 0);	// y(1)=0;
+        b_all(0, 0) += u(0, y_i(0));
+        b_all((N - 1), 0) += u(1, y_i(0));				// x(N+2)=1
+    }
+
+
+    for (int i = 1; i < N-1; ++i)
+    {
+        // Get the middle columns of b_all
+        for (int j = 0; j < N; ++j)
+        {
+            // Get the f_vector
+            for (int k = 0; k < N; ++k)
+            {
+                f_vec(k) = f(x_i(k), y_i(i));
+            }
+
+            //b_all(j, i) = ((N + 1)*(N + 1))*f_vec(j);
+            // Correction of b
+            b_all(j, i) = (h*h)*f_vec(j);
+            b_all(0, i) += u(0, y_i(i));			// x(1)=0
+            b_all((N - 1), i) += u(1, y_i(i));		// x(N+2)=1
+        }
+
+    }
+
+    // Get the last column of b_all
+    for (int j = 0; j < N; ++j)
+    {
+        for (int k = 0; k < N; ++k)
+        {
+            f_vec(k) = f(x_i(k), y_i(N - 1));
+        }
+        //b_all(j, (N - 1)) = ((N + 1)*(N + 1))*f_vec(j) + u(x_i(j), 1);		// y(N+2)=1
+        // correction of b
+        b_all(j, (N - 1)) = (h*h)*f_vec(j) + u(x_i(j), 1);
+        b_all(0, (N - 1)) += u(0, y_i(N - 1));
+        b_all((N - 1), (N - 1)) += u(1, y_i(N - 1));
+    }
+
+
+    // Merge the matrix of b_all to a column vector
+    Eigen::VectorXd b(N*N);
+    for (int i = 0; i < N; ++i)
+    {
+        for (int j = N*i; j < N*(i + 1); ++j)
+        {
+            if (i > 0)
+            {
+                b(j) = b_all((j % (N*i)), i);
+            }
+            else
+            {
+                b(j) = b_all(j, i);		// i=0
+            }
+
+        }
+    }
+
+    return b;
+}
+
 
 void verifyCholeskyDecomposition()
 {
