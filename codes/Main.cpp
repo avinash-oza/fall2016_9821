@@ -13,6 +13,8 @@ using namespace std;
 void verifyCholeskyDecomposition();
 MatrixXd generateTestBandedMatrix(int matrixSize); //defined at end
 
+MatrixXd generateHW3Matrix(int N);
+
 MatrixXd Some(const MatrixXd& x)
 {
 	return x;
@@ -91,43 +93,43 @@ int main() {
 
 
     // Iterative methods test code (Problem 3 from HW3)
-    Eigen::MatrixXd A = MatrixXd::Zero(14, 14);
-    Eigen::VectorXd b = VectorXd::Zero(14);
-    Eigen::VectorXd x_0 = VectorXd::Zero(14);
-    double tol = 0.000001;
-
-    for (int j = 0; j < 14; ++j) {
-        b(j) = j * j;
-        x_0(j) = 1;
-        for (int k = 0; k < 14; ++k) {
-            if (j == k)
-                A(j, k) = 2;
-
-            else if (j == k + 1)
-                A(j, k) = -1;
-            else if (j == k - 1)
-                A(j, k) = -1;
-            else
-                continue;
-        }
-    }
+//    Eigen::MatrixXd A = MatrixXd::Zero(14, 14);
+//    Eigen::VectorXd b = VectorXd::Zero(14);
+//    Eigen::VectorXd x_0 = VectorXd::Zero(14);
+//    double tol = 0.000001;
+//
+//    for (int j = 0; j < 14; ++j) {
+//        b(j) = j * j;
+//        x_0(j) = 1;
+//        for (int k = 0; k < 14; ++k) {
+//            if (j == k)
+//                A(j, k) = 2;
+//
+//            else if (j == k + 1)
+//                A(j, k) = -1;
+//            else if (j == k - 1)
+//                A(j, k) = -1;
+//            else
+//                continue;
+//        }
+//    }
 
 //    SORIteration jacobiIterator;
 //
 //    cout << "ret_new:\n" << std::endl;
 //    cout << consecutive_approximation_solver(A, b, x_0, std::pow(10, -6), jacobiIterator, 1.15);
-
+//
     GaussSiedelIteration iterationMethod;
 
-    //coordinates for mesh
+//    //coordinates for mesh
     double startX = 0;
     double endX = 1;
 
     //coordinates for y direction
     double startY = 0;
     double endY = 1;
-    int N = 4; // number of points to make on the x axis
-    int M = 4; // number of points on the y axis
+    int N = 3; // number of points to make on the x axis
+    int M = 3; // number of points on the y axis
 
     double xStepSize = (endX - startX) / N;
     double yStepSize = (endY - startY) / M;
@@ -142,62 +144,55 @@ int main() {
 //    for (int j=0; j < M; j++)
 //    {
 //        yCoordinates(j) = startY +j*yStepSize;
-//    }
+//    }MatrixXd T;
+    VectorXd b(9);
+    VectorXd x0(9);
+    x0.setZero();
+    b << 25, 50 ,150 ,0,0, 50, 0,0, 25;
+    MatrixXd T = generateHW3Matrix(N);
 
-    MatrixXd T(N * N, N * N);
+    std::cout <<"\n" << T << std::endl;
+    std::cout << linear_solve_cholesky(T, b) << std::endl;
+
+    cout << "ret_new:\n" << std::endl;
+    cout << consecutive_approximation_solver(T, b, x0, std::pow(10, -6), iterationMethod, 1.15);
+
+	return 0;
+}
+
+MatrixXd generateHW3Matrix(int N) {
+    int NSquared = N*N;
+    MatrixXd T(NSquared, NSquared);
     T.setZero();
-    int lastMatrixValue = N - 1;
 
     for (int i = 0; i < N * N; i++) {
         T(i, i) = 4.0;
     }
 
-    for (int j = 2; j < N * N; j++) {
-//        int originalLocation = j;
-        if (N % j != 0) {
+    for (int j = 1; j < N * N; j++) {
+        int valueToCheck = (j + 1)-1;
+        if (valueToCheck % N != 0) {
             T(j, j - 1) = -1.0;
         }
-
     }
 
-
-    for (int j = 1; j < N * N - 1; j++) {
-//        int originalLocation = j;
-        if (N % j != 0) {
+    for (int j = 0; j < N * N - 1; j++) {
+        int valueToCheck = j + 1;
+        if (valueToCheck % N != 0) {
+            //assign based on original index, check based on 1 indexed
             T(j, j + 1) = -1.0;
         }
-
     }
-
 
     for (int j = 0; j < N * N - N; j++) {
         T(j, j + N) = -1.0;
-
     }
 
-    for (int j = N; j < N * N - 1; j++) {
+    for (int j = N; j < N * N; j++) {
         T(j, j - N) = -1.0;
-
     }
-//    for (int i=0; i < N*N-1; i++)
-//    {
-//        if (N%i != 0) {
-//            T(i,i+1) = -1.0;
-//        }
-//
-//    }
+    return T;
 
-
-    std::cout << T << std::endl;
-    std::cout << cholesky(T) << std::endl;
-
-
-
-
-//    cout << "ret_new:\n" << std::endl;
-//    cout << consecutive_approximation_solver(A, b, x_0, std::pow(10, -6), iterationMethod, 1.15);
-
-	return 0;
 }
 
 
