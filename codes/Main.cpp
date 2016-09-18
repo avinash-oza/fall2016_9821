@@ -18,27 +18,15 @@ using namespace std;
 //defined at end
 VectorXd generateBVector(int N, VectorXd xMesh, VectorXd yMesh);
 MatrixXd generateHW3Matrix(int N);
-//double f(double x, double y);
-//VectorXd get_b(const int N);
 double u(double x, double y);
-
 VectorXd calculateuExactVector(int N, const VectorXd &xCoordinates, const VectorXd &yCoordinates);
-
 void runOneIteration(int N, double w);
-
-
-MatrixXd Some(const MatrixXd& x)
-{
-	return x;
-};
-
 
 int main() {
     /// Keep this line to make the decimals always print out
-    std::cout << std::fixed << std::setprecision(6);
+    std::cout << std::fixed << std::setprecision(9);
 //    decompositionExamples();
 //    verifyCholeskyDecomposition();
-
 
     // Iterative methods test code (Problem 3 from HW3)
 //    Eigen::MatrixXd A = MatrixXd::Zero(14, 14);
@@ -67,15 +55,15 @@ int main() {
 //    cout << "ret_new:\n" << std::endl;
 //    cout << consecutive_approximation_solver(A, b, x_0, std::pow(10, -6), jacobiIterator, 1.15);
 //
-    vector<int> NtoRunFor= {2};
-    for (double w = 1.02; w < 1.04; w+=0.02) {
-        cout << w << "|";
-        for (auto it = NtoRunFor.begin(); it != NtoRunFor.end(); it++) {
-            runOneIteration(*it, w);
-//            cout << ",";
-        }
-        cout << endl;
-    }
+//    vector<int> NtoRunFor= {2};
+//    for (double w = 1.02; w < 1.04; w+=0.02) {
+//        cout << w << "|";
+//        for (auto it = NtoRunFor.begin(); it != NtoRunFor.end(); it++) {
+//            runOneIteration(*it, w);
+            cout << ",";
+//        }
+//        cout << endl;
+//    }
 
     return 0;
 }
@@ -118,12 +106,9 @@ void runOneIteration(int N, double w) {
     VectorXd iterativeMethodResult(residual_based_solver(T, b, x0, std::pow(10, -6), iterationMethod, w));
 
     time_t endTime(time(NULL));
-//    cout << iterativeMethodResult ;
-//    VectorXd maxApproximationError = iterativeMethodResult - uExact;
-//    VectorXd maxApproximationError = iterativeMethodResult - uExact;
 
-    cout << N << "," <<  setprecision(10) << residualError(T, iterativeMethodResult, b);
-    cout <<  setprecision(10) << maxApproximationError(iterativeMethodResult, uExact);
+    cout << N << "," << residualError(T, iterativeMethodResult, b);
+    cout << maxApproximationError(iterativeMethodResult, uExact);
 //    std::cout << "The time elapsed was " << endTime - startTime << " seconds" << std::endl;
 
 }
@@ -137,6 +122,7 @@ VectorXd calculateuExactVector(int N, const VectorXd &xCoordinates, const Vector
     {
         for (int xIndex = 0; xIndex < N; xIndex++)
         {
+            // MAKE SURE TO CHANGE THIS FUNCTION IF NEEDED
             uExact(vectorLocation) = u(xCoordinates(xIndex), yCoordinates(yIndex));
 //            std::cout << "Mesh point is (" << xCoordinates(xIndex) << ", " << yCoordinates(yIndex) << ")" << std::endl;
             vectorLocation++;

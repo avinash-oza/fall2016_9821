@@ -59,20 +59,10 @@ VectorXd get_b(const int N, const VectorXd &xCoordinates, const VectorXd &yCoord
 {
     // use the xStepSize as the h here
     double h = xStepSize;
-//    // Get the h and xi=(i-1)h, yi=(i-1)h
-//    double h = 1.0 / (N + 1);
-//
-//    Eigen::VectorXd x_i(N);
-//    Eigen::VectorXd yCoordinates(N);
-//    for (int i = 0; i < N; ++i)
-//    {
-//        x_i(i) = (i + 1)*h;	// x2=h, here x2 is x_i(0), 1st element
-//        yCoordinates(i) = (i + 1)*h;
-//    }
 
     // Generate f_vector to compute bj
-    Eigen::VectorXd f_vec(N);
-    Eigen::MatrixXd b_all(N,N);	// Using matrix to store all N bj
+    VectorXd f_vec(N);
+    MatrixXd b_all(N,N);	// Using matrix to store all N bj
 
     // Get the 1st column of b_all
     for (int j = 0; j < N; ++j)
@@ -125,7 +115,7 @@ VectorXd get_b(const int N, const VectorXd &xCoordinates, const VectorXd &yCoord
 
 
     // Merge the matrix of b_all to a column vector
-    Eigen::VectorXd b(N*N);
+    VectorXd b(N*N);
     for (int i = 0; i < N; ++i)
     {
         for (int j = N*i; j < N*(i + 1); ++j)
