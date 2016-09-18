@@ -18,7 +18,6 @@ class IterationMethod{
     public:
         virtual VectorXd calculateBnew(MatrixXd lowerA, MatrixXd upperA, MatrixXd diagonalA, MatrixXd Dinverse, VectorXd b, VectorXd x0, double w)=0;
         virtual VectorXd calculateIteration(MatrixXd lowerA, MatrixXd upperA, MatrixXd diagonalA, MatrixXd Dinverse, VectorXd bNew, VectorXd x, double w)=0;
-
 };
 
 class JacobiIteration: public IterationMethod
