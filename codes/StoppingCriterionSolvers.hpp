@@ -22,7 +22,7 @@ void printResidualError(std::string textBefore, const MatrixXd &A, const MatrixX
     double residualError = (b - A*xApproximate).norm();
     // Print out the residual error in scientific notation
     std::cout << textBefore << std::endl
-              << "Residual Error" << std::scientific << residualError;
+              << "Residual Error" << std::scientific << residualError << std::endl;
     //restore back the stream to fixed
     std::cout << std::fixed;
 
