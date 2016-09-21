@@ -110,7 +110,7 @@ void runOneIteration(int N, double w) {
 
     time_t endTime(time(NULL));
 
-    cout << N << "," << residualError(T, iterativeMethodResult, b);
+    printResidualError("Error for iterative result", T, iterativeMethodResult, b);
     cout << maxApproximationError(iterativeMethodResult, uExact);
 //    std::cout << "The time elapsed was " << endTime - startTime << " seconds" << std::endl;
 

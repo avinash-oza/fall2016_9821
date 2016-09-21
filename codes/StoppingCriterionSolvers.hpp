@@ -15,10 +15,16 @@
 
 using namespace Eigen;
 
-double residualError(const MatrixXd &A, const MatrixXd &xApproximate, const VectorXd &b)
+void printResidualError(std::string textBefore, const MatrixXd &A, const MatrixXd &xApproximate, const VectorXd &b)
 {
+
     // This function computes the residual error ||b - Ax|| given the 3 inputs
-    return (b - A*xApproximate).norm();
+    double residualError = (b - A*xApproximate).norm();
+    // Print out the residual error in scientific notation
+    std::cout << textBefore << std::endl
+              << "Residual Error" << std::scientific << residualError;
+    //restore back the stream to fixed
+    std::cout << std::fixed;
 
 }
 

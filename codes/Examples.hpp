@@ -49,7 +49,11 @@ void exam2013()
     printCSVMatrix("L1", L1);
     printCSVMatrix("U1", U1);
 
-    std::cout << "Residual Error" << std::scientific << residualError(problem1A, v1,b1);
+    printResidualError("Residual for v1", problem1A, v1, b1);
+
+    VectorXd v2 = inverse(problem1A)*b1;
+    printCSVMatrix("A^-1 b1:", v2);
+    printResidualError("Residual for v2",problem1A, v2, b1);
 }
 
 void decompositionExamples() {//// Example 1
