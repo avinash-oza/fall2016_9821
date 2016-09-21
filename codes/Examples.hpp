@@ -6,12 +6,51 @@
 #define CPPCODETEST_EXAMPLES_HPP
 
 #include "Eigen/Dense"
+#include "Solvers.hpp"
 
 using namespace Eigen;
 
 void verifyCholeskyDecomposition();
 
 MatrixXd generateTestBandedMatrix(int matrixSize);
+
+void exam2013()
+{
+    MatrixXd problem1A = MatrixXd(9,9);
+    for(int i = 0 ; i <= 8; i++)
+    {
+        problem1A(i,i) = 2;
+    }
+    for(int i = 1 ; i <= 8; i++)
+    {
+        problem1A(i,i-1) = 3;
+    }
+    for(int i = 2 ; i <= 8 ; i++)
+    {
+        problem1A(i,i-2) = 4;
+    }
+    for(int i = 0 ; i <= 6; i++)
+    {
+        problem1A(i,i+2) = -1;
+    }
+
+    printCSVMatrix("Problem 1 matrix", problem1A);
+
+    VectorXd b1(9);
+    for(int i = 0; i< 9; i++)
+    {
+        b1(i) = std::sqrt(1.0*i*i-1.0*i+4);
+    }
+    MatrixXd L1, U1, P1;
+    std::tie(L1, U1, P1) = lu_pivoting(problem1A);
+
+    VectorXd v1 = linear_solve_lu_row_pivoting(problem1A, b1);
+    printCSVMatrix("v1 is", v1);
+    printCSVMatrix("L1", L1);
+    printCSVMatrix("U1", U1);
+
+    std::cout << "Residual Error" << std::scientific << residualError(problem1A, v1,b1);
+}
 
 void decompositionExamples() {//// Example 1
     //// Forward substitution for discounting rates

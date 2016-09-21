@@ -28,6 +28,7 @@ int main() {
     std::cout << std::fixed << std::setprecision(9);
 //    decompositionExamples();
 //    verifyCholeskyDecomposition();
+    exam2013();
 
     // Iterative methods test code (Problem 3 from HW3)
 //    Eigen::MatrixXd A = MatrixXd::Zero(14, 14);
@@ -61,35 +62,12 @@ int main() {
 //        cout << w << "|";
 //        for (auto it = NtoRunFor.begin(); it != NtoRunFor.end(); it++) {
 //            runOneIteration(*it, w);
-            cout << ",";
+    std::cout << ",";
 //        }
 //        cout << endl;
 //    }
-//    MatrixXd problem1A = MatrixXd(9,9);
-//    for(int i = 0 ; i < 9; i++)
-//    {
-//        problem1A(i,i) = 2;
-//    }
-//    for(int i = 1 ; i < 9; i++)
-//    {
-//        problem1A(i,i-1) = 3;
-//    }
-//    for(int i = 2 ; i < 9; i++)
-//    {
-//        problem1A(i,i-2) = 4;
-//    }
-//    for(int i = 0 ; i < 6; i++)
-//    {
-//        problem1A(i,i+2) = -1;
-//    }
-//    std::cout << "Probielmn 1a" << std::endl << problem1A << std::endl;
-//
-//    MatrixXd L,U,P;
-//    std::tie(L,U,P) = lu_pivoting(problem1A);
-//    printCSVMatrix("L", L);
-//    printCSVMatrix("U", U);
-//    printCSVMatrix("P", P);
-//
+
+
     return 0;
 }
 
@@ -189,11 +167,4 @@ MatrixXd generateHW3Matrix(int N) {
     }
     return T;
 
-}
-
-void printCSVMatrix(std::string stringToPrint, const MatrixXd& myMatrix)
-{
-    IOFormat csvFormatter(9, 0, ",");
-    std::cout << stringToPrint << std::endl;
-    std::cout << myMatrix.format(csvFormatter) << std::endl;
 }
