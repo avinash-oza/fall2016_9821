@@ -107,12 +107,15 @@ void exam2013()
         b4(i) = (2.0*i - 3)/(2.0*i*i + 1);
     }
 
-    JacobiIteration iterationMethod;
-    VectorXd x0(8);
+    SORIteration iterationMethod;
+    VectorXd x0(8), xResult;
     x0.setZero();
-    printCSVMatrix("A4", A4);
-    printCSVMatrix("b4", b4);
-    printCSVMatrix("Jacobi Solver:", residual_based_solver(A4, b4, x0, std::pow(10, -6), iterationMethod, 100 ));
+//    printCSVMatrix("A4", A4);
+//    printCSVMatrix("b4", b4);
+    int ic;
+    std::tie(xResult, ic) = residual_based_solver(A4, b4, x0, std::pow(10, -6), iterationMethod, 0.95 );
+    printCSVMatrix("Jacobi Result", xResult);
+    std::cout << "IC: " << ic << std::endl;
 
 }
 

@@ -36,7 +36,8 @@ double maxApproximationError(const VectorXd &xApprox, const VectorXd &uExact)
 }
 
 
-VectorXd residual_based_solver(const MatrixXd &A, const VectorXd &b, const VectorXd &x0, double tol, IterationMethod &iterMethod, double w) {
+std::tuple<VectorXd, int> residual_based_solver(const MatrixXd &A, const VectorXd &b, const VectorXd &x0, double tol,
+                                                IterationMethod &iterMethod, double w) {
     //w is only used when it is referred to. Otherwise this value does not matter
     MatrixXd copiedA(A);
     VectorXd x = x0;
@@ -60,16 +61,18 @@ VectorXd residual_based_solver(const MatrixXd &A, const VectorXd &b, const Vecto
 
     while (residual.norm() > stopIterResidual) {
         x = iterMethod.calculateIteration(lower_A, upper_A, diagonal_A, D_inverse, b_new, x, w);
-        residual = b - copiedA * x;
-        ic += 1;
+
         std::string toPrint = "After iteration ";
         toPrint += std::to_string(ic);
         toPrint += ":";
         printCSVMatrix(toPrint, x);
-    }
-//    std::cout << ic;
 
-    return x;
+        residual = b - copiedA * x;
+        ic += 1;
+
+    }
+
+    return std::make_tuple(x, ic);
 }
 
 VectorXd consecutive_approximation_solver(const MatrixXd &A, const VectorXd &b, const VectorXd &x0, double tol, IterationMethod &iterMethod, double w) {

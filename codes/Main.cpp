@@ -105,7 +105,9 @@ void runOneIteration(int N, double w) {
 
     time_t startTime(time(NULL));
 
-    VectorXd iterativeMethodResult(residual_based_solver(T, b, x0, std::pow(10, -6), iterationMethod, w));
+    double ic;
+    VectorXd iterativeMethodResult;
+    std::tie(iterativeMethodResult, ic) = residual_based_solver(T, b, x0, std::pow(10, -6), iterationMethod, w);
 
     time_t endTime(time(NULL));
 
