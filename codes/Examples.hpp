@@ -45,15 +45,75 @@ void exam2013()
     std::tie(L1, U1, P1) = lu_pivoting(problem1A);
 
     VectorXd v1 = linear_solve_lu_row_pivoting(problem1A, b1);
-    printCSVMatrix("v1 is", v1);
-    printCSVMatrix("L1", L1);
-    printCSVMatrix("U1", U1);
+//    printCSVMatrix("v1 is", v1);
+//    printCSVMatrix("L1", L1);
+//    printCSVMatrix("U1", U1);
 
     printResidualError("Residual for v1", problem1A, v1, b1);
 
     VectorXd v2 = inverse(problem1A)*b1;
-    printCSVMatrix("A^-1 b1:", v2);
-    printResidualError("Residual for v2",problem1A, v2, b1);
+//    printCSVMatrix("A^-1 b1:", v2);
+//    printResidualError("Residual for v2",problem1A, v2, b1);
+
+    MatrixXd A2 = problem1A.transpose()*problem1A;
+    MatrixXd choleskyA2 = cholesky(A2);
+//    printCSVMatrix("A2 cholesky factor", choleskyA2);
+
+    VectorXd b2(9);
+    for(int i =0; i<9; i++)
+    {
+        b2(i) = (1.0*i*i - 10)/(i + 3.0);
+    }
+
+    VectorXd x2 = linear_solve_cholesky(A2, b2);
+//    printCSVMatrix("X2 is", x2);
+//    printResidualError("x2 error is", A2, x2, b2);
+
+    MatrixXd A3 = problem1A.transpose() + problem1A;
+
+    VectorXd x3 = linear_solve_lu_row_pivoting(A3, b2);
+//    printCSVMatrix("X3 is", x3);
+//    printResidualError("x3 error is", A3, x3, b2);
+
+
+    MatrixXd A4 = MatrixXd::Zero(8, 8);
+//    A4.setZero();
+
+    for(int i = 0; i < 8; i++)
+    {
+        A4(i,i) = 8;
+    }
+    for(int i = 0; i < 6; i++)
+    {
+        A4(i,i+2) = -1;
+    }
+    for(int i = 2; i < 8; i++)
+    {
+        A4(i,i-2) = 2;
+    }
+    for(int i = 0; i < 5; i++)
+    {
+        A4(i,i+3) = -2;
+    }
+    for(int i = 3; i < 8; i++)
+    {
+        A4(i,i-3) = 1;
+    }
+
+    VectorXd b4(8);
+
+    for(int i = 0; i < 8; i++)
+    {
+        b4(i) = (2.0*i - 3)/(2.0*i*i + 1);
+    }
+
+    JacobiIteration iterationMethod;
+    VectorXd x0(8);
+    x0.setZero();
+    printCSVMatrix("A4", A4);
+    printCSVMatrix("b4", b4);
+    printCSVMatrix("Jacobi Solver:", residual_based_solver(A4, b4, x0, std::pow(10, -6), iterationMethod, 100 ));
+
 }
 
 void decompositionExamples() {//// Example 1

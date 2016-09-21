@@ -13,7 +13,6 @@
 using namespace Eigen;
 using namespace std;
 
-#define EIGEN_INITIALIZE_MATRICES_BY_NAN
 
 //defined at end
 VectorXd generateBVector(int N, VectorXd xMesh, VectorXd yMesh);

@@ -62,8 +62,12 @@ VectorXd residual_based_solver(const MatrixXd &A, const VectorXd &b, const Vecto
         x = iterMethod.calculateIteration(lower_A, upper_A, diagonal_A, D_inverse, b_new, x, w);
         residual = b - copiedA * x;
         ic += 1;
+        std::string toPrint = "After iteration ";
+        toPrint += std::to_string(ic);
+        toPrint += ":";
+        printCSVMatrix(toPrint, x);
     }
-    std::cout << ic;
+//    std::cout << ic;
 
     return x;
 }
