@@ -60,6 +60,7 @@ std::tuple<VectorXd, int> residual_based_solver(const MatrixXd &A, const VectorX
     int ic = 0; // iteration count
 
     while (residual.norm() > stopIterResidual) {
+        ic += 1;
         x = iterMethod.calculateIteration(lower_A, upper_A, diagonal_A, D_inverse, b_new, x, w);
 
         std::string toPrint = "After iteration ";
@@ -68,14 +69,13 @@ std::tuple<VectorXd, int> residual_based_solver(const MatrixXd &A, const VectorX
         printCSVMatrix(toPrint, x);
 
         residual = b - copiedA * x;
-        ic += 1;
-
     }
 
     return std::make_tuple(x, ic);
 }
 
-VectorXd consecutive_approximation_solver(const MatrixXd &A, const VectorXd &b, const VectorXd &x0, double tol, IterationMethod &iterMethod, double w) {
+std::tuple<VectorXd, int> consecutive_approximation_solver(const MatrixXd &A, const VectorXd &b, const VectorXd &x0,
+                                                           double tol, IterationMethod &iterMethod, double w) {
     //w is only used when it is referred to. Otherwise this value does not matter
     MatrixXd copiedA(A);
     VectorXd xOld(x0);
@@ -103,7 +103,7 @@ VectorXd consecutive_approximation_solver(const MatrixXd &A, const VectorXd &b, 
     }
     std::cout << "Iter count: " << ic << std::endl;
 
-    return xNew;
+    return std::make_tuple(xNew, ic);
 }
 
 
