@@ -1,14 +1,15 @@
+#include <tuple>
+#include <iomanip>
+#include <cmath>
+#include <time.h>
+#include <vector>
 #include "Eigen/Dense"
 #include "IterativeMethods.hpp"
 #include "StoppingCriterionSolvers.hpp"
 #include "Solvers.hpp"
 #include "Examples.hpp"
 #include "PDESolverFunctions.hpp"
-#include <tuple>
-#include <iomanip>
-#include <cmath>
-#include <time.h>
-#include <vector>
+#include "OptionPricers.hpp"
 
 using namespace Eigen;
 using namespace std;
@@ -27,7 +28,9 @@ int main() {
     std::cout << std::fixed << std::setprecision(9);
 //    decompositionExamples();
 //    verifyCholeskyDecomposition();
-    exam2013();
+//    exam2013();
+    std::cout << binomialTree(31, 30, 365/360, 0.01, 0.05, 100, 0.3);
+
 
     // Iterative methods test code (Problem 3 from HW3)
 //    Eigen::MatrixXd A = MatrixXd::Zero(14, 14);
