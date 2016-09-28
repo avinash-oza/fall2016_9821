@@ -31,7 +31,7 @@ double blackScholesPut(double S, double K, double T, double q, double r, int N, 
 
 double d1(double S, double K, double T, double q, double r, int N, double sigma)
 {
-    return (std::log(S/K) + (r - q + sigma*sigma/2)/(sigma*std::sqrt(T)));
+    return (std::log(S/K) + T*(r - q + sigma*sigma/2))/(sigma*std::sqrt(T));
 }
 
 double d2(double S, double K, double T, double q, double r, int N, double sigma)
