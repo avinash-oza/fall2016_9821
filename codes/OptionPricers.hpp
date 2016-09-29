@@ -46,7 +46,8 @@ std::tuple<double, double, double, double, double> binomialTree(double S, double
 //    return optionPrices[0];
 }
 
-double binomialBlackScholes(double S, double K, double T, double q, double r, int N, double sigma)
+std::tuple<double, double, double, double, double> binomialBlackScholes(double S, double K, double T, double q, double r, int N,
+                                                                double sigma)
 //S is spot price, K is strike price, T is time to maturity in years, q is the continuous dividend, r is the risk free rate
 // N is the number of time steps
 {
@@ -54,26 +55,33 @@ double binomialBlackScholes(double S, double K, double T, double q, double r, in
     double u = std::exp(sigma* std::sqrt(deltaT));
     double d = 1.0/u;
     double p = (std::exp((r - q)*deltaT) - d)/(u - d);
-    Eigen::VectorXd optionPrices(N + 1);
-    optionPrices.setZero();
-
-    for (int i = 0 ; i < N ; i++)
+    std::vector<double> optionPrices(N + 1);
+    for (int i = 0; i< N; i++)
     {
-        double spotPrice = S*std::pow(u, N - 1 - i)* std::pow(d, i);
-        optionPrices[i] = blackScholesPut(spotPrice, K, T - i*deltaT, q, r, N, sigma);
-        // The put price
+        optionPrices[i] = 0.0;
     }
 
-    for (int j = N - 3; j >= 0; j--)
+    for (int i = 0 ; i < N; i++)
+    {
+//        optionPrices[i] = std::max(K - S* std::pow(u, N - i) * std::pow(d, i) , 0.0)
+        double SPrice = S* std::pow(u, N - 1 - i) * std::pow(d, i);
+        optionPrices[i] = blackScholesPut(SPrice, K, deltaT, q, r, N, sigma);
+    }
+
+    for (int j = N - 2; j >= 0; j--)
     {
         for(int i = 0; i < j + 1; i++)
         {
             double riskNeutralDiscountedValue = std::exp(-r*deltaT)* (optionPrices[i] * p + optionPrices[i + 1] * (1 - p));
-//            optionPrices[i] = std::max(riskNeutralDiscountedValue, K - S*std::pow(u, j - i)* std::pow(d, i));
-            optionPrices[i] = riskNeutralDiscountedValue;
+//            optionPrices[i] = std::max(riskNeutralDiscountedValue, K - S*std::pow(u, j - i)* std::pow(d, i)); // american
+            optionPrices[i] = riskNeutralDiscountedValue; // european
         }
     }
-    return optionPrices[0];
+
+    double delta, vega, gamma, theta;
+    delta = vega= gamma = theta = 0;
+    return std::make_tuple(optionPrices[0], delta, vega, gamma, theta);
+//    return optionPrices[0];
 }
 
 double averageBinomialTree(double S, double K, double T, double q, double r, int N, double sigma)
@@ -109,12 +117,12 @@ void calculateTreesForN(int N)
     double averageBinomialTreePrice = averageBinomialTree(S, K, T, q, r, N, sigma);
     double blackScholesValue = blackScholesPut(S, K, T, q, r, N, sigma);
     double blackScholeswithRichardsonExtrapolation = binomialBlackScholeswithRichardsonExtrapolation(S, K, T, q, r, N, sigma);
-    double binomialBlackScholesPrice = binomialBlackScholes(S, K, T, q, r, N, sigma);
+    double binomialBlackScholesPrice = std::get<0>(binomialBlackScholes(S, K, T, q, r, N, sigma));
 
-    double absDiff = std::abs(averageBinomialTreePrice - blackScholesValue);
+    double absDiff = std::abs(binomialBlackScholesPrice - blackScholesValue);
 //    std::cout << blackScholesValue << std::endl;
     double x = std::get<0>(binomialTreePrice);
-    std::cout << averageBinomialTreePrice << "," << absDiff << "," << N*absDiff << "," << N*N*absDiff << std::endl;
+    std::cout << binomialBlackScholesPrice << "," << x << "," << N*absDiff << "," << N*N*absDiff << std::endl;
 
 }
 
