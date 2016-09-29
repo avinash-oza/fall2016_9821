@@ -10,7 +10,8 @@
 #include "BlackScholes.hpp"
 
 
-double binomialTree(double S, double K, double T, double q, double r, int N, double sigma)
+std::tuple<double, double, double, double, double> binomialTree(double S, double K, double T, double q, double r, int N,
+                                                        double sigma)
 //S is spot price, K is strike price, T is time to maturity in years, q is the continuous dividend, r is the risk free rate
 // N is the number of time steps
 {
@@ -19,7 +20,7 @@ double binomialTree(double S, double K, double T, double q, double r, int N, dou
     double d = 1/u;
     double p = (std::exp((r - q)*deltaT) - d)/(u - d);
     std::vector<double> optionPrices(N + 1);
-    for (int i = 1; i< N + 1; i++)
+    for (int i = 0; i< N; i++)
     {
         optionPrices[i] = 0.0;
     }
@@ -38,7 +39,11 @@ double binomialTree(double S, double K, double T, double q, double r, int N, dou
             optionPrices[i] = riskNeutralDiscountedValue; // european
         }
     }
-    return optionPrices[0];
+
+    double delta, vega, gamma, theta;
+    delta = vega= gamma = theta = 0;
+    return std::make_tuple(optionPrices[0], delta, vega, gamma, theta);
+//    return optionPrices[0];
 }
 
 double binomialBlackScholes(double S, double K, double T, double q, double r, int N, double sigma)
@@ -74,7 +79,13 @@ double binomialBlackScholes(double S, double K, double T, double q, double r, in
 double averageBinomialTree(double S, double K, double T, double q, double r, int N, double sigma)
 // N is the upper bound. Ex- input of 1280 will do 1280 and 1281
 {
-    return (binomialTree(S, K, T, q, r, N + 1, sigma) + binomialTree(S, K, T, q, r, N , sigma))/2.0;
+    const std::tuple<double, double, double, double, double> binomialTreeNPlus1 = binomialTree(S, K, T, q, r, N + 1, sigma);
+    const std::tuple<double, double, double, double, double> binomialTreeN = binomialTree(S, K, T, q, r, N , sigma);
+
+
+    double v1 = std::get<0>(binomialTreeNPlus1);
+    double v2 = std::get<0>(binomialTreeN);
+    return (v1 + v2) / 2.0;
 }
 
 double binomialBlackScholeswithRichardsonExtrapolation(double S, double K, double T, double q, double r, int N, double sigma)
@@ -94,15 +105,16 @@ void calculateTreesForN(int N)
     double r = 0.03;
     double sigma = 0.3;
 
-    double binomialTreePrice = binomialTree(S, K, T, q, r, N, sigma);
+    std::tuple<double, double, double, double, double> binomialTreePrice = binomialTree(S, K, T, q, r, N, sigma);
     double averageBinomialTreePrice = averageBinomialTree(S, K, T, q, r, N, sigma);
     double blackScholesValue = blackScholesPut(S, K, T, q, r, N, sigma);
     double blackScholeswithRichardsonExtrapolation = binomialBlackScholeswithRichardsonExtrapolation(S, K, T, q, r, N, sigma);
     double binomialBlackScholesPrice = binomialBlackScholes(S, K, T, q, r, N, sigma);
 
-    double absDiff = std::abs(binomialBlackScholesPrice - blackScholesValue);
+    double absDiff = std::abs(averageBinomialTreePrice - blackScholesValue);
 //    std::cout << blackScholesValue << std::endl;
-    std::cout << binomialBlackScholesPrice << "," << absDiff << "," << N*absDiff << "," << N*N*absDiff << std::endl;
+    double x = std::get<0>(binomialTreePrice);
+    std::cout << averageBinomialTreePrice << "," << absDiff << "," << N*absDiff << "," << N*N*absDiff << std::endl;
 
 }
 
