@@ -6,6 +6,7 @@
 #define CPPCODETEST_OPTIONPRICERS_HPP
 #include <vector>
 #include <cmath>
+#include <Eigen/Dense>
 #include "BlackScholes.hpp"
 
 
@@ -33,8 +34,8 @@ double binomialTree(double S, double K, double T, double q, double r, int N, dou
         for(int i = 0; i < j + 1; i++)
         {
             double riskNeutralDiscountedValue = std::exp(-r*deltaT)* (optionPrices[i] * p + optionPrices[i + 1] * (1 - p));
-            optionPrices[i] = std::max(riskNeutralDiscountedValue, K - S*std::pow(u, j - i)* std::pow(d, i)); // american
-//            optionPrices[i] = riskNeutralDiscountedValue; // european
+//            optionPrices[i] = std::max(riskNeutralDiscountedValue, K - S*std::pow(u, j - i)* std::pow(d, i)); // american
+            optionPrices[i] = riskNeutralDiscountedValue; // european
         }
     }
     return optionPrices[0];
@@ -46,24 +47,21 @@ double binomialBlackScholes(double S, double K, double T, double q, double r, in
 {
     double deltaT = T/N;
     double u = std::exp(sigma* std::sqrt(deltaT));
-    double d = 1/u;
+    double d = 1.0/u;
     double p = (std::exp((r - q)*deltaT) - d)/(u - d);
-    std::vector<double> optionPrices(N);
-    for (int i = 1; i<N; i++)
-    {
-        optionPrices[i] = 0.0;
-    }
+    Eigen::VectorXd optionPrices(N + 1);
+    optionPrices.setZero();
 
-    for (int i = 0 ; i < N; i++)
+    for (int i = 0 ; i < N ; i++)
     {
         double spotPrice = S*std::pow(u, N - 1 - i)* std::pow(d, i);
         optionPrices[i] = blackScholesPut(spotPrice, K, T - i*deltaT, q, r, N, sigma);
         // The put price
     }
 
-    for (int j = N; j > 0; j--)
+    for (int j = N - 3; j >= 0; j--)
     {
-        for(int i = 0; i < j; i++)
+        for(int i = 0; i < j + 1; i++)
         {
             double riskNeutralDiscountedValue = std::exp(-r*deltaT)* (optionPrices[i] * p + optionPrices[i + 1] * (1 - p));
 //            optionPrices[i] = std::max(riskNeutralDiscountedValue, K - S*std::pow(u, j - i)* std::pow(d, i));
@@ -91,7 +89,7 @@ void calculateTreesForN(int N)
 {
     double S = 41.0;
     double K = 40.0;
-    double T = 1;
+    double T = 1.0;
     double q = 0.01;
     double r = 0.03;
     double sigma = 0.3;
@@ -102,8 +100,9 @@ void calculateTreesForN(int N)
     double blackScholeswithRichardsonExtrapolation = binomialBlackScholeswithRichardsonExtrapolation(S, K, T, q, r, N, sigma);
     double binomialBlackScholesPrice = binomialBlackScholes(S, K, T, q, r, N, sigma);
 
-    double absDiff = std::abs(binomialTreePrice - blackScholesValue);
-    std::cout << binomialTreePrice << "," << absDiff << "," << N*absDiff << "," << N*N*absDiff << std::endl;
+    double absDiff = std::abs(binomialBlackScholesPrice - blackScholesValue);
+//    std::cout << blackScholesValue << std::endl;
+    std::cout << binomialBlackScholesPrice << "," << absDiff << "," << N*absDiff << "," << N*N*absDiff << std::endl;
 
 }
 
