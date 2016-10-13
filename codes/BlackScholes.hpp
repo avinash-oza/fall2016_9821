@@ -44,4 +44,10 @@ double normalDist(double d)
     boost::math::normal_distribution<double> normalVariable;
     return boost::math::cdf(normalVariable, d);
 }
+
+double deltaBSPut(double S, double K, double T, double q, double r, int N, double sigma)
+{
+    double d_1 = d1(S, K, T, q, r, N, sigma);
+    return -1*std::exp(-q*T)*normalDist(-d_1);
+}
 #endif //CPPCODETEST_BLACKSCHOLES_HPP

@@ -19,55 +19,60 @@ void exam2013()
     MatrixXd problem1A = MatrixXd(9,9);
     for(int i = 0 ; i <= 8; i++)
     {
-        problem1A(i,i) = 2;
+        problem1A(i,i) = 4;
     }
     for(int i = 1 ; i <= 8; i++)
     {
-        problem1A(i,i-1) = 3;
+        problem1A(i,i-1) = -1;
     }
     for(int i = 2 ; i <= 8 ; i++)
     {
-        problem1A(i,i-2) = 4;
+        problem1A(i,i-2) = 3;
     }
     for(int i = 0 ; i <= 6; i++)
     {
-        problem1A(i,i+2) = -1;
+        problem1A(i,i+2) = -2;
     }
 
-    printCSVMatrix("Problem 1 matrix", problem1A);
+//    printCSVMatrix("Problem 1 matrix", problem1A);
 
     VectorXd b1(9);
     for(int i = 0; i< 9; i++)
     {
-        b1(i) = std::sqrt(1.0*i*i-1.0*i+4);
+        b1(i) = std::sqrt(1.0*i*i/2.0-1.0*i+6);
     }
     MatrixXd L1, U1, P1;
     std::tie(L1, U1, P1) = lu_pivoting(problem1A);
 
     VectorXd v1 = linear_solve_lu_row_pivoting(problem1A, b1);
-//    printCSVMatrix("v1 is", v1);
+
 //    printCSVMatrix("L1", L1);
 //    printCSVMatrix("U1", U1);
-
-    printResidualError("Residual for v1", problem1A, v1, b1);
+//    printCSVMatrix("P1 is", P1);
+//    printCSVMatrix("v1", v1);
+//    printCSVMatrix("A^-1", inverse(problem1A));
+//    printCSVMatrix("L^-1", inverse(L1));
+//    printCSVMatrix("U^-1", inverse(U1));
+//
+//    printResidualError("Residual for v1", problem1A, v1, b1);
 
     VectorXd v2 = inverse(problem1A)*b1;
-//    printCSVMatrix("A^-1 b1:", v2);
-//    printResidualError("Residual for v2",problem1A, v2, b1);
+    printCSVMatrix("A^-1 b1:", v2);
+    printResidualError("Residual for v2",problem1A, v2, b1);
 
     MatrixXd A2 = problem1A.transpose()*problem1A;
     MatrixXd choleskyA2 = cholesky(A2);
-//    printCSVMatrix("A2 cholesky factor", choleskyA2);
-
+    printCSVMatrix("A2 cholesky factor", choleskyA2);
+//
     VectorXd b2(9);
     for(int i =0; i<9; i++)
     {
-        b2(i) = (1.0*i*i - 10)/(i + 3.0);
+        b2(i) = (1.0*i*i - 9.0)/(i + 5.0);
     }
-
+//
     VectorXd x2 = linear_solve_cholesky(A2, b2);
-//    printCSVMatrix("X2 is", x2);
-//    printResidualError("x2 error is", A2, x2, b2);
+    printCSVMatrix("X2 is", x2);
+    printResidualError("x2 error is", A2, x2, b2);
 
     MatrixXd A3 = problem1A.transpose() + problem1A;
 
@@ -77,19 +82,19 @@ void exam2013()
 
 
     MatrixXd A4 = MatrixXd::Zero(8, 8);
-//    A4.setZero();
-
+    A4.setZero();
+//
     for(int i = 0; i < 8; i++)
     {
-        A4(i,i) = 8;
+        A4(i,i) = 9;
     }
     for(int i = 0; i < 6; i++)
     {
-        A4(i,i+2) = -1;
+        A4(i,i+2) = -2;
     }
     for(int i = 2; i < 8; i++)
     {
-        A4(i,i-2) = 2;
+        A4(i,i-2) = 4;
     }
     for(int i = 0; i < 5; i++)
     {
@@ -97,24 +102,24 @@ void exam2013()
     }
     for(int i = 3; i < 8; i++)
     {
-        A4(i,i-3) = 1;
+        A4(i,i-3) = -1;
     }
 
     VectorXd b4(8);
 
     for(int i = 0; i < 8; i++)
     {
-        b4(i) = (2.0*i - 3)/(2.0*i*i + 1);
+        b4(i) = (4.0*i - 3)/(2.0*i*i + 1);
     }
-
+//
     SORIteration iterationMethod;
     VectorXd x0(8), xResult;
     x0.setZero();
-//    printCSVMatrix("A4", A4);
-//    printCSVMatrix("b4", b4);
+    printCSVMatrix("A4", A4);
+    printCSVMatrix("b4", b4);
     int ic;
-    std::tie(xResult, ic) = residual_based_solver(A4, b4, x0, std::pow(10, -6), iterationMethod, 0.95 );
-    printCSVMatrix("Jacobi Result", xResult);
+    std::tie(xResult, ic) = residual_based_solver(A4, b4, x0, std::pow(10, -6), iterationMethod, 1.21 );
+    printCSVMatrix("SOR Result", xResult);
     std::cout << "IC: " << ic << std::endl;
 
 }

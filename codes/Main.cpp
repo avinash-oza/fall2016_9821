@@ -10,6 +10,7 @@
 #include "Examples.hpp"
 #include "PDESolverFunctions.hpp"
 #include "OptionPricers.hpp"
+#include "BlackScholes.hpp"
 
 using namespace Eigen;
 using namespace std;
@@ -29,8 +30,10 @@ int main() {
 //    decompositionExamples();
 //    verifyCholeskyDecomposition();
 //    exam2013();
-    std::cout << binomialTree(31, 30, 365/360, 0.01, 0.05, 100, 0.3);
-
+    for (int i = 10; i <= 1280; i *= 2 )
+    {
+        calculateTrinomialTreesForN(i);
+    }
 
     // Iterative methods test code (Problem 3 from HW3)
 //    Eigen::MatrixXd A = MatrixXd::Zero(14, 14);

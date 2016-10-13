@@ -12,7 +12,7 @@ void printCSVMatrix(std::string stringToPrint, const MatrixXd& myMatrix)
 {
 	IOFormat csvFormatter(9, 0, ",");
 	std::cout << stringToPrint << std::endl;
-	std::cout << myMatrix.format(csvFormatter) << std::endl;
+	std::cout << myMatrix.format(FullPrecision) << std::endl;
 }
 
 // Function 1
