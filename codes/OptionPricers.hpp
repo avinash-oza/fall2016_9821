@@ -389,7 +389,7 @@ void calculateTrinomialTreesForN(int N)
     double r = 0.03;
     double sigma = 0.3;
 
-    std::tuple<double, double, double, double, double> binomialTreePrice = trinomialBlackScholeswithRichardsonExtrapolation(S, K, T, q, r, N, sigma);
+    std::tuple<double, double, double, double, double> binomialTreePrice = trinomialTree(S, K, T, q, r, N, sigma);
     double trinomialTreePrice = std::get<0>(binomialTreePrice);
     double deltaTrinomial = std::get<1>(binomialTreePrice);
     double gammaTrinomial = std::get<2>(binomialTreePrice);

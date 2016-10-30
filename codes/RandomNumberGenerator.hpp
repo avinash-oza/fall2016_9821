@@ -104,10 +104,10 @@ class AcceptanceRejectionMethod: public LinearCongruentialGenerator
 
         // If assuming a sample size s, then we need the largest integer that is divisible by 3, that
         // does not exceed size.
-        //int corrected_size = 3 * (size / 3);
+        int corrected_size = 3 * (numberOfSamples / 3);
 
         // If instead we need to generate 3*N sample size, comment out the line above and use the following line:
-        int corrected_size = 3 * numberOfSamples;
+//        int corrected_size = 3 * numberOfSamples;
 
         VectorXd UniformSample = LinearCongruentialGenerator::generateNSamples(corrected_size);
         vector<double> std_UniformSample; // To dynamically resize
@@ -141,9 +141,9 @@ class AcceptanceRejectionMethod: public LinearCongruentialGenerator
 
 
 // Acceptance Rejection Method
-VectorXd AcceptanceRejectionMethod(int size) {
-
-}
+//VectorXd AcceptanceRejectionMethod(int size) {
+//
+//}
 
 class BoxMullerMethod: public LinearCongruentialGenerator
 {

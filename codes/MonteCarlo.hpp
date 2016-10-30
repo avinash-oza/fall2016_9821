@@ -9,27 +9,27 @@
 
 
 using namespace std;
+tuple<double,long int> MonteCarlo(double Spot, double Strike, double Interest, double Volatility, double Dividend, double Maturity, int NumberOfPaths, RandomNumberGenerationMethod &transformMethod);
 
-tuple<double,long int> MonteCarlo(double Spot, double Strike, double Interest, double Volatility, double Dividend, double Maturity, int NumberOfPaths, string method)
+
+void runMonteCarloForPaths(double Spot, double Strike, double Interest, double Volatility, double Dividend, double Maturity, VectorXi pathsToRunFor, RandomNumberGenerationMethod &transformMethod, double price)
 {
-	VectorXd sample_random_var;
-//	if (method != "ITM" && method != "ARM" && method != "BBM")
-//	{
-//		std::cout << "The method must be ITM, ARM, or BBM for:\n";
-//		std::cout << "Inverse Transform Method, Acceptance-Rejection Method, or Box Muler Method\n";
-//		std::cout << "Box Muller Method is assumed\n";
-//		sample_random_var = BoxMullerMethod(NumberOfPaths);
-//	}
-//	else if (method == "ITM")
-//		sample_random_var = InverseTransformMethod(NumberOfPaths);
-//	else if (method == "ARM")
-//		sample_random_var = AcceptanceRejectionMethod(NumberOfPaths);
-//	else
-//		sample_random_var = BoxMullerMethod(NumberOfPaths);
-    InverseTransformMethod transformMethod;
-    sample_random_var = transformMethod.generateNSamples(NumberOfPaths);
+    for (int i = 0; i < pathsToRunFor.size(); ++i)
+    {
+        std::cout << setprecision(12) << setw(5);
+        tuple<double, long int> MonteCarloTuple = MonteCarlo(Spot, Strike, Interest, Volatility, Dividend, Maturity, pathsToRunFor[i], transformMethod);
+        double monte_carlo_price = std::get<0>(MonteCarloTuple); // Returns the price
+        long int number_simulations = std::get<1>(MonteCarloTuple); // Returns the number of simulations
+        cout << pathsToRunFor[i] << "\t" << number_simulations << "\t" << monte_carlo_price << "\t" << abs(price - monte_carlo_price) << std::endl;
+    }
+    std::cout << std::endl << std::endl;
+}
 
-	// At this point, we have the vector with the sample variables
+tuple<double,long int> MonteCarlo(double Spot, double Strike, double Interest, double Volatility, double Dividend, double Maturity, int NumberOfPaths, RandomNumberGenerationMethod &transformMethod)
+{
+    VectorXd sample_random_var = transformMethod.generateNSamples(NumberOfPaths);
+
+    // At this point, we have the vector with the sample variables
 	// We first find its size.
 	int size = sample_random_var.size();
 

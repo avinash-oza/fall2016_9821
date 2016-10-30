@@ -188,8 +188,7 @@ void Question3()
     double spot, strike, interest, vol, maturity, div;
     string option_type;
     double price;
-    spot = 50; strike = 55; interest = 0.04; vol = 0.3; maturity = 0.5; div = 0; option_type = "P";
-//    EuropeanOption option=EuropeanOption(spot, strike, interest, vol, maturity, div, option_type);
+    spot = 50; strike = 55; interest = 0.04; vol = 0.3; maturity = 0.5; div = 0;
     price = blackScholesPut(spot, strike, maturity, div, interest, 0, vol);
 
     // Creating the vector containing the value for the number of random variables.
@@ -199,33 +198,17 @@ void Question3()
     N_vector *= 10000;
 
     // Part a: Iverse Transform Method
-    for (int i = 0; i < N_vector_size; ++i)
-    {
-        std::cout << setprecision(12) << setw(5);
-        tuple<double, long int> MonteCarloTuple = MonteCarlo(spot, strike, interest, vol, div, maturity, N_vector[i], "ITM");
-        double monte_carlo_price = std::get<0>(MonteCarloTuple); // Returns the price
-        cout << N_vector[i] << "\t" << monte_carlo_price << "\t" << abs(price - monte_carlo_price) << std::endl;
-    }
-    std::cout << std::endl << std::endl;
+    InverseTransformMethod inverseTransformMethod;
+    runMonteCarloForPaths(spot, strike, interest, vol, div, maturity, N_vector, inverseTransformMethod, price);
 
 //     Part b: Acceptance Rejection Method
-//    for (int i = 0; i < N_vector_size; ++i)
-//    {
-//        tuple<double, long int> MonteCarloTuple = MonteCarlo(spot, strike, interest, vol, div, maturity, N_vector[i], "ARM");
-//        double monte_carlo_price = std::get<0>(MonteCarloTuple);
-//        long int number_simulations= std::get<1>(MonteCarloTuple);
-//        cout << N_vector[i] << "\t" << number_simulations<< "\t" << monte_carlo_price << "\t" << abs(price - monte_carlo_price) << std::endl;
-//    }
-//
-//    std::cout << std::endl << std::endl;
+    AcceptanceRejectionMethod acceptanceRejectionMethod;
+    runMonteCarloForPaths(spot, strike, interest, vol, div, maturity, N_vector, acceptanceRejectionMethod, price);
+
+
+    std::cout << std::endl << std::endl;
 //     Part c: Box  Muller Method
-//    for (int i = 0; i < N_vector_size; ++i)
-//    {
-//        std::cout << setprecision(Precision) << setw(Width);
-//        tuple<double, long int> MonteCarloTuple = MonteCarlo(spot, strike, interest, vol, div, maturity, N_vector[i], "BBM");
-//        double monte_carlo_price = std::get<0>(MonteCarloTuple);
-//        long int number_simulations = std::get<1>(MonteCarloTuple);
-//        cout << N_vector[i] << "\t" << number_simulations << "\t" << monte_carlo_price << "\t" << abs(price - monte_carlo_price) << std::endl;
-//    }
-//    std::cout << std::endl << std::endl;
+    BoxMullerMethod boxMullerMethod;
+    runMonteCarloForPaths(spot, strike, interest, vol, div, maturity, N_vector, boxMullerMethod, price);
+    std::cout << std::endl << std::endl;
 }
