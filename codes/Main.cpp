@@ -11,6 +11,10 @@
 #include "PDESolverFunctions.hpp"
 #include "OptionPricers.hpp"
 #include "BlackScholes.hpp"
+//#include "Options.hpp"
+#include "RandomNumberGenerator.hpp"
+#include "MonteCarlo.hpp"
+
 
 using namespace Eigen;
 using namespace std;
@@ -23,17 +27,19 @@ double u(double x, double y);
 VectorXd calculateuExactVector(int N, const VectorXd &xCoordinates, const VectorXd &yCoordinates);
 void runOneIteration(int N, double w);
 void printCSVMatrix(std::string stringToPrint, const MatrixXd& myMatrix);
+void Question3();
 
 int main() {
     /// Keep this line to make the decimals always print out
     std::cout << std::fixed << std::setprecision(9);
+    Question3();
 //    decompositionExamples();
 //    verifyCholeskyDecomposition();
 //    exam2013();
-    for (int i = 10; i <= 1280; i *= 2 )
-    {
-        calculateTrinomialTreesForN(i);
-    }
+//    for (int i = 10; i <= 1280; i *= 2 )
+//    {
+//        calculateTrinomialTreesForN(i);
+//    }
 
     // Iterative methods test code (Problem 3 from HW3)
 //    Eigen::MatrixXd A = MatrixXd::Zero(14, 14);
@@ -174,4 +180,52 @@ MatrixXd generateHW3Matrix(int N) {
     }
     return T;
 
+}
+
+void Question3()
+{
+    // Calculating the option price.
+    double spot, strike, interest, vol, maturity, div;
+    string option_type;
+    double price;
+    spot = 50; strike = 55; interest = 0.04; vol = 0.3; maturity = 0.5; div = 0; option_type = "P";
+//    EuropeanOption option=EuropeanOption(spot, strike, interest, vol, maturity, div, option_type);
+    price = blackScholesPut(spot, strike, maturity, div, interest, 0, vol);
+
+    // Creating the vector containing the value for the number of random variables.
+    int N_vector_size = 10;
+    Eigen::VectorXi N_vector = Eigen::VectorXi::Zero(N_vector_size);
+    N_vector << 1, 2, 4, 8, 16, 32, 64, 128, 256, 512;
+    N_vector *= 10000;
+
+    // Part a: Iverse Transform Method
+    for (int i = 0; i < N_vector_size; ++i)
+    {
+        std::cout << setprecision(12) << setw(5);
+        tuple<double, long int> MonteCarloTuple = MonteCarlo(spot, strike, interest, vol, div, maturity, N_vector[i], "ITM");
+        double monte_carlo_price = std::get<0>(MonteCarloTuple); // Returns the price
+        cout << N_vector[i] << "\t" << monte_carlo_price << "\t" << abs(price - monte_carlo_price) << std::endl;
+    }
+    std::cout << std::endl << std::endl;
+
+//     Part b: Acceptance Rejection Method
+//    for (int i = 0; i < N_vector_size; ++i)
+//    {
+//        tuple<double, long int> MonteCarloTuple = MonteCarlo(spot, strike, interest, vol, div, maturity, N_vector[i], "ARM");
+//        double monte_carlo_price = std::get<0>(MonteCarloTuple);
+//        long int number_simulations= std::get<1>(MonteCarloTuple);
+//        cout << N_vector[i] << "\t" << number_simulations<< "\t" << monte_carlo_price << "\t" << abs(price - monte_carlo_price) << std::endl;
+//    }
+//
+//    std::cout << std::endl << std::endl;
+//     Part c: Box  Muller Method
+//    for (int i = 0; i < N_vector_size; ++i)
+//    {
+//        std::cout << setprecision(Precision) << setw(Width);
+//        tuple<double, long int> MonteCarloTuple = MonteCarlo(spot, strike, interest, vol, div, maturity, N_vector[i], "BBM");
+//        double monte_carlo_price = std::get<0>(MonteCarloTuple);
+//        long int number_simulations = std::get<1>(MonteCarloTuple);
+//        cout << N_vector[i] << "\t" << number_simulations << "\t" << monte_carlo_price << "\t" << abs(price - monte_carlo_price) << std::endl;
+//    }
+//    std::cout << std::endl << std::endl;
 }
