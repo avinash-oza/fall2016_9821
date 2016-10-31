@@ -197,19 +197,22 @@ void Question3()
     N_vector << 1, 2, 4, 8, 16, 32, 64, 128, 256, 512;
     N_vector *= 10000;
 
+
     // Part a: Iverse Transform Method
-    InverseTransformMethod inverseTransformMethod;
+    BoxMullerMethod inverseTransformMethod;
     LinearCongruentialGenerator uniformMethod;
-    runMonteCarloForPaths(spot, strike, interest, vol, div, maturity, N_vector, inverseTransformMethod, uniformMethod, price);
+    MonteCarloMethod monteCarloPricer;
+
+    monteCarloPricer.runMonteCarloForPaths(spot, strike, interest, vol, div, maturity, N_vector, inverseTransformMethod, uniformMethod, price);
 
 //     Part b: Acceptance Rejection Method
-    AcceptanceRejectionMethod acceptanceRejectionMethod;
-    runMonteCarloForPaths(spot, strike, interest, vol, div, maturity, N_vector, acceptanceRejectionMethod, uniformMethod, price);
+//    AcceptanceRejectionMethod acceptanceRejectionMethod;
+//    runMonteCarloForPaths(spot, strike, interest, vol, div, maturity, N_vector, acceptanceRejectionMethod, uniformMethod, price);
 
 
     std::cout << std::endl << std::endl;
 //     Part c: Box  Muller Method
-    BoxMullerMethod boxMullerMethod;
-    runMonteCarloForPaths(spot, strike, interest, vol, div, maturity, N_vector, boxMullerMethod, uniformMethod, price);
-    std::cout << std::endl << std::endl;
+//    BoxMullerMethod boxMullerMethod;
+//    runMonteCarloForPaths(spot, strike, interest, vol, div, maturity, N_vector, boxMullerMethod, uniformMethod, price);
+//    std::cout << std::endl << std::endl;
 }

@@ -44,6 +44,26 @@ class LinearCongruentialGenerator : public UniformVariableGenerationMethod
         }
 };
 
+class AntitheticGenerationMethod: public LinearCongruentialGenerator
+{
+    public:
+        virtual VectorXd generateNSamples(int numberOfSamples) {
+            // We take half the samples from U and the other half from 1-U
+            VectorXd uniformSamples = LinearCongruentialGenerator::generateNSamples(numberOfSamples/2);
+            VectorXd difference(uniformSamples.size());
+            difference.setConstant(1.0);
+
+            VectorXd complementUniformSamples = difference - uniformSamples;
+
+            VectorXd returnValues(numberOfSamples);
+            returnValues << uniformSamples, complementUniformSamples;
+//            std::cout << complementUniformSamples << std::endl;
+            return returnValues;
+
+        }
+
+};
+
 class NormalVariableGenerationMethod
 {
     public:
