@@ -9,15 +9,18 @@
 
 
 using namespace std;
-tuple<double,long int> MonteCarlo(double Spot, double Strike, double Interest, double Volatility, double Dividend, double Maturity, int NumberOfPaths, RandomNumberGenerationMethod &transformMethod);
+tuple<double,long int> MonteCarlo(double Spot, double Strike, double Interest, double Volatility,
+                                  double Dividend, double Maturity, int NumberOfPaths, NormalVariableGenerationMethod &normalVariableGenerationMethod, UniformVariableGenerationMethod &uniformMethod);
 
 
-void runMonteCarloForPaths(double Spot, double Strike, double Interest, double Volatility, double Dividend, double Maturity, VectorXi pathsToRunFor, RandomNumberGenerationMethod &transformMethod, double price)
+void runMonteCarloForPaths(double Spot, double Strike, double Interest, double Volatility, double Dividend, double Maturity,
+                           VectorXi pathsToRunFor, NormalVariableGenerationMethod &transformMethod,
+                           UniformVariableGenerationMethod &uniformMethod, double price)
 {
     for (int i = 0; i < pathsToRunFor.size(); ++i)
     {
         std::cout << setprecision(12) << setw(5);
-        tuple<double, long int> MonteCarloTuple = MonteCarlo(Spot, Strike, Interest, Volatility, Dividend, Maturity, pathsToRunFor[i], transformMethod);
+        tuple<double, long int> MonteCarloTuple = MonteCarlo(Spot, Strike, Interest, Volatility, Dividend, Maturity, pathsToRunFor[i], transformMethod, uniformMethod);
         double monte_carlo_price = std::get<0>(MonteCarloTuple); // Returns the price
         long int number_simulations = std::get<1>(MonteCarloTuple); // Returns the number of simulations
         cout << pathsToRunFor[i] << "\t" << number_simulations << "\t" << monte_carlo_price << "\t" << abs(price - monte_carlo_price) << std::endl;
@@ -25,9 +28,10 @@ void runMonteCarloForPaths(double Spot, double Strike, double Interest, double V
     std::cout << std::endl << std::endl;
 }
 
-tuple<double,long int> MonteCarlo(double Spot, double Strike, double Interest, double Volatility, double Dividend, double Maturity, int NumberOfPaths, RandomNumberGenerationMethod &transformMethod)
+tuple<double,long int> MonteCarlo(double Spot, double Strike, double Interest, double Volatility,
+                                  double Dividend, double Maturity, int NumberOfPaths, NormalVariableGenerationMethod &normalVariableGenerationMethod, UniformVariableGenerationMethod &uniformMethod)
 {
-    VectorXd sample_random_var = transformMethod.generateNSamples(NumberOfPaths);
+    VectorXd sample_random_var = normalVariableGenerationMethod.generateNSamples(NumberOfPaths, uniformMethod);
 
     // At this point, we have the vector with the sample variables
 	// We first find its size.

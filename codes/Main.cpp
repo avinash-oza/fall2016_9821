@@ -199,16 +199,17 @@ void Question3()
 
     // Part a: Iverse Transform Method
     InverseTransformMethod inverseTransformMethod;
-    runMonteCarloForPaths(spot, strike, interest, vol, div, maturity, N_vector, inverseTransformMethod, price);
+    LinearCongruentialGenerator uniformMethod;
+    runMonteCarloForPaths(spot, strike, interest, vol, div, maturity, N_vector, inverseTransformMethod, uniformMethod, price);
 
 //     Part b: Acceptance Rejection Method
     AcceptanceRejectionMethod acceptanceRejectionMethod;
-    runMonteCarloForPaths(spot, strike, interest, vol, div, maturity, N_vector, acceptanceRejectionMethod, price);
+    runMonteCarloForPaths(spot, strike, interest, vol, div, maturity, N_vector, acceptanceRejectionMethod, uniformMethod, price);
 
 
     std::cout << std::endl << std::endl;
 //     Part c: Box  Muller Method
     BoxMullerMethod boxMullerMethod;
-    runMonteCarloForPaths(spot, strike, interest, vol, div, maturity, N_vector, boxMullerMethod, price);
+    runMonteCarloForPaths(spot, strike, interest, vol, div, maturity, N_vector, boxMullerMethod, uniformMethod, price);
     std::cout << std::endl << std::endl;
 }

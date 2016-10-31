@@ -7,10 +7,47 @@ using namespace Eigen;
 
 using namespace std;
 
-class RandomNumberGenerationMethod
+
+class UniformVariableGenerationMethod
 {
     public:
         virtual VectorXd generateNSamples(int numberOfSamples) = 0;
+};
+
+class LinearCongruentialGenerator : public UniformVariableGenerationMethod
+{
+    public:
+        virtual VectorXd generateNSamples(int numberOfSamples) {
+            int x0 = 1;
+            const int a = 39373;
+            const long int m = pow(2, 31) - 1;
+            const int c = 0;
+
+            // Variables needed to avoid overflow
+            int q, r, k;
+            q = floor(m / a);
+            r = m%a;
+
+            double a_current;
+            double x_current = double(x0);
+            VectorXd result=VectorXd::Zero(numberOfSamples);
+            for (int i = 0; i < numberOfSamples; ++i)
+            {
+                k = x0 / q;
+                x0 = a*(x0-k*q)-k*r;
+                if (x0 < 0)
+                    x0 = x0 + m;
+                a_current = (x0+0.0) / m;
+                result[i]=a_current;
+            }
+            return result;
+        }
+};
+
+class NormalVariableGenerationMethod
+{
+    public:
+        virtual VectorXd generateNSamples(int numberOfSamples, UniformVariableGenerationMethod &uniformMethod) = 0;
         double StandardNormalInverse(double u) {
             double a0, a1, a2, a3;
             double b0, b1, b2, b3;
@@ -41,44 +78,14 @@ class RandomNumberGenerationMethod
 
 };
 
-class LinearCongruentialGenerator: public RandomNumberGenerationMethod
+
+class InverseTransformMethod : public NormalVariableGenerationMethod
 {
     public:
-    virtual VectorXd generateNSamples(int numberOfSamples) {
-        int x0 = 1;
-        const int a = 39373;
-        const long int m = pow(2, 31) - 1;
-        const int c = 0;
-
-        // Variables needed to avoid overflow
-        int q, r, k;
-        q = floor(m / a);
-        r = m%a;
-
-        double a_current;
-        double x_current = double(x0);
-        VectorXd result=VectorXd::Zero(numberOfSamples);
-        for (int i = 0; i < numberOfSamples; ++i)
-        {
-            k = x0 / q;
-            x0 = a*(x0-k*q)-k*r;
-            if (x0 < 0)
-                x0 = x0 + m;
-            a_current = (x0+0.0) / m;
-            result[i]=a_current;
-        }
-        return result;
-    }
-};
-
-
-class InverseTransformMethod : public LinearCongruentialGenerator
-{
-    public:
-        virtual VectorXd generateNSamples(int numberOfSamples) {
+        virtual VectorXd generateNSamples(int numberOfSamples, UniformVariableGenerationMethod &uniformMethod) {
             // Create the uniform(0,1) random variable.
             // use linear congruential generator to get samples here
-            VectorXd result = LinearCongruentialGenerator::generateNSamples(numberOfSamples);
+            VectorXd result = uniformMethod.generateNSamples(numberOfSamples);
             for (int i = 0; i < numberOfSamples; ++i)
             {
                 result[i] = this->StandardNormalInverse(result[i]);
@@ -96,10 +103,10 @@ class InverseTransformMethod : public LinearCongruentialGenerator
 //
 //}
 
-class AcceptanceRejectionMethod: public LinearCongruentialGenerator
+class AcceptanceRejectionMethod: public NormalVariableGenerationMethod
 {
     public:
-    virtual VectorXd generateNSamples(int numberOfSamples)  {
+    virtual VectorXd generateNSamples(int numberOfSamples, UniformVariableGenerationMethod &uniformMethod) {
         //double u1, u2, u3;
 
         // If assuming a sample size s, then we need the largest integer that is divisible by 3, that
@@ -109,7 +116,7 @@ class AcceptanceRejectionMethod: public LinearCongruentialGenerator
         // If instead we need to generate 3*N sample size, comment out the line above and use the following line:
 //        int corrected_size = 3 * numberOfSamples;
 
-        VectorXd UniformSample = LinearCongruentialGenerator::generateNSamples(corrected_size);
+        VectorXd UniformSample = uniformMethod.generateNSamples(corrected_size);
         vector<double> std_UniformSample; // To dynamically resize
 
         for (int i = 0; i <corrected_size; i+=3)
@@ -145,11 +152,11 @@ class AcceptanceRejectionMethod: public LinearCongruentialGenerator
 //
 //}
 
-class BoxMullerMethod: public LinearCongruentialGenerator
+class BoxMullerMethod: public NormalVariableGenerationMethod
 {
     public:
-        virtual VectorXd generateNSamples(int numberOfSamples) {
-            VectorXd UniformSample = LinearCongruentialGenerator::generateNSamples(numberOfSamples);
+        virtual VectorXd generateNSamples(int numberOfSamples, UniformVariableGenerationMethod &uniformMethod) {
+            VectorXd UniformSample = uniformMethod.generateNSamples(numberOfSamples);
 
             vector<double> std_UniformSample; // To dynamically resize
             double u1, u2;
@@ -176,7 +183,5 @@ class BoxMullerMethod: public LinearCongruentialGenerator
         }
 };
 
-// Box Muller Method to generate standard normal distributions
-//VectorXd BoxMullerMethod(int size) {
 
 #endif // !RandomNumberGenerator
