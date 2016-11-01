@@ -193,15 +193,17 @@ void Question3()
 
     // Creating the vector containing the value for the number of random variables.
     int N_vector_size = 10;
+//    int N_vector_size = 1;
     Eigen::VectorXi N_vector = Eigen::VectorXi::Zero(N_vector_size);
     N_vector << 1, 2, 4, 8, 16, 32, 64, 128, 256, 512;
+//    N_vector << 1;
     N_vector *= 10000;
 
 
     // Part a: Iverse Transform Method
     BoxMullerMethod inverseTransformMethod;
     LinearCongruentialGenerator uniformMethod;
-    MonteCarloMethod monteCarloPricer;
+    MomentMatchingAndControlVariateMonteCarloMethod  monteCarloPricer;
 
     monteCarloPricer.runMonteCarloForPaths(spot, strike, interest, vol, div, maturity, N_vector, inverseTransformMethod, uniformMethod, price);
 

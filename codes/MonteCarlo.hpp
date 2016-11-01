@@ -15,7 +15,12 @@ tuple<double,long int> MonteCarlo(double Spot, double Strike, double Interest, d
 class MonteCarloMethod
 {
     public:
-        void runMonteCarloForPaths(double Spot, double Strike, double Interest, double Volatility, double Dividend, double Maturity,
+        virtual double calculatePriceFromSimulatedPaths(const VectorXd &spotPrices, const VectorXd &disc_payoff_vector, double discountFactor, double S0)
+        {
+            return disc_payoff_vector.mean();
+        }
+
+    virtual void runMonteCarloForPaths(double Spot, double Strike, double Interest, double Volatility, double Dividend, double Maturity,
                                    VectorXi pathsToRunFor, NormalVariableGenerationMethod &transformMethod,
                                    UniformVariableGenerationMethod &uniformMethod, double price)
         {
@@ -30,10 +35,16 @@ class MonteCarloMethod
             std::cout << std::endl << std::endl;
         }
 
+        virtual VectorXd adjustSpotPrice(const VectorXd &spotPrices, double discountFactor, double spotPrice)
+        {
+            return spotPrices;
+        }
+
         tuple<double,long int> MonteCarlo(double Spot, double Strike, double Interest, double Volatility,
                                           double Dividend, double Maturity, int NumberOfPaths, NormalVariableGenerationMethod &normalVariableGenerationMethod, UniformVariableGenerationMethod &uniformMethod)
         {
             VectorXd sample_random_var = normalVariableGenerationMethod.generateNSamples(NumberOfPaths, uniformMethod);
+            double discountFactor = exp(-Interest*Maturity);
 
             // At this point, we have the vector with the sample variables
             // We first find its size.
@@ -46,6 +57,8 @@ class MonteCarloMethod
                 spot_price_vector[i] = Spot*exp((Interest - Dividend - pow(Volatility, 2)/2.0)*Maturity + Volatility*sqrt(Maturity)*sample_random_var[i]);
             }
 
+            spot_price_vector = adjustSpotPrice(spot_price_vector, discountFactor, Spot);
+
             // Create the vector with the discounted payoffs
             VectorXd disc_payoff_vector = VectorXd::Zero(size);
             for (int i = 0; i < size; ++i)
@@ -53,11 +66,66 @@ class MonteCarloMethod
                 disc_payoff_vector[i] = exp(-Interest*Maturity)*max(Strike - spot_price_vector[i], 0.0);
             }
             // Then, return the mean of the payoffs
-            double average = disc_payoff_vector.mean();
+            double optionPrice = calculatePriceFromSimulatedPaths(spot_price_vector, disc_payoff_vector, discountFactor, Spot);
             long int sample_size = size;
-            tuple<double, long int> results = make_tuple(average, sample_size);
+            tuple<double, long int> results = make_tuple(optionPrice, sample_size);
             return results;
         }
+};
+
+class ControlVariateMonteCarloMethod: public MonteCarloMethod
+{
+    public:
+        virtual double
+            calculatePriceFromSimulatedPaths(const VectorXd &spotPrices, const VectorXd &disc_payoff_vector, double discountFactor, double S0) {
+
+                VectorXd S_hat(spotPrices.size());
+                S_hat.setConstant(spotPrices.mean());
+
+                VectorXd V_hat(spotPrices.size());
+                V_hat.setConstant(disc_payoff_vector.mean());
+
+                VectorXd dfVector(spotPrices.size());
+                dfVector.setConstant(1/discountFactor*S0);
+
+                VectorXd meanAdjustedSpotPrices = spotPrices - S_hat;
+                VectorXd meanAdjustedPayoffs = disc_payoff_vector - V_hat;
+
+                double b_hat = meanAdjustedSpotPrices.dot(meanAdjustedPayoffs)/(meanAdjustedSpotPrices.dot(meanAdjustedSpotPrices));
+
+                VectorXd W = disc_payoff_vector - b_hat*(spotPrices - dfVector);
+                return W.mean();
+
+            }
+};
+
+class MomentMatchingMonteCarloMethod: public MonteCarloMethod
+{
+    public:
+            virtual VectorXd adjustSpotPrice(const VectorXd &simulatedPrices, double discountFactor, double spotPrice) {
+                double S_hat = simulatedPrices.mean();
+                double factorToAdjust = spotPrice/(discountFactor*S_hat);
+                return simulatedPrices*factorToAdjust;
+        }
+};
+
+class MomentMatchingAndControlVariateMonteCarloMethod : public MomentMatchingMonteCarloMethod, ControlVariateMonteCarloMethod
+{
+    public:
+    virtual void runMonteCarloForPaths(double Spot, double Strike, double Interest, double Volatility, double Dividend,
+                                       double Maturity, VectorXi pathsToRunFor,
+                                       NormalVariableGenerationMethod &transformMethod,
+                                       UniformVariableGenerationMethod &uniformMethod, double price) override {
+        MomentMatchingMonteCarloMethod::runMonteCarloForPaths(Spot, Strike, Interest, Volatility, Dividend, Maturity, pathsToRunFor,
+                                                transformMethod, uniformMethod, price);
+    }
+
+    private:
+    virtual double calculatePriceFromSimulatedPaths(const VectorXd &spotPrices, const VectorXd &disc_payoff_vector,
+                                                    double discountFactor, double S0) override {
+        return ControlVariateMonteCarloMethod::calculatePriceFromSimulatedPaths(spotPrices, disc_payoff_vector,
+                                                                                discountFactor, S0);
+    }
 };
 
 
