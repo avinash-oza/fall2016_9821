@@ -196,23 +196,29 @@ void Question3()
 //    int N_vector_size = 1;
     Eigen::VectorXi N_vector = Eigen::VectorXi::Zero(N_vector_size);
     N_vector << 1, 2, 4, 8, 16, 32, 64, 128, 256, 512;
-//    N_vector << 1;
+//    N_vector << 8;
     N_vector *= 10000;
 
 
     // Part a: Iverse Transform Method
     BoxMullerMethod inverseTransformMethod;
     LinearCongruentialGenerator uniformMethod;
-    MomentMatchingAndControlVariateMonteCarloMethod  monteCarloPricer;
+//    MomentMatchingAndControlVariateMonteCarloMethod monteCarloPricer;
 
-    monteCarloPricer.runMonteCarloForPaths(spot, strike, interest, vol, div, maturity, N_vector, inverseTransformMethod, uniformMethod, price);
+//    monteCarloPricer.runMonteCarloForPaths(spot, strike, interest, vol, div, maturity, N_vector, inverseTransformMethod, uniformMethod, price);
+    double vol2 = 0.2, spot2 = 30;
+    spot = 25; strike = 50; interest = 0.05; vol = 0.3; maturity = 0.5; div = 0;
+
+    BasketOptionMonteCarloMethod basketOptionMonteCarloMethod(0.35);
+    basketOptionMonteCarloMethod.runMonteCarloForPaths(spot, spot2, strike, interest, vol, vol2, div, maturity, N_vector, inverseTransformMethod, uniformMethod, price);
+
 
 //     Part b: Acceptance Rejection Method
 //    AcceptanceRejectionMethod acceptanceRejectionMethod;
 //    runMonteCarloForPaths(spot, strike, interest, vol, div, maturity, N_vector, acceptanceRejectionMethod, uniformMethod, price);
 
 
-    std::cout << std::endl << std::endl;
+//    std::cout << std::endl << std::endl;
 //     Part c: Box  Muller Method
 //    BoxMullerMethod boxMullerMethod;
 //    runMonteCarloForPaths(spot, strike, interest, vol, div, maturity, N_vector, boxMullerMethod, uniformMethod, price);

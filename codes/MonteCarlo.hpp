@@ -20,27 +20,27 @@ class MonteCarloMethod
             return disc_payoff_vector.mean();
         }
 
-    virtual void runMonteCarloForPaths(double Spot, double Strike, double Interest, double Volatility, double Dividend, double Maturity,
-                                   VectorXi pathsToRunFor, NormalVariableGenerationMethod &transformMethod,
-                                   UniformVariableGenerationMethod &uniformMethod, double price)
-        {
-            for (int i = 0; i < pathsToRunFor.size(); ++i)
+        virtual void runMonteCarloForPaths(double Spot, double Strike, double Interest, double Volatility, double Dividend, double Maturity,
+                                       VectorXi pathsToRunFor, NormalVariableGenerationMethod &transformMethod,
+                                       UniformVariableGenerationMethod &uniformMethod, double price)
             {
-                std::cout << setprecision(12) << setw(5);
-                tuple<double, long int> MonteCarloTuple = MonteCarlo(Spot, Strike, Interest, Volatility, Dividend, Maturity, pathsToRunFor[i], transformMethod, uniformMethod);
-                double monte_carlo_price = std::get<0>(MonteCarloTuple); // Returns the price
-                long int number_simulations = std::get<1>(MonteCarloTuple); // Returns the number of simulations
-                cout << pathsToRunFor[i] << "\t" << number_simulations << "\t" << monte_carlo_price << "\t" << abs(price - monte_carlo_price) << std::endl;
+                for (int i = 0; i < pathsToRunFor.size(); ++i)
+                {
+                    std::cout << setprecision(12) << setw(5);
+                    tuple<double, long int> MonteCarloTuple = MonteCarlo(Spot, Strike, Interest, Volatility, Dividend, Maturity, pathsToRunFor[i], transformMethod, uniformMethod);
+                    double monte_carlo_price = std::get<0>(MonteCarloTuple); // Returns the price
+                    long int number_simulations = std::get<1>(MonteCarloTuple); // Returns the number of simulations
+                    cout << pathsToRunFor[i] << "\t" << number_simulations << "\t" << monte_carlo_price << "\t" << abs(price - monte_carlo_price) << std::endl;
+                }
+                std::cout << std::endl << std::endl;
             }
-            std::cout << std::endl << std::endl;
-        }
 
         virtual VectorXd adjustSpotPrice(const VectorXd &spotPrices, double discountFactor, double spotPrice)
         {
             return spotPrices;
         }
 
-        tuple<double,long int> MonteCarlo(double Spot, double Strike, double Interest, double Volatility,
+        virtual tuple<double,long int> MonteCarlo(double Spot, double Strike, double Interest, double Volatility,
                                           double Dividend, double Maturity, int NumberOfPaths, NormalVariableGenerationMethod &normalVariableGenerationMethod, UniformVariableGenerationMethod &uniformMethod)
         {
             VectorXd sample_random_var = normalVariableGenerationMethod.generateNSamples(NumberOfPaths, uniformMethod);
@@ -54,7 +54,7 @@ class MonteCarloMethod
             VectorXd spot_price_vector = VectorXd::Zero(size);
             for (int i = 0; i < size; ++i)
             {
-                spot_price_vector[i] = Spot*exp((Interest - Dividend - pow(Volatility, 2)/2.0)*Maturity + Volatility*sqrt(Maturity)*sample_random_var[i]);
+                spot_price_vector[i] = calculateLogNormalSpotPrice(Spot, Interest, Volatility, Dividend, Maturity, sample_random_var[i]);
             }
 
             spot_price_vector = adjustSpotPrice(spot_price_vector, discountFactor, Spot);
@@ -71,6 +71,9 @@ class MonteCarloMethod
             tuple<double, long int> results = make_tuple(optionPrice, sample_size);
             return results;
         }
+
+    virtual double calculateLogNormalSpotPrice(double Spot, double Interest, double Volatility, double Dividend, double Maturity, double normalVariableValue) {
+        return Spot * exp((Interest - Dividend - pow(Volatility, 2) / 2.0) * Maturity + Volatility * sqrt(Maturity) * normalVariableValue); }
 };
 
 class ControlVariateMonteCarloMethod: public MonteCarloMethod
@@ -112,22 +115,84 @@ class MomentMatchingMonteCarloMethod: public MonteCarloMethod
 class MomentMatchingAndControlVariateMonteCarloMethod : public MomentMatchingMonteCarloMethod, ControlVariateMonteCarloMethod
 {
     public:
-    virtual void runMonteCarloForPaths(double Spot, double Strike, double Interest, double Volatility, double Dividend,
-                                       double Maturity, VectorXi pathsToRunFor,
-                                       NormalVariableGenerationMethod &transformMethod,
-                                       UniformVariableGenerationMethod &uniformMethod, double price) override {
-        MomentMatchingMonteCarloMethod::runMonteCarloForPaths(Spot, Strike, Interest, Volatility, Dividend, Maturity, pathsToRunFor,
-                                                transformMethod, uniformMethod, price);
-    }
+        virtual void runMonteCarloForPaths(double Spot, double Strike, double Interest, double Volatility, double Dividend,
+                                           double Maturity, VectorXi pathsToRunFor,
+                                           NormalVariableGenerationMethod &transformMethod,
+                                           UniformVariableGenerationMethod &uniformMethod, double price) override {
+            MomentMatchingMonteCarloMethod::runMonteCarloForPaths(Spot, Strike, Interest, Volatility, Dividend, Maturity, pathsToRunFor,
+                                                    transformMethod, uniformMethod, price);
+        }
 
-    private:
-    virtual double calculatePriceFromSimulatedPaths(const VectorXd &spotPrices, const VectorXd &disc_payoff_vector,
-                                                    double discountFactor, double S0) override {
-        return ControlVariateMonteCarloMethod::calculatePriceFromSimulatedPaths(spotPrices, disc_payoff_vector,
-                                                                                discountFactor, S0);
-    }
+        virtual double calculatePriceFromSimulatedPaths(const VectorXd &spotPrices, const VectorXd &disc_payoff_vector,
+                                                        double discountFactor, double S0) override {
+            return ControlVariateMonteCarloMethod::calculatePriceFromSimulatedPaths(spotPrices, disc_payoff_vector, discountFactor, S0);
+        }
 };
 
+
+class BasketOptionMonteCarloMethod : public MonteCarloMethod
+{
+    public:
+        BasketOptionMonteCarloMethod(double rho): rho(rho) {};
+
+    virtual void runMonteCarloForPaths(double Spot, double Spot2, double Strike, double Interest, double Volatility, double Volatility2, double Dividend, double Maturity,
+                                       VectorXi pathsToRunFor, NormalVariableGenerationMethod &transformMethod,
+                                       UniformVariableGenerationMethod &uniformMethod, double price)
+    {
+        for (int i = 0; i < pathsToRunFor.size(); ++i)
+        {
+            std::cout << setprecision(12) << setw(5);
+            tuple<double, long int> MonteCarloTuple = MonteCarlo(Spot, Spot2, Strike, Interest, Volatility, Volatility2, Dividend, Maturity, pathsToRunFor[i], transformMethod, uniformMethod);
+            double monte_carlo_price = std::get<0>(MonteCarloTuple); // Returns the price
+            long int number_simulations = std::get<1>(MonteCarloTuple); // Returns the number of simulations
+            cout << pathsToRunFor[i] << "\t" << number_simulations << "\t" << monte_carlo_price << "\t" << abs(price - monte_carlo_price) << std::endl;
+        }
+        std::cout << std::endl << std::endl;
+    }
+
+    virtual tuple<double,long int> MonteCarlo(double Spot, double Spot2, double Strike, double Interest, double Volatility, double Volatility2,
+                                          double Dividend, double Maturity, int NumberOfPaths, NormalVariableGenerationMethod &normalVariableGenerationMethod, UniformVariableGenerationMethod &uniformMethod)
+        {
+            VectorXd sample_random_var = normalVariableGenerationMethod.generateNSamples(2*NumberOfPaths, uniformMethod);
+            double discountFactor = exp(-Interest*Maturity);
+
+            // At this point, we have the vector with the sample variables
+            // We first find its size.
+            int size = sample_random_var.size();
+            int vectorSize = size / 2; // The size of the spot, stock and option price vectors
+
+            // Create the vector with the spot prices corresponding with each element in the random sample
+            VectorXd spot_price_vector = VectorXd::Zero(vectorSize);
+            VectorXd second_spot_price_vector = VectorXd::Zero(vectorSize);
+            for (int i = 0; i < vectorSize - 1; ++i)
+            {
+                spot_price_vector[i] = calculateLogNormalSpotPrice(Spot, Interest, Volatility, Dividend, Maturity, sample_random_var[2*i]);
+                // calculate out the final z that should go in for pricing
+                double finalStandardNormValue = rho*sample_random_var[2*i] + sqrt(1- rho*rho)* sample_random_var[2*i + 1];
+                second_spot_price_vector[i] = calculateLogNormalSpotPrice(Spot2, Interest, Volatility2, Dividend, Maturity, finalStandardNormValue);
+            }
+
+//            spot_price_vector = adjustSpotPrice(spot_price_vector, discountFactor, Spot);
+            VectorXd strikeVector = VectorXd::Ones(vectorSize);
+            strikeVector *= Strike; // Make the vector of strikes
+            VectorXd undiscountedOptionValues = spot_price_vector + second_spot_price_vector - strikeVector;
+
+
+            // Create the vector with the discounted payoffs
+            VectorXd disc_payoff_vector = VectorXd::Zero(vectorSize);
+            for (int i = 0; i < vectorSize; ++i)
+            {
+                disc_payoff_vector[i] = discountFactor*max(undiscountedOptionValues[i], 0.0);
+            }
+            // Then, return the mean of the payoffs
+            double optionPrice = calculatePriceFromSimulatedPaths(spot_price_vector, disc_payoff_vector, discountFactor, Spot);
+            long int sample_size = size;
+            tuple<double, long int> results = make_tuple(optionPrice, sample_size);
+            return results;
+        }
+    private:
+        double rho;
+};
 
 
 #endif // !MonteCarlo_HPP
