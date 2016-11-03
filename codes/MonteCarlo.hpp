@@ -159,16 +159,18 @@ class BasketOptionMonteCarloMethod : public MonteCarloMethod
             // At this point, we have the vector with the sample variables
             // We first find its size.
             int size = sample_random_var.size();
-            int vectorSize = size / 2; // The size of the spot, stock and option price vectors
+            int vectorSize = NumberOfPaths / 2; // The size of the spot, stock and option price vectors
 
             // Create the vector with the spot prices corresponding with each element in the random sample
             VectorXd spot_price_vector = VectorXd::Zero(vectorSize);
             VectorXd second_spot_price_vector = VectorXd::Zero(vectorSize);
-            for (int i = 0; i < vectorSize - 1; ++i)
+            for (int i = 0; i < vectorSize; ++i)
             {
-                spot_price_vector[i] = calculateLogNormalSpotPrice(Spot, Interest, Volatility, Dividend, Maturity, sample_random_var[2*i]);
+                double &firstSample = sample_random_var[2 * i];
+                double &secondSample = sample_random_var[2 * i + 1];
+                spot_price_vector[i] = calculateLogNormalSpotPrice(Spot, Interest, Volatility, Dividend, Maturity, firstSample);
                 // calculate out the final z that should go in for pricing
-                double finalStandardNormValue = rho*sample_random_var[2*i] + sqrt(1- rho*rho)* sample_random_var[2*i + 1];
+                double finalStandardNormValue = rho * firstSample + sqrt(1 - rho * rho) * secondSample;
                 second_spot_price_vector[i] = calculateLogNormalSpotPrice(Spot2, Interest, Volatility2, Dividend, Maturity, finalStandardNormValue);
             }
 

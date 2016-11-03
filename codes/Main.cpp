@@ -192,11 +192,11 @@ void Question3()
     price = blackScholesPut(spot, strike, maturity, div, interest, 0, vol);
 
     // Creating the vector containing the value for the number of random variables.
-    int N_vector_size = 10;
+    int N_vector_size = 9;
 //    int N_vector_size = 1;
     Eigen::VectorXi N_vector = Eigen::VectorXi::Zero(N_vector_size);
-    N_vector << 1, 2, 4, 8, 16, 32, 64, 128, 256, 512;
-//    N_vector << 8;
+    N_vector << 1, 2, 4, 8, 16, 32, 64, 128, 256;
+//    N_vector << 1;
     N_vector *= 10000;
 
 
