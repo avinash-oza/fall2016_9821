@@ -186,10 +186,10 @@ void Question3()
 {
     // Calculating the option price.
     double spot, strike, interest, vol, maturity, div;
-    string option_type;
+    BlackScholesOption option;
     double price;
     spot = 50; strike = 55; interest = 0.04; vol = 0.3; maturity = 0.5; div = 0;
-    price = blackScholesPut(spot, strike, maturity, div, interest, 0, vol);
+    price = option.putPrice(spot, strike, maturity, div, interest, 0, vol);
 
     // Creating the vector containing the value for the number of random variables.
     int N_vector_size = 9;
