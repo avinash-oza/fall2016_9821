@@ -51,7 +51,6 @@ class MonteCarloMethod
             // At this point, we have the vector with the sample variables
             // We first find its size.
             int size = sample_random_var.size();
-//            int size = NumberOfPaths;
 //             Create the vector with the spot prices corresponding with each element in the random sample
             VectorXd spot_price_vector = VectorXd::Zero(size);
             for (int i = 0; i < size; ++i)

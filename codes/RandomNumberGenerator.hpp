@@ -13,6 +13,7 @@ class UniformVariableGenerationMethod
     public:
         virtual VectorXd generateNSamples(int numberOfSamples) = 0;
         virtual void resetGenerator() {};
+        virtual double generateSingleSample()  = 0;
 };
 
 class LinearCongruentialGenerator : public UniformVariableGenerationMethod
@@ -56,25 +57,25 @@ class LinearCongruentialGenerator : public UniformVariableGenerationMethod
 
 };
 
-class AntitheticGenerationMethod: public LinearCongruentialGenerator
-{
-    public:
-        virtual VectorXd generateNSamples(int numberOfSamples) {
-            // We take half the samples from U and the other half from 1-U
-            VectorXd uniformSamples = LinearCongruentialGenerator::generateNSamples(numberOfSamples/2);
-            VectorXd difference(uniformSamples.size());
-            difference.setConstant(1.0);
-
-            VectorXd complementUniformSamples = difference - uniformSamples;
-
-            VectorXd returnValues(numberOfSamples);
-            returnValues << uniformSamples, complementUniformSamples;
+//class AntitheticGenerationMethod: public LinearCongruentialGenerator
+//{
+//    public:
+//        virtual VectorXd generateNSamples(int numberOfSamples) {
+//             We take half the samples from U and the other half from 1-U
+//            VectorXd uniformSamples = LinearCongruentialGenerator::generateNSamples(numberOfSamples/2);
+//            VectorXd difference(uniformSamples.size());
+//            difference.setConstant(1.0);
+//
+//            VectorXd complementUniformSamples = difference - uniformSamples;
+//
+//            VectorXd returnValues(numberOfSamples);
+//            returnValues << uniformSamples, complementUniformSamples;
 //            std::cout << complementUniformSamples << std::endl;
-            return returnValues;
-
-        }
-
-};
+//            return returnValues;
+//
+//        }
+//
+//};
 
 class NormalVariableGenerationMethod
 {
@@ -125,15 +126,6 @@ class InverseTransformMethod : public NormalVariableGenerationMethod
             return result;
         }
 };
-
-// Inverse Transform Method
-// Generates N 'independent' sample from the standard normal distribution by using the
-// independent uniform samples on (0,1). Then, the inverse standard normal is approximated
-// by Beasley-Springer-Moro algorith.
-//VectorXd InverseTransformMethod(int size) {
-//
-//
-//}
 
 class AcceptanceRejectionMethod: public NormalVariableGenerationMethod
 {
@@ -188,49 +180,26 @@ class BoxMullerMethod: public NormalVariableGenerationMethod
 {
     public:
         virtual VectorXd generateNSamples(int numberOfSamples, UniformVariableGenerationMethod &uniformMethod) {
-//            VectorXd UniformSample = uniformMethod.generateNSamples(numberOfSamples);
-            VectorXd UniformSample = uniformMethod.generateNSamples(numberOfSamples * 3);
+            VectorXd normalDistSamples = VectorXd::Zero(numberOfSamples);
 
-            vector<double> std_UniformSample; // To dynamically resize
             double u1, u2;
-////////////////////////////////////////////////////////////////////////////
-//            for (int i = 0; i < numberOfSamples; i += 2)
-//            {
-//                double x,y,z1,z2;
-//                u1 = 2 * UniformSample[i] - 1;
-//                u2 = 2 * UniformSample[i + 1] - 1;
-//                x = u1*u1 + u2*u2;
-//                if (x < 1)
-//                {
-//                    y = sqrt(-2 * log(x) / x);
-//                    z1 = u1*y; z2 = u2*y;
-//                    std_UniformSample.push_back(z1);
-//                    std_UniformSample.push_back(z2);
-//                }
-//            }
-            ///////////////////////////////////////////////////
-            for (int i = 0; i < UniformSample.size(); i += 2)
+            int i = 0; // how many samples are generated right now
+            while (i < numberOfSamples - 1)
             {
                 double x, y, z1, z2;
-            u1 = 2 * UniformSample[i] - 1;
-            u2 = 2 * UniformSample[i + 1] - 1;
-            x = u1 * u1 + u2 * u2;
-            if (x < 1) {
-                y = sqrt(-2 * log(x) / x);
-                z1 = u1 * y;
-                z2 = u2 * y;
-                std_UniformSample.push_back(z1);
-                std_UniformSample.push_back(z2);
-            }
-            if (std_UniformSample.size() >= numberOfSamples) {
-                break;
+                u1 = 2 * uniformMethod.generateSingleSample() - 1;
+                u2 = 2 * uniformMethod.generateSingleSample() - 1;
+                x = u1 * u1 + u2 * u2;
+                if (x < 1) {
+                    y = sqrt(-2 * log(x) / x);
+                    z1 = u1 * y;
+                    z2 = u2 * y;
+                    normalDistSamples[i] = z1;
+                    normalDistSamples[i + 1] = z2;
+                    i += 2; // only record non rejected samples
                 }
             }
-            int final_size = std_UniformSample.size();
-            VectorXd final_vector = VectorXd::Zero(final_size);
-            for (int i = 0; i < final_size; ++i)
-                final_vector[i] = std_UniformSample[i];
-            return final_vector;
+            return normalDistSamples;
         }
 };
 
