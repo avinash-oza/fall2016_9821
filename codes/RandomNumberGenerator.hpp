@@ -12,36 +12,48 @@ class UniformVariableGenerationMethod
 {
     public:
         virtual VectorXd generateNSamples(int numberOfSamples) = 0;
+        virtual void resetGenerator() {};
 };
 
 class LinearCongruentialGenerator : public UniformVariableGenerationMethod
 {
     public:
         virtual VectorXd generateNSamples(int numberOfSamples) {
-            int x0 = 1;
-            const int a = 39373;
-            const long int m = pow(2, 31) - 1;
-            const int c = 0;
-
             // Variables needed to avoid overflow
             int q, r, k;
-            q = floor(m / a);
-            r = m%a;
-
             double a_current;
             double x_current = double(x0);
             VectorXd result=VectorXd::Zero(numberOfSamples);
             for (int i = 0; i < numberOfSamples; ++i)
             {
-                k = x0 / q;
-                x0 = a*(x0-k*q)-k*r;
-                if (x0 < 0)
-                    x0 = x0 + m;
-                a_current = (x0+0.0) / m;
-                result[i]=a_current;
+                result[i] = generateSingleSample();
             }
             return result;
         }
+
+        virtual void resetGenerator()
+        {
+            // reset the seed so this can be reused
+            x0 = 1;
+        }
+
+    double generateSingleSample()
+    {
+        long k = x0 / q;
+        x0 = a*(x0-k*q)-k*r;
+        if (x0 < 0)
+            x0 = x0 + m;
+        return (x0+0.0) / m;
+    }
+
+    private:
+        long x0 = 1;
+        const int a = 39373;
+        const long int m = pow(2, 31) - 1;
+        const int c = 0;
+        const long int q = floor(m / a);
+        const long int r = m%a;
+
 };
 
 class AntitheticGenerationMethod: public LinearCongruentialGenerator
@@ -176,23 +188,42 @@ class BoxMullerMethod: public NormalVariableGenerationMethod
 {
     public:
         virtual VectorXd generateNSamples(int numberOfSamples, UniformVariableGenerationMethod &uniformMethod) {
-            VectorXd UniformSample = uniformMethod.generateNSamples(numberOfSamples);
+//            VectorXd UniformSample = uniformMethod.generateNSamples(numberOfSamples);
+            VectorXd UniformSample = uniformMethod.generateNSamples(numberOfSamples * 3);
 
             vector<double> std_UniformSample; // To dynamically resize
             double u1, u2;
-
-            for (int i = 0; i < numberOfSamples; i += 2)
+////////////////////////////////////////////////////////////////////////////
+//            for (int i = 0; i < numberOfSamples; i += 2)
+//            {
+//                double x,y,z1,z2;
+//                u1 = 2 * UniformSample[i] - 1;
+//                u2 = 2 * UniformSample[i + 1] - 1;
+//                x = u1*u1 + u2*u2;
+//                if (x < 1)
+//                {
+//                    y = sqrt(-2 * log(x) / x);
+//                    z1 = u1*y; z2 = u2*y;
+//                    std_UniformSample.push_back(z1);
+//                    std_UniformSample.push_back(z2);
+//                }
+//            }
+            ///////////////////////////////////////////////////
+            for (int i = 0; i < UniformSample.size(); i += 2)
             {
-                double x,y,z1,z2;
-                u1 = 2 * UniformSample[i] - 1;
-                u2 = 2 * UniformSample[i + 1] - 1;
-                x = u1*u1 + u2*u2;
-                if (x < 1)
-                {
-                    y = sqrt(-2 * log(x) / x);
-                    z1 = u1*y; z2 = u2*y;
-                    std_UniformSample.push_back(z1);
-                    std_UniformSample.push_back(z2);
+                double x, y, z1, z2;
+            u1 = 2 * UniformSample[i] - 1;
+            u2 = 2 * UniformSample[i + 1] - 1;
+            x = u1 * u1 + u2 * u2;
+            if (x < 1) {
+                y = sqrt(-2 * log(x) / x);
+                z1 = u1 * y;
+                z2 = u2 * y;
+                std_UniformSample.push_back(z1);
+                std_UniformSample.push_back(z2);
+            }
+            if (std_UniformSample.size() >= numberOfSamples) {
+                break;
                 }
             }
             int final_size = std_UniformSample.size();

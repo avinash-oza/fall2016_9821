@@ -26,6 +26,8 @@ class MonteCarloMethod
             {
                 for (int i = 0; i < pathsToRunFor.size(); ++i)
                 {
+                    //Make sure to reset the generator's seed if required
+                    uniformMethod.resetGenerator();
                     std::cout << setprecision(12) << setw(5);
                     tuple<double, long int> MonteCarloTuple = MonteCarlo(Spot, Strike, Interest, Volatility, Dividend, Maturity, pathsToRunFor[i], transformMethod, uniformMethod);
                     double monte_carlo_price = std::get<0>(MonteCarloTuple); // Returns the price
@@ -49,8 +51,8 @@ class MonteCarloMethod
             // At this point, we have the vector with the sample variables
             // We first find its size.
             int size = sample_random_var.size();
-
-            // Create the vector with the spot prices corresponding with each element in the random sample
+//            int size = NumberOfPaths;
+//             Create the vector with the spot prices corresponding with each element in the random sample
             VectorXd spot_price_vector = VectorXd::Zero(size);
             for (int i = 0; i < size; ++i)
             {
