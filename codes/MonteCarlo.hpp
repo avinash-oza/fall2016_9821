@@ -142,6 +142,7 @@ class BasketOptionMonteCarloMethod : public MonteCarloMethod
     {
         for (int i = 0; i < pathsToRunFor.size(); ++i)
         {
+            uniformMethod.resetGenerator();
             std::cout << setprecision(12) << setw(5);
             tuple<double, long int> MonteCarloTuple = MonteCarlo(Spot, Spot2, Strike, Interest, Volatility, Volatility2, Dividend, Maturity, pathsToRunFor[i], transformMethod, uniformMethod);
             double monte_carlo_price = std::get<0>(MonteCarloTuple); // Returns the price
