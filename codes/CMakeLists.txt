@@ -14,7 +14,7 @@ set(SOURCE_FILES
     Main.cpp
     MatrixDecomposition.hpp
     Solvers.hpp
-    Main.cpp IterativeMethods.hpp StoppingCriterionSolvers.hpp Examples.hpp PDESolverFunctions.hpp OptionPricers.hpp BlackScholes.hpp
-        MonteCarlo.hpp RandomNumberGenerator.hpp BlackScholesOption.hpp)
+    IterativeMethods.hpp StoppingCriterionSolvers.hpp Examples.hpp PDESolverFunctions.hpp OptionPricers.hpp BlackScholes.hpp
+        MonteCarlo.hpp RandomNumberGenerator.hpp BlackScholesOption.hpp FiniteDifferenceMethods.hpp)
 
 add_executable(cppcodetest ${SOURCE_FILES})

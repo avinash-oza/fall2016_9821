@@ -66,12 +66,13 @@ Eigen::VectorXd forwardEuler(uFunction &gLeftFunc, uFunction &gRightFunc, uFunct
         std::cout << "t=" << t << "x=" << x + i*dx << "u=" << u_1[i] << std::endl;
     }
 
-    for (int i = 0; i < M + 1; ++i) {
+    for (int i = 0; i < M; ++i) {
         t = t0 + i*dt;
         // iterate through each x value
         for (int j = 1; j < N; ++j) {
-            u[j] = u_1[j] + F * (u_1[j - 1] - 2 * u_1[j] + u_1[j + 1]);
-            std::cout << "t=" << t << " x=" << x + j*dx  << " u= " <<  u[j] << std::endl;
+            u[j] = alpha*u_1[j + 1]  + (1-2*alpha) * u_1[j] + alpha*u_1[j-1];
+            std::cout << "t=" << t << " x=" << x + j*dx  << " u= " <<  u[j] << "EXACT:" << std::exp(t + x + j*dx)
+                      << "DIFF:" <<  abs(std::exp(t + x + j*dx) - u[j]) << std::endl;
         }
 
 
@@ -83,7 +84,6 @@ Eigen::VectorXd forwardEuler(uFunction &gLeftFunc, uFunction &gRightFunc, uFunct
         // update u_1 as current values to keep for next iteration
         u_1 = u;
     }
-
     return u;
 }
 
