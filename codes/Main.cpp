@@ -14,6 +14,7 @@
 //#include "Options.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "MonteCarlo.hpp"
+#include "FiniteDifferenceMethods.hpp"
 
 
 using namespace Eigen;
@@ -28,11 +29,13 @@ VectorXd calculateuExactVector(int N, const VectorXd &xCoordinates, const Vector
 void runOneIteration(int N, double w);
 void printCSVMatrix(std::string stringToPrint, const MatrixXd& myMatrix);
 void Question3();
+void hw8();
 
 int main() {
     /// Keep this line to make the decimals always print out
     std::cout << std::fixed << std::setprecision(9);
-    Question3();
+    hw8();
+//    Question3();
 //    decompositionExamples();
 //    verifyCholeskyDecomposition();
 //    exam2013();
@@ -81,6 +84,17 @@ int main() {
 
     return 0;
 }
+
+void hw8()
+{
+    hw8gLeft  gLeft;
+    hw8gRight gRight;
+    hw8f f;
+
+    VectorXd fEulerResult = forwardEuler(gLeft, gRight, f, 0.0, 1.0, -2.0, 2.0, 8, 8);
+//    std::cout << fEulerResult << std::endl;
+}
+
 
 void runOneIteration(int N, double w) {
     //Start building the mesh
@@ -192,25 +206,25 @@ void Question3()
     price = option.putPrice(spot, strike, maturity, div, interest, 0, vol);
 
     // Creating the vector containing the value for the number of random variables.
-    int N_vector_size = 9;
-//    int N_vector_size = 1;
+//    int N_vector_size = 10;
+    int N_vector_size = 1;
     Eigen::VectorXi N_vector = Eigen::VectorXi::Zero(N_vector_size);
-    N_vector << 1, 2, 4, 8, 16, 32, 64, 128, 256;
-//    N_vector << 1;
+//    N_vector << 1, 2, 4, 8, 16, 32, 64, 128, 256, 512;
+    N_vector << 1;
     N_vector *= 10000;
 
 
     // Part a: Iverse Transform Method
-    BoxMullerMethod inverseTransformMethod;
+    InverseTransformMethod inverseTransformMethod;
     LinearCongruentialGenerator uniformMethod;
-//    MomentMatchingAndControlVariateMonteCarloMethod monteCarloPricer;
+    MonteCarloMethod monteCarloPricer;
 
-//    monteCarloPricer.runMonteCarloForPaths(spot, strike, interest, vol, div, maturity, N_vector, inverseTransformMethod, uniformMethod, price);
-    double vol2 = 0.2, spot2 = 30;
-    spot = 25; strike = 50; interest = 0.05; vol = 0.3; maturity = 0.5; div = 0;
-
-    BasketOptionMonteCarloMethod basketOptionMonteCarloMethod(0.35);
-    basketOptionMonteCarloMethod.runMonteCarloForPaths(spot, spot2, strike, interest, vol, vol2, div, maturity, N_vector, inverseTransformMethod, uniformMethod, price);
+    monteCarloPricer.runMonteCarloForPaths(spot, strike, interest, vol, div, maturity, N_vector, inverseTransformMethod, uniformMethod, price);
+//    double vol2 = 0.2, spot2 = 30;
+//    spot = 25; strike = 50; interest = 0.05; vol = 0.3; maturity = 0.5; div = 0;
+//
+//    BasketOptionMonteCarloMethod basketOptionMonteCarloMethod(0.35);
+//    basketOptionMonteCarloMethod.runMonteCarloForPaths(spot, spot2, strike, interest, vol, vol2, div, maturity, N_vector, inverseTransformMethod, uniformMethod, price);
 
 
 //     Part b: Acceptance Rejection Method
