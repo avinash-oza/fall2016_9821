@@ -124,25 +124,29 @@ class hw8gRight : public uFunction
 class PDESolver
 {
 public:
-    Eigen::MatrixXd forwardEuler(uFunction &gLeftFunc, uFunction &gRightFunc, uFunction &f, double t0, double tFinal, double xLeft, double xRight, int M, int N)
+    PDESolver(uFunction &gLeftFunc, uFunction &gRightFunc, uFunction &f, double t0, double tFinal, double xLeft, double xRight, int M, int N) :
+            _gLeftFunc(gLeftFunc), _gRightFunc(gRightFunc),
+            _f(f), _t0(t0), _tFinal(tFinal), _xLeft(xLeft), _xRight(xRight), M(M), N(N) {};
+
+    Eigen::MatrixXd forwardEuler()
     {
         Eigen::MatrixXd valuesAtNodes = Eigen::MatrixXd::Zero(M + 1, N + 1);
 
-        valuesAtNodes(0,0) = gLeftFunc.evaluate(xLeft,0);
-        valuesAtNodes(0,N) = gRightFunc.evaluate(xRight,0);
-        double dx = (xRight - xLeft) / N;
-        double dt = (tFinal - t0) / M;
+        valuesAtNodes(0,0) = _gLeftFunc.evaluate(_xLeft,0);
+        valuesAtNodes(0,N) = _gRightFunc.evaluate(_xRight,0);
+        double dx = (_xRight - _xLeft) / N;
+        double dt = (_tFinal - _t0) / M;
         double alpha = dt/(dx*dx);
 
         // create initial vector
         long size = N - 1;
-        double deltaX = (xRight - xLeft) / N;
+        double deltaX = (_xRight - _xLeft) / N;
 
         VectorXd U = VectorXd::Zero(size);
 
         for (long i = 0; i < size; ++i)
         {
-            U(i) = f.evaluate(xLeft + (i + 1) * dx, 0);
+            U(i) = _f.evaluate(_xLeft + (i + 1) * dx, 0);
         }
 
         //
@@ -178,13 +182,13 @@ public:
 
             VectorXd b = VectorXd::Zero(size);
 
-            b(0) = alpha * gLeftFunc.evaluate(xLeft,(timeIndex - 1) * dt);
-            b(size - 1) = alpha * gRightFunc.evaluate(xRight,(timeIndex - 1) * dt);
+            b(0) = alpha * _gLeftFunc.evaluate(_xLeft,(timeIndex - 1) * dt);
+            b(size - 1) = alpha * _gRightFunc.evaluate(_xRight,(timeIndex - 1) * dt);
 
             U = A * U + b;
             //
-            valuesAtNodes(timeIndex,0) = gLeftFunc.evaluate(xLeft, timeIndex * tFinal / M);
-            valuesAtNodes(timeIndex,N) = gRightFunc.evaluate(xRight, timeIndex * tFinal / M);
+            valuesAtNodes(timeIndex,0) = _gLeftFunc.evaluate(_xLeft, timeIndex * _tFinal / M);
+            valuesAtNodes(timeIndex,N) = _gRightFunc.evaluate(_xRight, timeIndex * _tFinal / M);
 
             for (long i = 1; i < N; ++i)
             {
@@ -209,6 +213,16 @@ public:
 
         return std::sqrt(totalScaledError.sum()/(N + 1));
     }
+private:
+    uFunction & _gLeftFunc;
+    uFunction & _gRightFunc;
+    uFunction & _f;
+    double _t0;
+    double _tFinal;
+    double _xLeft;
+    double _xRight;
+    long M;
+    long N;
 
 
 };

@@ -99,8 +99,8 @@ void hw8()
     long N = 8;
     cout << setprecision(16);
     double tol = std::pow(10, -6);
-    PDESolver solver;
-    MatrixXd fEulerResult = solver.forwardEuler(gLeft, gRight, f, 0.0, tauFinal, xLeft, xRight, M, N);
+    PDESolver solver(gLeft, gRight, f, 0, tauFinal, xLeft, xRight, M, N);
+    MatrixXd fEulerResult = solver.forwardEuler();
     std::cout << fEulerResult << std::endl;
     std::cout << solver.RootMeanSquaredError(fEulerResult, uExact1, M, N, xLeft, xRight, 0, tauFinal);
 }
