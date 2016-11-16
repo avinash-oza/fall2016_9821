@@ -95,16 +95,27 @@ void hw8()
     double xLeft = -2.0;
     double xRight = 2.0;
     double tauFinal = 1.0;
-    long M = 32;
-    long N = 8;
+    long M = 1;
+    long N = 2;
     cout << setprecision(16);
     double tol = std::pow(10, -6);
-//    Mesh m(0, tauFinal, xLeft, xRight, M, N);
-    PDESolver solver(gLeft, gRight, f, 0, tauFinal, xLeft, xRight, M, N);
-    MatrixXd fEulerResult = solver.forwardEuler();
-//    std::cout << fEulerResult << std::endl;
-    std::cout << solver.MaxPointwiseApproximationError(fEulerResult, uExact1) << std::endl;
-    std::cout << solver.RootMeanSquaredError(fEulerResult, uExact1) << std::endl;
+    double omega = 1.2;
+
+    for (int i = 0; i < 4; ++i)
+    {
+        M = 8 * pow(4, i);
+        N *= 2;
+
+        cout << M << "," << N  << endl;
+        PDESolver solver(gLeft, gRight, f, 0, tauFinal, xLeft, xRight, M, N);
+//    MatrixXd fEulerResult = solver.forwardEuler();
+        MatrixXd bEulerResult = solver.backwardEuler(LU, tol, omega);
+//    std::cout << bEulerResult << std::endl;
+//    std::cout << solver.MaxPointwiseApproximationError(bEulerResult, uExact1) << std::endl;
+        std::cout << solver.RootMeanSquaredError(bEulerResult, uExact1) << std::endl;
+    }
+
+
 }
 
 

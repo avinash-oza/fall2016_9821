@@ -7,6 +7,8 @@
 #include <Eigen/Dense>
 #include "PDEMesh.hpp"
 
+enum LinearSolveMethod {LU, SOR}; // define enum for linear solve
+
 class uFunction
 {
     public:
@@ -54,72 +56,6 @@ class hw8gRight : public uFunction
 
 };
 
-//Eigen::VectorXd backwardEuler(uFunction &gLeftFunc, uFunction &gRightFunc, uFunction &f, double t0, double tFinal, double xLeft, double xRight, int M, int N)
-//{
-//    double dx = (xRight - xLeft) / (N);
-//    double dt = (tFinal - t0) / (M);
-//    double alpha = (tFinal * N * N) / ((xRight - xLeft) * (xRight - xLeft) * M);
-//    double F = alpha * dt / (dx * dx);
-//    double t = t0;
-//    double x = xLeft;
-//
-//    //////
-//    VectorXd u(N + 1); // u value at current time
-//    u.setZero();
-//
-//    VectorXd u_1(N + 1); // u from the previous time
-//    u_1.setZero();
-//    //////
-//
-//    Eigen::MatrixXd A(N - 1, N - 1);
-//    A.setZero();
-//
-//    for(int i = 0; i < N - 1; ++i)
-//    {
-//        A(i, i) = 1 + 2*alpha;
-//    }
-//    for(int i = 0; i < N - 2; ++i)
-//    {
-//        A(i, i + 1) = - alpha;
-//    }
-//    for(int i = 1; i < N - 1; ++i)
-//    {
-//        A(i, i - 1) = - alpha;
-//    }
-//    std::cout << A << std::endl;
-//
-//    ///set initial conditions
-//    for (int i = 0; i < N + 1; ++i) {
-//        //set value equal to the x boundary
-//        u_1[i] = f.evaluate(0, x + i*dx);
-//        std::cout << "t=" << t << "x=" << x + i*dx << "u=" << u_1[i] << std::endl;
-//    }
-//    ///
-//
-///////
-//    for (int i = 0; i < M; ++i) {
-//        t = t0 + i * dt;
-//        // iterate through each x value
-//        for (int j = 1; j < N; ++j) {
-//            u[j] = alpha * u_1[j + 1] + (1 - 2 * alpha) * u_1[j] + alpha * u_1[j - 1];
-//            std::cout << "t=" << t << " x=" << x + j * dx << " u= " << u[j] << "EXACT:" << std::exp(t + x + j * dx)
-//                      << "DIFF:" << abs(std::exp(t + x + j * dx) - u[j]) << std::endl;
-//        }
-//
-//
-//
-//        // set boundary conditions
-//        u[0] = gLeftFunc.evaluate(t, xLeft);
-//        u[N] = gRightFunc.evaluate(t, xRight);
-//
-//        // update u_1 as current values to keep for next iteration
-//        u_1 = u;
-//    }
-/////
-
-//    return VectorXd();
-//}
-
 //M time intervals, N x intervals
 
 class PDESolver
@@ -138,9 +74,7 @@ public:
 
         valuesAtNodes(0,0) = _gLeftFunc.evaluate(_xLeft,0);
         valuesAtNodes(0,N) = _gRightFunc.evaluate(_xRight,0);
-        double dx = (_xRight - _xLeft) / N;
-        double dt = (_tFinal - _t0) / M;
-        double alpha = dt/(dx*dx);
+        double alpha = getAlpha();
 
         // create initial vector
         long size = N - 1;
@@ -200,6 +134,13 @@ public:
         return valuesAtNodes;
     }
 
+    double getAlpha() const {
+        double dx = (_xRight - _xLeft) / N;
+        double dt = (_tFinal - _t0) / M;
+        double alpha = dt/(dx*dx);
+        return alpha;
+    }
+
     double RootMeanSquaredError(MatrixXd& approximations, uFunction &uExact)
     {
         double dx = (_xRight - _xLeft) / N;
@@ -215,6 +156,92 @@ public:
 
         return std::sqrt(totalScaledError.sum()/(N + 1));
     }
+
+    MatrixXd backwardEuler(LinearSolveMethod linearSolverMethod, double tol, double omega)
+    {
+
+        MatrixXd valuesAtNodes = MatrixXd::Zero(M + 1, N + 1);
+
+        long numberTimeSteps = M;
+
+        //create U initial
+        long size = N - 1;
+        double deltaX = (_xRight - _xLeft) / N;
+
+        VectorXd U = VectorXd::Zero(size);
+
+        for (long i = 0; i < size; ++i)
+        {
+            U(i) = _f.evaluate(mesh.getX(i + 1), mesh.getT(0));
+        }
+
+        //
+
+        //create A
+        double alpha = getAlpha();
+
+        MatrixXd A = MatrixXd::Zero(size, size);
+
+        for (long i = 0; i < size; ++i)
+        {
+            A(i,i) = 1 + 2 * alpha;
+        }
+
+        for (long i = 0; i < size - 1; ++i)
+        {
+            A(i, i + 1) = -alpha;
+        }
+
+        for (long i = 1; i < size; ++i)
+        {
+            A(i, i - 1) = -alpha;
+        }
+
+        //
+        VectorXd x0 = VectorXd::Zero(N - 1);
+
+        valuesAtNodes(0,0) = _gLeftFunc.evaluate(_xLeft,0);
+        valuesAtNodes(0,N) = _gRightFunc.evaluate(_xRight,0);
+
+        for (long i = 1; i < N; ++i)
+        {
+            valuesAtNodes(0,i) = U(i-1);
+        }
+
+        for (long timeIndex = 1; timeIndex <= numberTimeSteps; ++timeIndex)
+        {
+            VectorXd b = VectorXd::Zero(size);
+
+            b(0) = alpha * _gLeftFunc.evaluate(_xLeft, mesh.getT(timeIndex));
+            b(size - 1) = alpha * _gRightFunc.evaluate(_xRight, mesh.getT(timeIndex));
+
+
+
+            //
+            int ic;
+
+            switch (linearSolverMethod)
+            {
+                case LinearSolveMethod ::LU :
+                    U = linear_solve_lu_no_pivoting(A, U + b);
+                    break;
+                case LinearSolveMethod ::SOR :
+                    SORIteration iterationMethod;
+                    std::tie(U, ic) = consecutive_approximation_solver(A, U + b, x0, tol, iterationMethod, omega);
+                    break;
+            }
+
+            valuesAtNodes(timeIndex,0) = _gLeftFunc.evaluate(_xLeft, mesh.getT(timeIndex));
+            valuesAtNodes(timeIndex,N) = _gRightFunc.evaluate(_xRight, mesh.getT(timeIndex));
+
+            for (long i = 1; i < N; ++i)
+            {
+                valuesAtNodes(timeIndex,i) = U(i-1);
+            }
+        }
+        return valuesAtNodes;
+    }
+
 
     double MaxPointwiseApproximationError(MatrixXd &approximations, uFunction& uExact) const {
         double dx = (_xRight - _xLeft)/ N;

@@ -63,10 +63,10 @@ std::tuple<VectorXd, int> residual_based_solver(const MatrixXd &A, const VectorX
         ic += 1;
         x = iterMethod.calculateIteration(lower_A, upper_A, diagonal_A, D_inverse, b_new, x, w);
 
-        std::string toPrint = "After iteration ";
-        toPrint += std::to_string(ic);
-        toPrint += ":";
-        printCSVMatrix(toPrint, x);
+//        std::string toPrint = "After iteration ";
+//        toPrint += std::to_string(ic);
+//        toPrint += ":";
+//        printCSVMatrix(toPrint, x);
 
         residual = b - copiedA * x;
     }
