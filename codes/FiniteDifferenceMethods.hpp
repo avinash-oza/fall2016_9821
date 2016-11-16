@@ -121,12 +121,65 @@ class hw8gRight : public uFunction
 
 //M time intervals, N x intervals
 
+class Mesh
+{
+public:
+    Mesh() {};
+    Mesh(double t0, double tFinal, double xLeft, double xRight, int M, int N):
+            _t0(t0), _tFinal(tFinal), _xLeft(xLeft), _xRight(xRight), M(M), N(N)
+    {
+        // construct mesh here
+        timeCoordinates = Eigen::VectorXd::Zero(M + 1);
+        xCoordinates = Eigen::VectorXd::Zero(N + 1);
+        double dx = (_xRight - _xLeft) / N;
+        double dt = (_tFinal - _t0) / M;
+
+        for(int i = 0; i < M + 1; ++i)
+        {
+            timeCoordinates(i) = t0 + i*dt;
+        }
+
+        for(int j = 0; j < N + 1; ++j)
+        {
+            // alter only the x coordinate
+            xCoordinates(j) = xLeft + j*dx;
+        }
+
+//        std::cout << timeCoordinates << std::endl;
+//        std::cout << xCoordinates << std::endl;
+
+    };
+
+    double getX(double index)
+    {
+        return xCoordinates(index);
+    }
+
+    double getT(double index)
+    {
+        return timeCoordinates(index);
+    }
+private:
+    VectorXd timeCoordinates;
+    VectorXd xCoordinates;
+    double _t0;
+    double _tFinal;
+    double _xLeft;
+    double _xRight;
+    long M;
+    long N;
+
+};
+
 class PDESolver
 {
 public:
     PDESolver(uFunction &gLeftFunc, uFunction &gRightFunc, uFunction &f, double t0, double tFinal, double xLeft, double xRight, int M, int N) :
             _gLeftFunc(gLeftFunc), _gRightFunc(gRightFunc),
-            _f(f), _t0(t0), _tFinal(tFinal), _xLeft(xLeft), _xRight(xRight), M(M), N(N) {};
+            _f(f), _t0(t0), _tFinal(tFinal), _xLeft(xLeft), _xRight(xRight), M(M), N(N) {
+        mesh = Mesh(0, tFinal, xLeft, xRight, M, N);
+    };
+
 
     Eigen::MatrixXd forwardEuler()
     {
@@ -146,10 +199,8 @@ public:
 
         for (long i = 0; i < size; ++i)
         {
-            U(i) = _f.evaluate(_xLeft + (i + 1) * dx, 0);
+            U(i) = _f.evaluate(mesh.getX(i + 1), mesh.getT(0));
         }
-
-        //
 
         //create constant Euler matrix A
 
@@ -182,13 +233,13 @@ public:
 
             VectorXd b = VectorXd::Zero(size);
 
-            b(0) = alpha * _gLeftFunc.evaluate(_xLeft,(timeIndex - 1) * dt);
-            b(size - 1) = alpha * _gRightFunc.evaluate(_xRight,(timeIndex - 1) * dt);
+            b(0) = alpha * _gLeftFunc.evaluate(_xLeft, mesh.getT(timeIndex - 1));
+            b(size - 1) = alpha * _gRightFunc.evaluate(_xRight, mesh.getT(timeIndex - 1));
 
             U = A * U + b;
             //
-            valuesAtNodes(timeIndex,0) = _gLeftFunc.evaluate(_xLeft, timeIndex * _tFinal / M);
-            valuesAtNodes(timeIndex,N) = _gRightFunc.evaluate(_xRight, timeIndex * _tFinal / M);
+            valuesAtNodes(timeIndex,0) = _gLeftFunc.evaluate(_xLeft, mesh.getT(timeIndex));
+            valuesAtNodes(timeIndex,N) = _gRightFunc.evaluate(_xRight, mesh.getT(timeIndex));
 
             for (long i = 1; i < N; ++i)
             {
@@ -207,8 +258,7 @@ public:
         VectorXd totalScaledError(N + 1); // contains the difference of the error squared divided by the exact value squared
 
         for (long i = 0; i < N + 1; ++i) {
-            double x = _xLeft + i * dx;
-            uExactValue = uExact.evaluate(x, _tFinal);
+            uExactValue = uExact.evaluate(mesh.getX(i), _tFinal);
             totalScaledError(i) = std::pow(std::abs((boundaryApproximations(i) - uExactValue)),2) / (std::pow(std::abs(uExactValue), 2));
         }
 
@@ -235,6 +285,7 @@ private:
     uFunction & _gLeftFunc;
     uFunction & _gRightFunc;
     uFunction & _f;
+    Mesh mesh;
     double _t0;
     double _tFinal;
     double _xLeft;

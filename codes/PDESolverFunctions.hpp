@@ -71,7 +71,7 @@ VectorXd get_b(const int N, const VectorXd &xCoordinates, const VectorXd &yCoord
         {
             f_vec(k) = f(xCoordinates(k), yCoordinates(0));
         }
-        //b_all(j, (N - 1)) = ((N + 1)*(N + 1))*f_vec(j) + u(xCoordinates(j), 1);		// y(N+2)=1
+        //b_all(j, (N - 1)) = ((N + 1)*(N + 1))*f_vec(j) + u(timeCoordinates(j), 1);		// y(N+2)=1
         // correction of b
         b_all(j, 0) = (h*h)*f_vec(j) + u(xCoordinates(j), 0);	// y(1)=0;
         b_all(0, 0) += u(0, yCoordinates(0));
@@ -106,7 +106,7 @@ VectorXd get_b(const int N, const VectorXd &xCoordinates, const VectorXd &yCoord
         {
             f_vec(k) = f(xCoordinates(k), yCoordinates(N - 1));
         }
-        //b_all(j, (N - 1)) = ((N + 1)*(N + 1))*f_vec(j) + u(xCoordinates(j), 1);		// y(N+2)=1
+        //b_all(j, (N - 1)) = ((N + 1)*(N + 1))*f_vec(j) + u(timeCoordinates(j), 1);		// y(N+2)=1
         // correction of b
         b_all(j, (N - 1)) = (h*h)*f_vec(j) + u(xCoordinates(j), 1);
         b_all(0, (N - 1)) += u(0, yCoordinates(N - 1));
