@@ -76,7 +76,7 @@ int main() {
 //        cout << w << "|";
 //        for (auto it = NtoRunFor.begin(); it != NtoRunFor.end(); it++) {
 //            runOneIteration(*it, w);
-    std::cout << ",";
+//    std::cout << ",";
 //        }
 //        cout << endl;
 //    }
@@ -90,9 +90,19 @@ void hw8()
     hw8gLeft  gLeft;
     hw8gRight gRight;
     hw8f f;
+    uExact uExact1;
 
-    VectorXd fEulerResult = forwardEuler(gLeft, gRight, f, 0.0, 1.0, -2.0, 2.0, 8, 8);
-//    std::cout << fEulerResult << std::endl;
+    double xLeft = -2.0;
+    double xRight = 2.0;
+    double tauFinal = 1.0;
+    long M = 32;
+    long N = 8;
+    cout << setprecision(16);
+    double tol = std::pow(10, -6);
+
+    MatrixXd fEulerResult = forwardEuler(gLeft, gRight, f, 0.0, tauFinal, xLeft, xRight, M, N);
+    std::cout << fEulerResult << std::endl;
+    std::cout << RootMeanSquaredError(fEulerResult, uExact1, M, N, xLeft, xRight, 0, tauFinal);
 }
 
 
