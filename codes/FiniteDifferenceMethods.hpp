@@ -198,20 +198,38 @@ public:
         return valuesAtNodes;
     }
 
-    double RootMeanSquaredError(MatrixXd& approximations, uFunction &uExact, long M, long N, double xLeft, double xRight, double t0, double tFinal)  {
-        double dx = (xRight - xLeft) / N;
+    double RootMeanSquaredError(MatrixXd& approximations, uFunction &uExact)
+    {
+        double dx = (_xRight - _xLeft) / N;
         double uExactValue;
 
         VectorXd boundaryApproximations = approximations.row(M); // the lower most row of matrix
         VectorXd totalScaledError(N + 1); // contains the difference of the error squared divided by the exact value squared
 
         for (long i = 0; i < N + 1; ++i) {
-            double x = xLeft + i * dx;
-            uExactValue = uExact.evaluate(x, tFinal);
+            double x = _xLeft + i * dx;
+            uExactValue = uExact.evaluate(x, _tFinal);
             totalScaledError(i) = std::pow(std::abs((boundaryApproximations(i) - uExactValue)),2) / (std::pow(std::abs(uExactValue), 2));
         }
 
         return std::sqrt(totalScaledError.sum()/(N + 1));
+    }
+
+    double MaxPointwiseApproximationError(MatrixXd &approximations, uFunction& uExact) const {
+        double dx = (_xRight - _xLeft)/ N;
+
+        VectorXd boundaryApproximations = approximations.row(M); // the lower most row of matrix
+        VectorXd uExactBoundary(N + 1);
+
+        for (long i = 0; i < N + 1; ++i)
+        {
+            double x = _xLeft + i * dx;
+            uExactBoundary(i)  = uExact.evaluate(x, _tFinal);
+        }
+
+        VectorXd difference = (boundaryApproximations - uExactBoundary);
+
+        return difference.cwiseAbs().maxCoeff();
     }
 private:
     uFunction & _gLeftFunc;

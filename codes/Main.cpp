@@ -102,7 +102,8 @@ void hw8()
     PDESolver solver(gLeft, gRight, f, 0, tauFinal, xLeft, xRight, M, N);
     MatrixXd fEulerResult = solver.forwardEuler();
     std::cout << fEulerResult << std::endl;
-    std::cout << solver.RootMeanSquaredError(fEulerResult, uExact1, M, N, xLeft, xRight, 0, tauFinal);
+    std::cout << solver.RootMeanSquaredError(fEulerResult, uExact1) << std::endl;
+    std::cout << solver.MaxPointwiseApproximationError(fEulerResult, uExact1) << std::endl;
 }
 
 
