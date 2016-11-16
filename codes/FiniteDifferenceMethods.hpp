@@ -121,90 +121,98 @@ class hw8gRight : public uFunction
 
 //M time intervals, N x intervals
 
-Eigen::MatrixXd forwardEuler(uFunction &gLeftFunc, uFunction &gRightFunc, uFunction &f, double t0, double tFinal, double xLeft, double xRight, int M, int N) {
-    Eigen::MatrixXd valuesAtNodes = Eigen::MatrixXd::Zero(M + 1, N + 1);
-
-    valuesAtNodes(0,0) = gLeftFunc.evaluate(xLeft,0);
-    valuesAtNodes(0,N) = gRightFunc.evaluate(xRight,0);
-    double dx = (xRight - xLeft) / N;
-    double dt = (tFinal - t0) / M;
-    double alpha = dt/(dx*dx);
-
-    // create initial vector
-    long size = N - 1;
-    double deltaX = (xRight - xLeft) / N;
-
-    VectorXd U = VectorXd::Zero(size);
-
-    for (long i = 0; i < size; ++i)
+class PDESolver
+{
+public:
+    Eigen::MatrixXd forwardEuler(uFunction &gLeftFunc, uFunction &gRightFunc, uFunction &f, double t0, double tFinal, double xLeft, double xRight, int M, int N)
     {
-        U(i) = f.evaluate(xLeft + (i + 1) * dx, 0);
-    }
+        Eigen::MatrixXd valuesAtNodes = Eigen::MatrixXd::Zero(M + 1, N + 1);
 
-    //
+        valuesAtNodes(0,0) = gLeftFunc.evaluate(xLeft,0);
+        valuesAtNodes(0,N) = gRightFunc.evaluate(xRight,0);
+        double dx = (xRight - xLeft) / N;
+        double dt = (tFinal - t0) / M;
+        double alpha = dt/(dx*dx);
 
-    //create constant Euler matrix A
+        // create initial vector
+        long size = N - 1;
+        double deltaX = (xRight - xLeft) / N;
 
-    MatrixXd A = MatrixXd::Zero(size, size);
+        VectorXd U = VectorXd::Zero(size);
 
-    for (long i = 0; i < size; ++i)
-    {
-        A(i,i) = 1 - 2 * alpha;
-    }
+        for (long i = 0; i < size; ++i)
+        {
+            U(i) = f.evaluate(xLeft + (i + 1) * dx, 0);
+        }
 
-    for (long i = 0; i < size - 1; ++i)
-    {
-        A(i, i + 1) = alpha;
-    }
-
-    for (long i = 1; i < size; ++i)
-    {
-        A(i, i - 1) = alpha;
-    }
-    //
-
-    for (long i = 1; i < N; ++i)
-    {
-        valuesAtNodes(0,i) = U(i-1);
-    }
-
-    for (long timeIndex = 1; timeIndex <= M; ++timeIndex)
-    {
-        // create b vector
-
-        VectorXd b = VectorXd::Zero(size);
-
-        b(0) = alpha * gLeftFunc.evaluate(xLeft,(timeIndex - 1) * dt);
-        b(size - 1) = alpha * gRightFunc.evaluate(xRight,(timeIndex - 1) * dt);
-
-        U = A * U + b;
         //
-        valuesAtNodes(timeIndex,0) = gLeftFunc.evaluate(xLeft, timeIndex * tFinal / M);
-        valuesAtNodes(timeIndex,N) = gRightFunc.evaluate(xRight, timeIndex * tFinal / M);
+
+        //create constant Euler matrix A
+
+        MatrixXd A = MatrixXd::Zero(size, size);
+
+        for (long i = 0; i < size; ++i)
+        {
+            A(i,i) = 1 - 2 * alpha;
+        }
+
+        for (long i = 0; i < size - 1; ++i)
+        {
+            A(i, i + 1) = alpha;
+        }
+
+        for (long i = 1; i < size; ++i)
+        {
+            A(i, i - 1) = alpha;
+        }
+        //
 
         for (long i = 1; i < N; ++i)
         {
-            valuesAtNodes(timeIndex,i) = U(i-1);
+            valuesAtNodes(0,i) = U(i-1);
         }
+
+        for (long timeIndex = 1; timeIndex <= M; ++timeIndex)
+        {
+            // create b vector
+
+            VectorXd b = VectorXd::Zero(size);
+
+            b(0) = alpha * gLeftFunc.evaluate(xLeft,(timeIndex - 1) * dt);
+            b(size - 1) = alpha * gRightFunc.evaluate(xRight,(timeIndex - 1) * dt);
+
+            U = A * U + b;
+            //
+            valuesAtNodes(timeIndex,0) = gLeftFunc.evaluate(xLeft, timeIndex * tFinal / M);
+            valuesAtNodes(timeIndex,N) = gRightFunc.evaluate(xRight, timeIndex * tFinal / M);
+
+            for (long i = 1; i < N; ++i)
+            {
+                valuesAtNodes(timeIndex,i) = U(i-1);
+            }
+        }
+        return valuesAtNodes;
     }
-    return valuesAtNodes;
-}
 
-double RootMeanSquaredError(MatrixXd& approximations, uFunction &uExact, long M, long N, double xLeft, double xRight, double t0, double tFinal)  {
-    double dx = (xRight - xLeft) / N;
-    double uExactValue;
+    double RootMeanSquaredError(MatrixXd& approximations, uFunction &uExact, long M, long N, double xLeft, double xRight, double t0, double tFinal)  {
+        double dx = (xRight - xLeft) / N;
+        double uExactValue;
 
-    VectorXd boundaryApproximations = approximations.row(M); // the lower most row of matrix
-    VectorXd totalScaledError(N + 1); // contains the difference of the error squared divided by the exact value squared
+        VectorXd boundaryApproximations = approximations.row(M); // the lower most row of matrix
+        VectorXd totalScaledError(N + 1); // contains the difference of the error squared divided by the exact value squared
 
-    for (long i = 0; i < N + 1; ++i) {
-        double x = xLeft + i * dx;
-        uExactValue = uExact.evaluate(x, tFinal);
-        totalScaledError(i) = std::pow(std::abs((boundaryApproximations(i) - uExactValue)),2) / (std::pow(std::abs(uExactValue), 2));
+        for (long i = 0; i < N + 1; ++i) {
+            double x = xLeft + i * dx;
+            uExactValue = uExact.evaluate(x, tFinal);
+            totalScaledError(i) = std::pow(std::abs((boundaryApproximations(i) - uExactValue)),2) / (std::pow(std::abs(uExactValue), 2));
+        }
+
+        return std::sqrt(totalScaledError.sum()/(N + 1));
     }
 
-    return std::sqrt(totalScaledError.sum()/(N + 1));
-}
+
+};
+
 
 
 #endif //CPPCODETEST_FINITEDIFFERENCEMETHODS_HPP
