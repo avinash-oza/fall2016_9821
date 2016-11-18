@@ -101,7 +101,7 @@ std::tuple<VectorXd, int> consecutive_approximation_solver(const MatrixXd &A, co
 
         ic += 1;
     }
-    std::cout << "Iter count: " << ic << std::endl;
+//    std::cout << "Iter count: " << ic << std::endl;
 
     return std::make_tuple(xNew, ic);
 }

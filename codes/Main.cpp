@@ -95,24 +95,30 @@ void hw8()
     double xLeft = -2.0;
     double xRight = 2.0;
     double tauFinal = 1.0;
-    long M = 1;
-    long N = 2;
+    long M = 2;
+    long N = 8;
     cout << setprecision(16);
     double tol = std::pow(10, -6);
     double omega = 1.2;
 
+//    PDESolver solver(gLeft, gRight, f, 0, tauFinal, xLeft, xRight, M, N);
+//    MatrixXd fEulerResult = solver.CrankNicolson(LU, tol, omega);
+//    MatrixXd bEulerResult = solver.CrankNicolson(LU, tol, omega);
+//    printCSVMatrix("Print" ,bEulerResult);
+
     for (int i = 0; i < 4; ++i)
     {
-        M = 8 * pow(4, i);
+        M *= 4;
         N *= 2;
 
-        cout << M << "," << N  << endl;
+        cout << M << "," << N  << ",";
         PDESolver solver(gLeft, gRight, f, 0, tauFinal, xLeft, xRight, M, N);
-//    MatrixXd fEulerResult = solver.forwardEuler();
-        MatrixXd bEulerResult = solver.backwardEuler(LU, tol, omega);
-//    std::cout << bEulerResult << std::endl;
-//    std::cout << solver.MaxPointwiseApproximationError(bEulerResult, uExact1) << std::endl;
-        std::cout << solver.RootMeanSquaredError(bEulerResult, uExact1) << std::endl;
+//        MatrixXd fEulerResult = solver.forwardEuler();
+//        MatrixXd bEulerResult = solver.backwardEuler(SOR, tol, omega);
+        MatrixXd bEulerResult = solver.CrankNicolson(SOR, tol, omega);
+//        std::cout << fEulerResult << std::endl;
+        std::cout << solver.MaxPointwiseApproximationError(bEulerResult, uExact1)
+        << "," <<  solver.RootMeanSquaredError(bEulerResult, uExact1) << std::endl;
     }
 
 
