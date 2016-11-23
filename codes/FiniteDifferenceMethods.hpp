@@ -6,111 +6,12 @@
 #define CPPCODETEST_FINITEDIFFERENCEMETHODS_HPP
 #include <Eigen/Dense>
 #include "PDEMesh.hpp"
+#include "uFunctions.hpp"
 
 
 using namespace Eigen;
 enum LinearSolveMethod {LU, SOR}; // define enum for linear solve
 
-class uFunction
-{
-    public:
-        virtual double evaluate(double x, double t) = 0;
-
-};
-
-class hw8f : public uFunction
-{
-    public:
-        double evaluate(double x, double t)
-        {
-            return std::exp(x);
-        }
-
-};
-
-class hw8fOption : public uFunction
-{
-	public:
-		double sigma;
-		double S0;
-		double q;
-		double K;
-		double T;
-		double r;
-		double a;
-		hw8fOption(double _sigma, double _S0, double _q, double _K, double _T, double _r):
-			sigma(_sigma), S0(_S0), q(_q), K(_K), T(_T), r(_r)
-		{
-			a = (r-q)/(sigma*sigma) - 0.5;
-		}
-		double evaluate(double x, double t)
-		{
-			return K*exp(a*x)*std::max(1-exp(x),0.0);
-		}
-
-};
-
-class hw8gLeft : public uFunction
-{
-    public:
-    double evaluate(double x, double t)
-    {
-        return std::exp(t - 2.0);
-    }
-
-};
-
-class hw8gLeftOption : public uFunction
-{
-	public:
-		double sigma;
-		double S0;
-		double q;
-		double K;
-		double T;
-		double r;
-		double a;
-		double b;
-		hw8gLeftOption(double _sigma, double _S0, double _q, double _K, double _T, double _r):
-			sigma(_sigma), S0(_S0), q(_q), K(_K), T(_T), r(_r)
-		{
-			a = (r-q)/(sigma*sigma) - 0.5;
-			b = pow((r-q)/(sigma*sigma) + 0.5, 2) + 2*q/(sigma*sigma);
-		}
-		double evaluate(double x, double t)
-		{
-			return K*exp(a*x + b*t)*(exp(-(2*r*t)/(sigma*sigma)) - exp(x - 2*q*t/(sigma*sigma)));
-		}
-};
-
-class uExact : public uFunction
-{
-public:
-    double evaluate(double x, double t)
-    {
-        return std::exp(t + x);
-    }
-
-};
-
-class hw8gRight : public uFunction
-{
-    public:
-    double evaluate(double x, double t)
-    {
-        return std::exp(t + 2.0);
-    }
-
-};
-
-class hw8gRightOption : public uFunction
-{
-	public:
-    double evaluate(double x, double t)
-    {
-        return 0.0;
-    }
-};
 //M time intervals, N x intervals
 
 class PDESolver
@@ -122,12 +23,7 @@ public:
         mesh = Mesh(0, tFinal, xLeft, xRight, M, N);
     };
 
-	PDESolver(uFunction &gLeftFunc, uFunction &gRightFunc, uFunction &f, double t0, double tFinal, double xLeft, double xRight, int M, double alphatemp) :
-            _gLeftFunc(gLeftFunc), _gRightFunc(gRightFunc),
-            _f(f), _t0(t0), _tFinal(tFinal), _xLeft(xLeft), _xRight(xRight), M(M){
-		N = std::floor((xRight-xLeft)/sqrt(tFinal/(alphatemp*M)));
-        mesh = Mesh(0, tFinal, xLeft, xRight, M, N);
-    };
+
 
 	double getM() const {return M;};
 	double getN() const {return N;};
@@ -435,7 +331,24 @@ public:
 
         return difference.cwiseAbs().maxCoeff();
     }
-private:
+
+    double get_xLeft() const {
+        return _xLeft;
+    }
+
+    void set_xLeft(double _xLeft) {
+        PDESolver::_xLeft = _xLeft;
+    }
+
+    double get_xRight() const {
+        return _xRight;
+    }
+
+    void set_xRight(double _xRight) {
+        PDESolver::_xRight = _xRight;
+    }
+
+public:
     uFunction & _gLeftFunc;
     uFunction & _gRightFunc;
     uFunction & _f;
@@ -445,12 +358,90 @@ private:
     double _xRight;
     long M;
     long N;
-public:
 	Mesh mesh;
 
 
 };
 
+class EuropeanPutPDESolver : public PDESolver {
+public:
+    EuropeanPutPDESolver(uFunction &gLeftFunc, uFunction &gRightFunc, uFunction &f, double t0,
+                         double S0, double K, double T, double q, double r, double sigma, int M, double alphatemp) :
+            PDESolver(gLeftFunc, gRightFunc, f, 0, T, 0, 0, M, 0), S0(S0) {
+        // set  values based on logic required
+        set_xLeft(log(S0 / K) + (r - q - sigma * sigma / 2) * T - 3 * sigma * sqrt(T));
+        set_xRight(log(S0 / K) + (r - q - sigma * sigma / 2) * T + 3 * sigma * sqrt(T));
+        a = (r-q)/(sigma*sigma) - 0.5;
+        b = pow((r-q)/(sigma*sigma) + 0.5, 2) + 2*q/(sigma*sigma);
+        _tFinal = T*sigma*sigma/2;
 
+        N = std::floor((_xRight-_xLeft)/sqrt(_tFinal/(alphatemp*M)));
+        mesh = Mesh(0, _tFinal, _xLeft, _xRight, M, N);
+    };
+
+    double getXCompute()
+    {
+        return log(S0/K);
+    }
+
+    int getxComputeLowerBound() {
+        double valueToFind = getXCompute();
+        int i = 0;
+        for (i; i < N + 1; ++i)
+        {
+            if (valueToFind < mesh.getX(i))
+                break;
+        }
+        return i - 1;
+    }
+
+    double calculateVapprox(double S0, MatrixXd & approximations)
+    {
+        VectorXd V = approximations.row(M);
+
+        double xCompute = getXCompute();
+        double lowerxComputePoint = getxComputeLowerBound();
+        
+        double xComputeLowerBoundValue = mesh.getX(lowerxComputePoint);
+        double xComputeUpperBoundValue = mesh.getX(lowerxComputePoint + 1);
+
+        double S1 = K*exp(xComputeLowerBoundValue);
+        double S2 = K * exp(xComputeUpperBoundValue);
+
+        double V1 = V(lowerxComputePoint)*exp(-a*xComputeLowerBoundValue - b*_tFinal);
+        double V2 = V(lowerxComputePoint + 1)*exp(-a*xComputeUpperBoundValue - b*_tFinal);
+
+        return ((S2-S0)*V1 + (S0-S1)*V2)/(S2-S1);
+    }
+
+    double calculateVapproxLinearInterpolation(double S0, MatrixXd & approximations)
+    {
+        VectorXd V = approximations.row(M);
+
+        double xCompute = getXCompute();
+        double lowerxComputePoint = getxComputeLowerBound();
+
+        double xComputeLowerBoundValue = mesh.getX(lowerxComputePoint);
+        double xComputeUpperBoundValue = mesh.getX(lowerxComputePoint + 1);
+
+//                ((solver.mesh.getX(i+1)-x)*EulerResultOption(M,i)+(x-solver.mesh.getX(i))*EulerResultOption(M,i+1))/(solver.mesh.getX(i+1)-solver.mesh.getX(i));
+        double part1 = (xComputeUpperBoundValue- xCompute)*V(lowerxComputePoint)+(xCompute-xComputeLowerBoundValue)*V(lowerxComputePoint +1);
+        double part2 = xComputeUpperBoundValue - xComputeLowerBoundValue;
+        return part1/part2;
+    }
+
+public:
+    double S0;
+    double q;
+    double K;
+    double T;
+    double r;
+    double sigma;
+private:
+    // constants used in calculation of option price
+    double a;
+    double b;
+
+};
 
 #endif //CPPCODETEST_FINITEDIFFERENCEMETHODS_HPP
