@@ -13,11 +13,13 @@
 #include "BlackScholes.hpp"
 #include "PDESolver.hpp"
 #include "EuropeanPDESolver.hpp"
+#include "AmericanPDESolver.hpp"
 
 
 using namespace Eigen;
 using namespace std;
 
+string FILE_ROOT = "/home/avi/";
 //defined at end
 void writeCSVMatrix(MatrixXd &matrixToWrite, string fileName);
 void hw8();
@@ -31,8 +33,8 @@ int main() {
 	myfile<<(U).format(CSVFormat)<<std::endl;
 	myfile.close();
 	*/
-    hw8();
-//    hw9();
+//    hw8();
+    hw9();
 //    Question3();
 //    decompositionExamples();
 //    verifyCholeskyDecomposition();
@@ -47,6 +49,37 @@ int main() {
 
 void hw9()
 {
+    long M = 4;
+    cout << setprecision(16);
+    double tol = std::pow(10, -6);
+    double omega = 1.2;
+
+    double sigma = 0.35;
+    double S0 = 41;
+    double q = 0.02;
+    double K = 40;
+    double T = 0.75;
+    double r = 0.04;
+    double alphatemp = 0.45;
+
+    hw8fOption fOption(sigma, S0, q, K, T, r);
+    gAmericanLeftFunc gLeftOption(sigma, S0, q, K, T, r);
+    hw8gRightOption gRightOption(sigma, S0, q, K, T, r);
+
+    BlackScholesOption option(S0, K, T, q, r, sigma);
+    double Vexact = option.putPrice();
+
+
+    EuropeanPutPDESolver solver(gLeftOption, gRightOption, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp, option);
+    AmericanPutPDESolver solverAmerican(gLeftOption, gRightOption, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp);
+
+    MatrixXd fEulerEuropean = solver.forwardEuler();
+    writeCSVMatrix(fEulerEuropean, "forward_euler_eur.csv");
+
+    MatrixXd fEulerAmerican = solverAmerican.forwardEuler();
+    writeCSVMatrix(fEulerAmerican, "forward_euler_american.csv");
+
+//    writeCSVMatrix(fEulerResult, "/home/avi/forwardEuler.csv");
 }
 
 void hw8()
@@ -93,7 +126,7 @@ void hw8()
 void writeCSVMatrix(MatrixXd &matrixToWrite, string fileName)
 {
     const static Eigen::IOFormat CSVFormat(Eigen::FullPrecision, 0, ",", "\n");
-    std::ofstream myfile(fileName);
+    std::ofstream myfile(FILE_ROOT + fileName);
     myfile<<(matrixToWrite).format(CSVFormat) << std::endl;
     myfile.close();
     std::cout << "Wrote output to " << fileName << std::endl;

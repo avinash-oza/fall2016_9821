@@ -26,7 +26,8 @@ public:
 
 	double getM() const {return M;};
 	double getN() const {return N;};
-    Eigen::MatrixXd forwardEuler()
+
+    virtual Eigen::MatrixXd forwardEuler()
     {
         Eigen::MatrixXd valuesAtNodes = Eigen::MatrixXd::Zero(M + 1, N + 1);
 
@@ -86,10 +87,16 @@ public:
 
             for (long i = 1; i < N; ++i)
             {
-                valuesAtNodes(timeIndex,i) = U(i-1);
+                  valuesAtNodes(timeIndex, i) = calculateUOnMesh(timeIndex, i, U(i-1), mesh.getX(i), mesh.getT(timeIndex));
             }
         }
         return valuesAtNodes;
+    }
+
+    virtual double calculateUOnMesh(long timeIndex, long currentIndex,  double europeanUValue, double x, double t)
+    {
+        // calculates the value for U at a given point on the mesh. Used to handle the calculation of the early exercise premium
+        return europeanUValue;
     }
 
     double getAlpha() const {
@@ -362,22 +369,5 @@ public:
 
 };
 
-
-
-//class AmericanPutPDESolver : public EuropeanPutPDESolver
-//{
-//public:
-//     gLeft is hardcoded to the gAmericanLeft function
-//     the blackScholes option is a dummy option
-//    AmericanPutPDESolver( uOptionFunction &gRightFunc, uOptionFunction &f, double t0,
-//                         double S0, double K, double T, double q, double r, double sigma, int M, double alphatemp,) :
-//            EuropeanPutPDESolver(gAmericanLeftFunc, gRightFunc, f, t0, S0, K, T, q, r, sigma, M,
-//                                 alphatemp, BlackScholesOption(S0, K, T, q, r, sigma)) {};
-//
-//    double earlyExercisePremium(double x, double t)
-//    {
-//        return K*std::exp(a*x + b*t) * (1.0 - std::exp(x));
-//    }
-//};
 
 #endif //CPPCODETEST_FINITEDIFFERENCEMETHODS_HPP
