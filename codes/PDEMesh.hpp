@@ -45,6 +45,16 @@ public:
     {
         return timeCoordinates(index);
     }
+
+    VectorXd getTimeCoordinates()
+    {
+        return timeCoordinates;
+    }
+
+    VectorXd getxCoordinates()
+    {
+        return xCoordinates;
+    }
 private:
     VectorXd timeCoordinates;
     VectorXd xCoordinates;
