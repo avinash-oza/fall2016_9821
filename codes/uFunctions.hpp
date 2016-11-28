@@ -20,6 +20,7 @@ public:
             sigma(_sigma), S0(_S0), q(_q), K(_K), T(_T), r(_r)
     {
         a = (r-q)/(sigma*sigma) - 0.5;
+        b = pow((r-q)/(sigma*sigma) + 0.5, 2) + 2*q/(sigma*sigma);
     }
 
     double evaluate(double x, double t)
@@ -123,6 +124,16 @@ public:
         return K*std::exp(a*x + b*t) * (1.0 - std::exp(x));
     }
 };
+
+//class fAmericanBoundaryFunc : public uOptionFunction
+//{
+//public:
+//    using uOptionFunction::uOptionFunction;
+//    double evaluate(double x, double t)
+//    {
+//        return K*std::exp(a*x + b*t) * std::max(1.0 - std::exp(x), 0.0);
+//    }
+//};
 
 #include <Eigen/Dense>
 
