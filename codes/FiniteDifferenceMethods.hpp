@@ -366,8 +366,8 @@ public:
 class EuropeanPutPDESolver : public PDESolver {
 public:
     EuropeanPutPDESolver(uFunction &gLeftFunc, uFunction &gRightFunc, uFunction &f, double t0,
-                         double S0, double K, double T, double q, double r, double sigma, int M, double alphatemp) :
-            PDESolver(gLeftFunc, gRightFunc, f, 0, T, 0, 0, M, 0), S0(S0) {
+                         double S0, double K, double T, double q, double r, double sigma, int M, double alphatemp, BlackScholesOption blackScholesOption1) :
+            PDESolver(gLeftFunc, gRightFunc, f, 0, T, 0, 0, M, 0), S0(S0), K(K), T(T), q(q), r(r), sigma(sigma), blackScholesOption(blackScholesOption1) {
         // set  values based on logic required
         set_xLeft(log(S0 / K) + (r - q - sigma * sigma / 2) * T - 3 * sigma * sqrt(T));
         set_xRight(log(S0 / K) + (r - q - sigma * sigma / 2) * T + 3 * sigma * sqrt(T));
@@ -430,6 +430,32 @@ public:
         return part1/part2;
     }
 
+    double RootMeanSquaredError(MatrixXd& approximations)
+    {
+        double oldSpot = blackScholesOption.getS();
+        VectorXd boundaryApproximations = approximations.row(M); // the lower most row of matrix
+        long N = getN();
+        VectorXd Vappro = VectorXd::Zero(N+1);
+        VectorXd S = VectorXd::Zero(N+1);
+        double Nrms = 0;
+        double sum = 0;
+        for(int j = 0; j < N+1; ++j)
+        {
+            S(j) = K*exp(mesh.getX(j));
+            Vappro(j) = boundaryApproximations(j)*exp(-a*mesh.getX(j)-b*_tFinal);
+            blackScholesOption.setS(S(j));
+            double price = blackScholesOption.putPrice();
+            if(price > 0.00001*S0)
+            {
+                ++Nrms;
+                sum = sum + pow(Vappro(j) - price , 2)/pow(price,2);
+            }
+        }
+        // put the old spot back
+        blackScholesOption.setS(oldSpot);
+        return sqrt(sum/Nrms);
+    }
+
 public:
     double S0;
     double q;
@@ -437,6 +463,7 @@ public:
     double T;
     double r;
     double sigma;
+    BlackScholesOption blackScholesOption;
 private:
     // constants used in calculation of option price
     double a;
