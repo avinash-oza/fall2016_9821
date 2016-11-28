@@ -487,6 +487,36 @@ public:
         return (Vapprox(i+1) - Vapprox(i))/(S(i+1) - S(i));
     }
 
+    double calculateGamma(MatrixXd &approximations)
+    {
+        int i = getxComputeLowerBound();
+        VectorXd Vapprox = calculateVApproxVector(approximations);
+        VectorXd S = calculateSpotPrices();
+
+        double delta2 = (Vapprox(i+2) - Vapprox(i+1))/(S(i+2) - S(i+1));
+		double delta0 = (Vapprox(i) - Vapprox(i-1))/(S(i) - S(i-1));
+		return (delta2-delta0)/((S(i+2)+S(i+1)-S(i)-S(i-1))/2);
+    }
+
+    double calculateTheta(MatrixXd &approximations)
+    {
+        int i = getxComputeLowerBound();
+        VectorXd priorboundaryApproximations = approximations.row(M - 1); // the 2nd to last row of the matrix
+        VectorXd boundaryApproximations = approximations.row(M); // the 2nd to last row of the matrix
+        double S2 = K*exp(mesh.getX(i+1));
+        double S1 = K*exp(mesh.getX(i));
+        double V1 = boundaryApproximations(i)*exp(-a*mesh.getX(i)-b*_tFinal);
+        double V2 = boundaryApproximations(i+1)*exp(-a*mesh.getX(i+1)-b*_tFinal);
+
+        double Vappro1 = ((S2-S0)*V1 + (S0-S1)*V2)/(S2-S1);
+
+        double dT = 2*(mesh.getT(M) - mesh.getT(M-1))/(sigma*sigma);
+		double V1dT = priorboundaryApproximations(i)*exp(-a*mesh.getX(i)-b*mesh.getT(M-1));
+		double V2dT = priorboundaryApproximations(i+1)*exp(-a*mesh.getX(i+1)-b*mesh.getT(M-1));
+		double Vt = ((S2-S0)*V1dT + (S0-S1)*V2dT)/(S2-S1);
+		return (Vappro1 - Vt)/dT;
+    }
+
 
 
 public:
