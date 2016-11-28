@@ -11,8 +11,8 @@
 #include "Solvers.hpp"
 #include "OptionPricers.hpp"
 #include "BlackScholes.hpp"
-//#include "Options.hpp"
-#include "FiniteDifferenceMethods.hpp"
+#include "PDESolver.hpp"
+#include "EuropeanPDESolver.hpp"
 
 
 using namespace Eigen;

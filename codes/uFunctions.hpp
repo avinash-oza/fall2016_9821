@@ -114,6 +114,15 @@ class hw8gRightOption : public uOptionFunction
         }
 };
 
+class gAmericanLeftFunc : public uOptionFunction
+{
+public:
+    double evaluate(double x, double t)
+    {
+        return K*std::exp(a*x + b*t) * (1.0 - std::exp(x));
+    }
+};
+
 #include <Eigen/Dense>
 
 #endif //CPPCODETEST_UFUNCTIONS_HPP
