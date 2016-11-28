@@ -79,7 +79,9 @@ void hw8()
 
     EuropeanPutPDESolver solver(gLeftOption, gRightOption, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp, option);
     MatrixXd fEulerResult = solver.forwardEuler();
-    writeCSVMatrix(fEulerResult, "/home/avi/forwardEuler.csv");
+    std::cout << solver.calculateErrorPointwise(fEulerResult) << std::endl;
+    std::cout << solver.calculateErrorPointwise2(fEulerResult) << std::endl;
+//    writeCSVMatrix(fEulerResult, "/home/avi/forwardEuler.csv");
 }
 
 void writeCSVMatrix(MatrixXd &matrixToWrite, string fileName)
