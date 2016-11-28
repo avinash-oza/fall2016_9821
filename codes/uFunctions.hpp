@@ -12,9 +12,35 @@ class uFunction
 
 };
 
+class uOptionFunction : public uFunction
+{
+    // to make it easier to implement option functionality
+public:
+    uOptionFunction(double _sigma, double _S0, double _q, double _K, double _T, double _r):
+            sigma(_sigma), S0(_S0), q(_q), K(_K), T(_T), r(_r)
+    {
+        a = (r-q)/(sigma*sigma) - 0.5;
+    }
+
+    double evaluate(double x, double t)
+    {
+        return K * exp(a * x) * std::max(1 - exp(x), 0.0);
+    }
+
+    double sigma;
+    double S0;
+    double q;
+    double K;
+    double T;
+    double r;
+    double a;
+    double b;
+};
+
 class hw8f : public uFunction
 {
     public:
+
         double evaluate(double x, double t)
         {
             return std::exp(x);
@@ -22,21 +48,10 @@ class hw8f : public uFunction
 
 };
 
-class hw8fOption : public uFunction
+class hw8fOption : public uOptionFunction
 {
 	public:
-		double sigma;
-		double S0;
-		double q;
-		double K;
-		double T;
-		double r;
-		double a;
-		hw8fOption(double _sigma, double _S0, double _q, double _K, double _T, double _r):
-			sigma(_sigma), S0(_S0), q(_q), K(_K), T(_T), r(_r)
-		{
-			a = (r-q)/(sigma*sigma) - 0.5;
-		}
+        using uOptionFunction::uOptionFunction;
 		double evaluate(double x, double t)
 		{
 			return K * exp(a * x) * std::max(1 - exp(x), 0.0);
@@ -54,19 +69,11 @@ class hw8gLeft : public uFunction
 
 };
 
-class hw8gLeftOption : public uFunction
+class hw8gLeftOption : public uOptionFunction
 {
 	public:
-		double sigma;
-		double S0;
-		double q;
-		double K;
-		double T;
-		double r;
-		double a;
-		double b;
 		hw8gLeftOption(double _sigma, double _S0, double _q, double _K, double _T, double _r):
-			sigma(_sigma), S0(_S0), q(_q), K(_K), T(_T), r(_r)
+			uOptionFunction(_sigma, _S0, _q, _K, _T, _r)
 		{
 			a = (r-q)/(sigma*sigma) - 0.5;
 			b = pow((r-q)/(sigma*sigma) + 0.5, 2) + 2*q/(sigma*sigma);
@@ -97,13 +104,14 @@ class hw8gRight : public uFunction
 
 };
 
-class hw8gRightOption : public uFunction
+class hw8gRightOption : public uOptionFunction
 {
 	public:
-    double evaluate(double x, double t)
-    {
-        return 0.0;
-    }
+        using uOptionFunction::uOptionFunction;
+        double evaluate(double x, double t)
+        {
+            return 0.0;
+        }
 };
 
 #include <Eigen/Dense>

@@ -21,6 +21,7 @@ using namespace std;
 //defined at end
 void writeCSVMatrix(MatrixXd &matrixToWrite, string fileName);
 void hw8();
+void hw9();
 
 int main() {
     /// Keep this line to make the decimals always print out
@@ -31,6 +32,7 @@ int main() {
 	myfile.close();
 	*/
     hw8();
+//    hw9();
 //    Question3();
 //    decompositionExamples();
 //    verifyCholeskyDecomposition();
@@ -41,6 +43,10 @@ int main() {
 //    }
 
     return 0;
+}
+
+void hw9()
+{
 }
 
 void hw8()
@@ -71,7 +77,7 @@ void hw8()
 
     hw8fOption fOption(sigma, S0, q, K, T, r);
     hw8gLeftOption gLeftOption(sigma, S0, q, K, T, r);
-    hw8gRightOption gRightOption;
+    hw8gRightOption gRightOption(sigma, S0, q, K, T, r);
 
     BlackScholesOption option(S0, K, T, q, r, sigma);
     double Vexact = option.putPrice();

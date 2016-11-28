@@ -365,7 +365,7 @@ public:
 
 class EuropeanPutPDESolver : public PDESolver {
 public:
-    EuropeanPutPDESolver(uFunction &gLeftFunc, uFunction &gRightFunc, uFunction &f, double t0,
+    EuropeanPutPDESolver(uOptionFunction &gLeftFunc, uOptionFunction &gRightFunc, uOptionFunction &f, double t0,
                          double S0, double K, double T, double q, double r, double sigma, int M, double alphatemp, BlackScholesOption blackScholesOption1) :
             PDESolver(gLeftFunc, gRightFunc, f, 0, T, 0, 0, M, 0), S0(S0), K(K), T(T), q(q), r(r), sigma(sigma), blackScholesOption(blackScholesOption1) {
         // set  values based on logic required
