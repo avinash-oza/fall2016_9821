@@ -430,19 +430,41 @@ public:
         return part1/part2;
     }
 
+    VectorXd calculateSpotPrices()
+    {
+        VectorXd S = VectorXd::Zero(N+1);
+        for(int j = 0; j < N+1; ++j)
+        {
+            S(j) = K*exp(mesh.getX(j));
+        }
+        return S;
+    }
+
+    VectorXd calculateVApproxVector(MatrixXd &approximations)
+    {
+        VectorXd boundaryApproximations = approximations.row(M); // the lower most row of matrix
+        VectorXd S = calculateSpotPrices();
+        VectorXd Vappro = VectorXd::Zero(N+1);
+        for(int j = 0; j < N+1; ++j)
+        {
+            S(j) = K*exp(mesh.getX(j));
+            Vappro(j) = boundaryApproximations(j)*exp(-a*mesh.getX(j)-b*_tFinal);
+        }
+
+        return Vappro;
+    }
+
     double RootMeanSquaredError(MatrixXd& approximations)
     {
         double oldSpot = blackScholesOption.getS();
         VectorXd boundaryApproximations = approximations.row(M); // the lower most row of matrix
         long N = getN();
-        VectorXd Vappro = VectorXd::Zero(N+1);
-        VectorXd S = VectorXd::Zero(N+1);
+        VectorXd Vappro = calculateVApproxVector(approximations);
+        VectorXd S = calculateSpotPrices();
         double Nrms = 0;
         double sum = 0;
         for(int j = 0; j < N+1; ++j)
         {
-            S(j) = K*exp(mesh.getX(j));
-            Vappro(j) = boundaryApproximations(j)*exp(-a*mesh.getX(j)-b*_tFinal);
             blackScholesOption.setS(S(j));
             double price = blackScholesOption.putPrice();
             if(price > 0.00001*S0)
@@ -455,6 +477,17 @@ public:
         blackScholesOption.setS(oldSpot);
         return sqrt(sum/Nrms);
     }
+
+    double calculateDelta(MatrixXd &approximations)
+    {
+        int i = getxComputeLowerBound();
+        VectorXd Vapprox = calculateVApproxVector(approximations);
+        VectorXd S = calculateSpotPrices();
+
+        return (Vapprox(i+1) - Vapprox(i))/(S(i+1) - S(i));
+    }
+
+
 
 public:
     double S0;
