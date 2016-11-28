@@ -414,7 +414,7 @@ public:
         return ((S2-S0)*V1 + (S0-S1)*V2)/(S2-S1);
     }
 
-    double calculateVapproxLinearInterpolation(double S0, MatrixXd & approximations)
+    double calculateVapproxLinearInterpolation(MatrixXd & approximations)
     {
         VectorXd V = approximations.row(M);
 
@@ -498,6 +498,25 @@ public:
 		return (delta2-delta0)/((S(i+2)+S(i+1)-S(i)-S(i-1))/2);
     }
 
+    double calculateVApprox1(VectorXd &boundaryApproximations)
+    {
+        int i = getxComputeLowerBound();
+        double S2 = K*exp(mesh.getX(i+1));
+        double S1 = K*exp(mesh.getX(i));
+        double V1 = boundaryApproximations(i)*exp(-a*mesh.getX(i)-b*_tFinal);
+        double V2 = boundaryApproximations(i+1)*exp(-a*mesh.getX(i+1)-b*_tFinal);
+
+        return ((S2-S0)*V1 + (S0-S1)*V2)/(S2-S1);
+
+    }
+
+    double calculateVApprox2(MatrixXd &approximations)
+    {
+        double xComputeLowerBoundValue = getXCompute();
+        double uApprox = calculateVapproxLinearInterpolation(approximations);
+        return std::exp(-a*xComputeLowerBoundValue-b*_tFinal)*uApprox;
+    }
+
     double calculateTheta(MatrixXd &approximations)
     {
         int i = getxComputeLowerBound();
@@ -508,13 +527,26 @@ public:
         double V1 = boundaryApproximations(i)*exp(-a*mesh.getX(i)-b*_tFinal);
         double V2 = boundaryApproximations(i+1)*exp(-a*mesh.getX(i+1)-b*_tFinal);
 
-        double Vappro1 = ((S2-S0)*V1 + (S0-S1)*V2)/(S2-S1);
+        double Vappro1 = calculateVApprox1(boundaryApproximations);
 
         double dT = 2*(mesh.getT(M) - mesh.getT(M-1))/(sigma*sigma);
 		double V1dT = priorboundaryApproximations(i)*exp(-a*mesh.getX(i)-b*mesh.getT(M-1));
 		double V2dT = priorboundaryApproximations(i+1)*exp(-a*mesh.getX(i+1)-b*mesh.getT(M-1));
 		double Vt = ((S2-S0)*V1dT + (S0-S1)*V2dT)/(S2-S1);
 		return (Vappro1 - Vt)/dT;
+    }
+
+    double calculateErrorPointwise(MatrixXd &approximations)
+    {
+        blackScholesOption.setS(S0);
+        VectorXd boundaryApproximations = approximations.row(M);
+        return std::abs(calculateVApprox1(boundaryApproximations) - blackScholesOption.putPrice());
+    }
+
+    double calculateErrorPointwise2(MatrixXd &approximations)
+    {
+        blackScholesOption.setS(S0);
+        return std::abs(calculateVApprox2(approximations) - blackScholesOption.putPrice());
     }
 
 
