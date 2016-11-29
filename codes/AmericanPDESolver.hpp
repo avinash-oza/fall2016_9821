@@ -11,8 +11,21 @@
 class AmericanPutPDESolver : public EuropeanPutPDESolver
 {
 public:
-//     gLeft is hardcoded to the gAmericanLeft function
-//     the blackScholes option is a dummy option
+    /**
+     *
+     * @param gLeftFunc : gLeft is hardcoded to the gAmericanLeft function
+     * @param gRightFunc : right boundary function
+     * @param f : boundary at the bottom of the rectangle
+     * @param t0 : typically 0
+     * @param S0 : inital spot price
+     * @param K  : strike
+     * @param T : maturity
+     * @param q : dividend
+     * @param r : risk free rate
+     * @param sigma : volatility
+     * @param M : number of intervals in x
+     * @param alphatemp 
+     */
     AmericanPutPDESolver(uOptionFunction &gLeftFunc, uOptionFunction &gRightFunc, uOptionFunction &f, double t0,
                          double S0, double K, double T, double q, double r, double sigma, int M, double alphatemp) :
             EuropeanPutPDESolver(gLeftFunc, gRightFunc, f, t0, S0, K, T, q, r, sigma, M, alphatemp)
