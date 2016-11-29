@@ -30,28 +30,24 @@ public:
             // alter only the x coordinate
             xCoordinates(j) = xLeft + j*dx;
         }
-
-//        std::cout << timeCoordinates << std::endl;
-//        std::cout << xCoordinates << std::endl;
-
     };
 
-    double getX(double index)
+    double getX(double index) const
     {
         return xCoordinates(index);
     }
 
-    double getT(double index)
+    double getT(double index) const
     {
         return timeCoordinates(index);
     }
 
-    VectorXd getTimeCoordinates()
+    VectorXd getTimeCoordinates() const
     {
         return timeCoordinates;
     }
 
-    VectorXd getxCoordinates()
+    VectorXd getxCoordinates() const
     {
         return xCoordinates;
     }

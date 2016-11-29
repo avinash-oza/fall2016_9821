@@ -34,10 +34,7 @@ public:
         double x = mesh.getX(currentIndex);
         double t = mesh.getT(timeIndex);
         double earlyExerciseValue = earlyExercisePremium(x, t);
-//        if(timeIndex == 4)
-//        {
-//            std::cout << x << "," << t << "::" << earlyExerciseValue << std::endl;
-//        }
+
         return std::max(europeanUValue, earlyExerciseValue);
     }
 };
