@@ -12,8 +12,8 @@
 class EuropeanPutPDESolver : public PDESolver {
 public:
     EuropeanPutPDESolver(uOptionFunction &gLeftFunc, uOptionFunction &gRightFunc, uOptionFunction &f, double t0,
-                         double S0, double K, double T, double q, double r, double sigma, int M, double alphatemp, BlackScholesOption blackScholesOption1) :
-            PDESolver(gLeftFunc, gRightFunc, f, 0, T, 0, 0, M, 0), S0(S0), K(K), T(T), q(q), r(r), sigma(sigma), blackScholesOption(blackScholesOption1) {
+                         double S0, double K, double T, double q, double r, double sigma, int M, double alphatemp) :
+            PDESolver(gLeftFunc, gRightFunc, f, 0, T, 0, 0, M, 0), S0(S0), K(K), T(T), q(q), r(r), sigma(sigma) {
         // set  values based on logic required
         set_xLeft(log(S0 / K) + (r - q - sigma * sigma / 2) * T - 3 * sigma * sqrt(T));
         set_xRight(log(S0 / K) + (r - q - sigma * sigma / 2) * T + 3 * sigma * sqrt(T));
@@ -100,9 +100,9 @@ public:
         return Vappro;
     }
 
-    double RootMeanSquaredError(MatrixXd& approximations)
+    double RootMeanSquaredError(MatrixXd& approximations, BlackScholesOption &option)
     {
-        double oldSpot = blackScholesOption.getS();
+        double oldSpot = option.getS();
         VectorXd boundaryApproximations = approximations.row(M); // the lower most row of matrix
         long N = getN();
         VectorXd Vappro = calculateVApproxVector(approximations);
@@ -111,8 +111,8 @@ public:
         double sum = 0;
         for(int j = 0; j < N+1; ++j)
         {
-            blackScholesOption.setS(S(j));
-            double price = blackScholesOption.putPrice();
+            option.setS(S(j));
+            double price = option.putPrice();
             if(price > 0.00001*S0)
             {
                 ++Nrms;
@@ -120,7 +120,7 @@ public:
             }
         }
         // put the old spot back
-        blackScholesOption.setS(oldSpot);
+        option.setS(oldSpot);
         return sqrt(sum/Nrms);
     }
 
@@ -183,16 +183,14 @@ public:
         return (Vappro1 - Vt)/dT;
     }
 
-    double calculateErrorPointwise(MatrixXd &approximations)
+    double calculateErrorPointwise(MatrixXd &approximations, double Vexact)
     {
-        blackScholesOption.setS(S0);
-        return std::abs(calculateVApprox1(approximations) - blackScholesOption.putPrice());
+        return std::abs(calculateVApprox1(approximations) - Vexact);
     }
 
-    double calculateErrorPointwise2(MatrixXd &approximations)
+    double calculateErrorPointwise2(MatrixXd &approximations, double Vexact)
     {
-        blackScholesOption.setS(S0);
-        return std::abs(calculateVApprox2(approximations) - blackScholesOption.putPrice());
+        return std::abs(calculateVApprox2(approximations) - Vexact);
     }
 
 
@@ -203,7 +201,6 @@ public:
     double T;
     double r;
     double sigma;
-    BlackScholesOption blackScholesOption;
     // constants used in calculation of option price
     double a;
     double b;

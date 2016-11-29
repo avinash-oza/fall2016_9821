@@ -15,8 +15,8 @@ public:
 //     the blackScholes option is a dummy option
     AmericanPutPDESolver(uOptionFunction &gLeftFunc, uOptionFunction &gRightFunc, uOptionFunction &f, double t0,
                          double S0, double K, double T, double q, double r, double sigma, int M, double alphatemp) :
-            EuropeanPutPDESolver(gLeftFunc, gRightFunc, f, t0, S0, K, T, q, r, sigma, M,
-                                 alphatemp, BlackScholesOption(0, 0, 0, 0, 0, 0)) {
+            EuropeanPutPDESolver(gLeftFunc, gRightFunc, f, t0, S0, K, T, q, r, sigma, M, alphatemp)
+    {
 
         // for the american option we have a constant left boundary:
         _gLeftFunc = gAmericanLeftFunc(sigma, S0, q, K, T, r);

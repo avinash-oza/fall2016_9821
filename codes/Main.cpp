@@ -70,7 +70,7 @@ void hw9()
     double Vexact = option.putPrice();
 
 
-    EuropeanPutPDESolver solver(gLeftOption, gRightOption, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp, option);
+    EuropeanPutPDESolver solver(gLeftOption, gRightOption, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp);
     AmericanPutPDESolver solverAmerican(gLeftOption, gRightOption, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp);
 
     MatrixXd fEulerEuropean = solver.forwardEuler();
@@ -116,10 +116,10 @@ void hw8()
     double Vexact = option.putPrice();
 
 
-    EuropeanPutPDESolver solver(gLeftOption, gRightOption, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp, option);
+    EuropeanPutPDESolver solver(gLeftOption, gRightOption, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp);
     MatrixXd fEulerResult = solver.forwardEuler();
-    std::cout << solver.calculateErrorPointwise(fEulerResult) << std::endl;
-    std::cout << solver.calculateErrorPointwise2(fEulerResult) << std::endl;
+    std::cout << solver.calculateErrorPointwise(fEulerResult, Vexact) << std::endl;
+    std::cout << solver.calculateErrorPointwise2(fEulerResult, Vexact) << std::endl;
 //    writeCSVMatrix(fEulerResult, "/home/avi/forwardEuler.csv");
 }
 
