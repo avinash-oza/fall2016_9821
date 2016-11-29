@@ -87,13 +87,13 @@ public:
 
             for (long i = 1; i < N; ++i)
             {
-                  valuesAtNodes(timeIndex, i) = calculateUOnMesh(timeIndex, i, U(i-1), mesh.getX(i), mesh.getT(timeIndex));
+                  valuesAtNodes(timeIndex, i) = calculateUOnMesh(timeIndex, i, U(i-1));
             }
         }
         return valuesAtNodes;
     }
 
-    virtual double calculateUOnMesh(long timeIndex, long currentIndex,  double europeanUValue, double x, double t)
+    virtual double calculateUOnMesh(long timeIndex, long currentIndex,  double europeanUValue)
     {
         // calculates the value for U at a given point on the mesh. Used to handle the calculation of the early exercise premium
         return europeanUValue;

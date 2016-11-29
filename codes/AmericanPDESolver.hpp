@@ -19,7 +19,7 @@ public:
                                  alphatemp, BlackScholesOption(0, 0, 0, 0, 0, 0)) {
 
         // for the american option we have a constant left boundary:
-        _gLeftFunc = uOptionFunction(sigma, S0, q, K, T, r);
+        _gLeftFunc = gAmericanLeftFunc(sigma, S0, q, K, T, r);
 
     };
 
@@ -28,10 +28,16 @@ public:
         return K*std::exp(a*x + b*t) * std::max(1.0 - std::exp(x), 0.0);
     }
 
-    virtual double calculateUOnMesh(long timeIndex, long currentIndex,  double europeanUValue, double x, double t)
+    virtual double calculateUOnMesh(long timeIndex, long currentIndex,  double europeanUValue)
     {
         // here we need to take the max between the european and american value
+        double x = mesh.getX(currentIndex);
+        double t = mesh.getT(timeIndex);
         double earlyExerciseValue = earlyExercisePremium(x, t);
+//        if(timeIndex == 4)
+//        {
+//            std::cout << x << "," << t << "::" << earlyExerciseValue << std::endl;
+//        }
         return std::max(europeanUValue, earlyExerciseValue);
     }
 };
