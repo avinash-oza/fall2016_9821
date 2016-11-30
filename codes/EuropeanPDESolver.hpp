@@ -180,7 +180,7 @@ public:
         double V1dT = priorboundaryApproximations(i)*exp(-a*mesh.getX(i)-b*mesh.getT(M-1));
         double V2dT = priorboundaryApproximations(i+1)*exp(-a*mesh.getX(i+1)-b*mesh.getT(M-1));
         double Vt = ((S2-S0)*V1dT + (S0-S1)*V2dT)/(S2-S1);
-        return (Vappro1 - Vt)/dT;
+        return -1 * (Vappro1 - Vt)/dT;
     }
 
     double calculateErrorPointwise(MatrixXd &approximations, double Vexact)
