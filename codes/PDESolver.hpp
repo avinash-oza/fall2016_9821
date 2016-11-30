@@ -60,7 +60,9 @@ public:
 
             for (long i = 1; i < N; ++i)
             {
-                  valuesAtNodes(timeIndex, i) = calculateUOnMesh(timeIndex, i, U(i-1));
+                U(i-1) = calculateUOnMesh(timeIndex, i, U(i-1));
+                // update the mesh with this value
+                valuesAtNodes(timeIndex, i) = U(i-1);
             }
         }
         return valuesAtNodes;
