@@ -49,12 +49,37 @@ class SORIteration: public IterationMethod
 {
 public:
     VectorXd calculateBnew(MatrixXd lowerA, MatrixXd upperA, MatrixXd diagonalA, MatrixXd D_inverse, VectorXd b, VectorXd x0, double w) {
-        return w*forward_subst(diagonalA + w*lowerA, b); // calculate b_new
+//        return w*forward_subst(diagonalA + w*lowerA, b); // calculate b_new
+        return b;
     }
 
-    VectorXd calculateIteration(MatrixXd lowerA, MatrixXd upperA, MatrixXd diagonalA, MatrixXd DInverse, VectorXd bNew, VectorXd x, double w) {
-        return forward_subst(diagonalA + w*lowerA, (1-w)*diagonalA*x -  w* upperA*x) + bNew;
+    virtual VectorXd calculateIteration(MatrixXd lowerA, MatrixXd upperA, MatrixXd diagonalA, MatrixXd DInverse, VectorXd bNew, VectorXd x, double w) {
+        MatrixXd A = lowerA + upperA + diagonalA;
+        long size = x.rows();
+        VectorXd xSOR = VectorXd::Zero(size);
+
+        for( int j = 0; j < size; ++j)
+        {
+            if (j == 0)
+            {
+                xSOR(j) = (1 - w) * x(j) + w / A(j,j) * (bNew(j) - A(j,j+1) * x(j+1));
+            }
+            else
+            {
+                if (j == (size - 1))
+                {
+                    xSOR(j) = (1 - w) * x(j) + w / A(j,j) * (bNew(j) - A(j,j-1) * xSOR(j-1));
+                }
+                else
+                {
+                    xSOR(j) = (1 - w) * x(j) + w / A(j,j) * (bNew(j) - A(j,j-1) * xSOR(j-1) - A(j,j+1) * x(j+1));
+                }
+            }
+
+        }
+        return xSOR;
     }
+
 };
 
 #endif //CPPCODETEST_ITERATIVEMETHODS_HPP

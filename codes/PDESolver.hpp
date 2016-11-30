@@ -163,8 +163,7 @@ public:
                     U = linear_solve_lu_no_pivoting(A, B * U + b);
                     break;
                 case LinearSolveMethod ::SOR :
-                    SORIteration iterationMethod;
-                    std::tie(U, ic) = consecutive_approximation_solver(A, B * U + b, U, tol, iterationMethod, omega);
+                    std::tie(U, ic) = getSORIterationValues(timeIndex, tol, omega, U, A, B, b);
                     break;
             }
 
@@ -178,6 +177,13 @@ public:
         }
 
         return valuesAtNodes;
+    }
+
+    virtual std::tuple<VectorXd, int>
+    getSORIterationValues(long timeIndex, double tol, double omega, const VectorXd &U, const MatrixXd &A, const MatrixXd &B,
+                          const MatrixXd &b) {
+        SORIteration iterationMethod;
+        return consecutive_approximation_solver(A, B * U + b, U, tol, iterationMethod, omega);
     }
 
     virtual double calculateUOnMesh(long timeIndex, long currentIndex,  double europeanUValue)
