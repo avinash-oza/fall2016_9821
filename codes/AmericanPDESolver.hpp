@@ -50,6 +50,16 @@ public:
 
         return std::max(europeanUValue, earlyExerciseValue);
     }
+
+    double priceVarianceReduction(MatrixXd &approximations, double europeanFDPrice, double blackScholesPrice)
+    {
+        return calculateVapprox(S0, approximations) + (blackScholesPrice - europeanFDPrice);
+    }
+
+    double calculateErrorPointWiseVarianceReduction(MatrixXd &approximations, double europeanFDPrice, double blackScholesPrice, double P_american_bin)
+    {
+        return std::abs(priceVarianceReduction(approximations, europeanFDPrice, blackScholesPrice) - P_american_bin);
+    }
 };
 
 
