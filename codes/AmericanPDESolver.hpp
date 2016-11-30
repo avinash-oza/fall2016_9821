@@ -32,6 +32,7 @@ public:
     {
 
         // for the american option we have a constant left boundary:
+        ///////THIS NEEDS TO BE CHECKED!!!!!!!!!!!!!!
         _gLeftFunc = gAmericanLeftFunc(sigma, S0, q, K, T, r);
 
     };
@@ -59,6 +60,27 @@ public:
     double calculateErrorPointWiseVarianceReduction(MatrixXd &approximations, double europeanFDPrice, double blackScholesPrice, double P_american_bin)
     {
         return std::abs(priceVarianceReduction(approximations, europeanFDPrice, blackScholesPrice) - P_american_bin);
+    }
+
+    VectorXd calculateEarlyExerciseVector(long timeIndex) {
+        VectorXd earlyExerciseValues = VectorXd::Zero(N - 1);
+        double x;
+        double t = mesh.getT(timeIndex);
+
+        for (int i = 1; i < N - 1; ++i) {
+            x = mesh.getX(i);
+            earlyExerciseValues(i - 1) = earlyExercisePremium(x, t);
+        }
+        return earlyExerciseValues;
+    }
+
+    virtual std::tuple<VectorXd, int>
+    getSORIterationValues(long timeIndex, double tol, double omega, const VectorXd &U, const MatrixXd &A, const MatrixXd &B,
+                          const MatrixXd &b) {
+        // we need to use the projected SOR method in the American put calculation
+        VectorXd earlyExerciseValues = calculateEarlyExerciseVector(timeIndex);
+        ProjectedSORIteration iterationMethod(earlyExerciseValues);
+        return consecutive_approximation_solver(A, B * U + b, earlyExerciseValues, tol, iterationMethod, omega);;
     }
 };
 

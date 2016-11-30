@@ -53,26 +53,38 @@ public:
         return b;
     }
 
+    virtual double calculateSORValue(double currentValue, int currentIndex)
+    {
+        // for European options we don't need to edit the value
+        return currentValue;
+    }
+
     virtual VectorXd calculateIteration(MatrixXd lowerA, MatrixXd upperA, MatrixXd diagonalA, MatrixXd DInverse, VectorXd bNew, VectorXd x, double w) {
         MatrixXd A = lowerA + upperA + diagonalA;
         long size = x.rows();
         VectorXd xSOR = VectorXd::Zero(size);
+        double currentValue;
 
         for( int j = 0; j < size; ++j)
         {
             if (j == 0)
             {
-                xSOR(j) = (1 - w) * x(j) + w / A(j,j) * (bNew(j) - A(j,j+1) * x(j+1));
+                currentValue = (1 - w) * x(j) + w / A(j,j) * (bNew(j) - A(j,j+1) * x(j+1));
+                // boundary, do not reset
+                xSOR(j) = currentValue;
             }
             else
             {
                 if (j == (size - 1))
                 {
-                    xSOR(j) = (1 - w) * x(j) + w / A(j,j) * (bNew(j) - A(j,j-1) * xSOR(j-1));
+                    currentValue = (1 - w) * x(j) + w / A(j,j) * (bNew(j) - A(j,j-1) * xSOR(j-1));
+                    // another boundary, do not reset value
+                    xSOR(j) = currentValue;
                 }
                 else
                 {
-                    xSOR(j) = (1 - w) * x(j) + w / A(j,j) * (bNew(j) - A(j,j-1) * xSOR(j-1) - A(j,j+1) * x(j+1));
+                    currentValue = (1 - w) * x(j) + w / A(j,j) * (bNew(j) - A(j,j-1) * xSOR(j-1) - A(j,j+1) * x(j+1));
+                    xSOR(j) = calculateSORValue(currentValue, j);
                 }
             }
 
@@ -80,6 +92,32 @@ public:
         return xSOR;
     }
 
+};
+
+class ProjectedSORIteration : public SORIteration
+{
+public:
+    ProjectedSORIteration(VectorXd & _earlyExerciseValues) : earlyExerciseValues(_earlyExerciseValues) {};
+
+    virtual double calculateSORValue(double currentValue, int currentIndex) override {
+        double &earlyExerciseValue = earlyExerciseValues(currentIndex);
+        return std::max(earlyExerciseValue, currentValue);;
+    }
+
+//    virtual VectorXd
+//    calculateIteration(MatrixXd lowerA, MatrixXd upperA, MatrixXd diagonalA, MatrixXd DInverse, VectorXd bNew,
+//                       VectorXd x, double w) override {
+//        VectorXd xSOR =  SORIteration::calculateIteration(lowerA, upperA, diagonalA, DInverse, bNew, x, w);
+//
+//        for(int i = 0; i < xSOR.size() - 1; ++i)
+//        {
+//            xSOR(i) = std::max(xSOR(i), earlyExerciseValues(i));
+//        }
+//        return xSOR;
+//    }
+
+private:
+    VectorXd earlyExerciseValues;
 };
 
 #endif //CPPCODETEST_ITERATIVEMETHODS_HPP
