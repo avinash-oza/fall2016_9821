@@ -85,6 +85,7 @@ void hw9()
 
 
         MatrixXd fEulerAmerican = solverAmerican.CrankNicolson(SOR, tol, omega);
+//        VectorXd t = solverAmerican.findSEarlyExerciseSoptimal(fEulerAmerican);
 //        writeCSVMatrix(fEulerAmerican, "forward_euler_american_crank.csv");
 //        MatrixXd fEulerAmerican = solverAmerican.forwardEuler();
 //        std::cout << fEulerAmerican << std::endl;
@@ -92,18 +93,21 @@ void hw9()
                   << solverAmerican.calculateErrorPointwise(fEulerAmerican, P_amer_bin)
                   << ","
                   << solverAmerican.calculateErrorPointwise2(fEulerAmerican, P_amer_bin)
+                  << ","
 //                  << std::endl;
-//                std::cout << M <<"," << solverAmerican.calculateDelta(fEulerAmerican) << ","
+//                std::cout << M <<","
+                    << solverAmerican.calculateDelta(fEulerAmerican)
+                    << ","
                           << solverAmerican.calculateGamma(fEulerAmerican)
                           << ","
                           << solverAmerican.calculateTheta(fEulerAmerican)
 //                          << std::endl;
 //            std::cout << M
-                      << ","
+//                      << ","
 //                      << solverAmerican.calculateVapprox(S0, fEulerAmerican)
 //                      << ","
 //                      << VEurApprox
-//                      << ","
+                      << ","
 //                      << Vexact
                       << solverAmerican.priceVarianceReduction(fEulerAmerican, VEurApprox, Vexact)
                       << ","
