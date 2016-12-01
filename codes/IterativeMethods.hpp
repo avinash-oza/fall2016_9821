@@ -70,23 +70,19 @@ public:
             if (j == 0)
             {
                 currentValue = (1 - w) * x(j) + w / A(j,j) * (bNew(j) - A(j,j+1) * x(j+1));
-                // boundary, do not reset
-                xSOR(j) = currentValue;
             }
             else
             {
                 if (j == (size - 1))
                 {
                     currentValue = (1 - w) * x(j) + w / A(j,j) * (bNew(j) - A(j,j-1) * xSOR(j-1));
-                    // another boundary, do not reset value
-                    xSOR(j) = currentValue;
                 }
                 else
                 {
                     currentValue = (1 - w) * x(j) + w / A(j,j) * (bNew(j) - A(j,j-1) * xSOR(j-1) - A(j,j+1) * x(j+1));
-                    xSOR(j) = calculateSORValue(currentValue, j);
                 }
             }
+            xSOR(j) = calculateSORValue(currentValue, j);
 
         }
         return xSOR;
