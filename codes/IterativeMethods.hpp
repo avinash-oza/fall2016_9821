@@ -100,18 +100,6 @@ public:
         return std::max(earlyExerciseValue, currentValue);;
     }
 
-//    virtual VectorXd
-//    calculateIteration(MatrixXd lowerA, MatrixXd upperA, MatrixXd diagonalA, MatrixXd DInverse, VectorXd bNew,
-//                       VectorXd x, double w) override {
-//        VectorXd xSOR =  SORIteration::calculateIteration(lowerA, upperA, diagonalA, DInverse, bNew, x, w);
-//
-//        for(int i = 0; i < xSOR.size() - 1; ++i)
-//        {
-//            xSOR(i) = std::max(xSOR(i), earlyExerciseValues(i));
-//        }
-//        return xSOR;
-//    }
-
 private:
     VectorXd earlyExerciseValues;
 };
