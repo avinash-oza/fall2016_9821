@@ -41,7 +41,7 @@ public:
         return i - 1;
     }
 
-    double calculateVapprox(double S0, MatrixXd & approximations)
+    double calculateVapprox(MatrixXd &approximations)
     {
         VectorXd V = approximations.row(M);
 
