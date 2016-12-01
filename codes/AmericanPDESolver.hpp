@@ -82,6 +82,48 @@ public:
         ProjectedSORIteration iterationMethod(earlyExerciseValues);
         return consecutive_approximation_solver(A, B * U + b, earlyExerciseValues, tol, iterationMethod, omega);;
     }
+
+/**
+ * Given a mesh of approximations, this method returns a vector of optimal exercise Spot prices.
+ * It first finds S_Nopt, S_Nopt + 1, and then computes the average
+ * @param approximations : Approximations from an FD method
+ * @return : Vector of SOptimal values foir early exercise
+ */
+    VectorXd findSEarlyExerciseSoptimal(MatrixXd &approximations)
+    {
+        // given the output of a method, this returns a 2 column vector.
+        // The first column is U(N_opt), second column is U(N_opt+1)
+        VectorXd earlyExerciseSpotValues(M + 1);
+        double tol = std::pow(10, -14);
+
+        // At the boundary/maturity (t=T), there is no difference between early exercise and holding
+        earlyExerciseSpotValues(0) = K;
+
+        // loop through each time vector and try to find the early exercise point
+        for(int timeIndex = 1; timeIndex < M + 1; ++timeIndex)
+        {
+            VectorXd earlyExerciseValues = calculateEarlyExerciseVector(timeIndex);
+            VectorXd uMeshValues = approximations.row(timeIndex);
+
+            // loop through each x value in the time to see if it fills our criteria
+            for(int xIndex = 0; xIndex < N - 1; ++xIndex)
+            {
+                // The logic does not make sense, but it seems to work
+                if(uMeshValues(xIndex + 1) > earlyExerciseValues(xIndex))
+                {
+                    // this value is the early exercise value. Convert to spot price
+                    double optimalValueLeft = K*std::exp(mesh.getX(xIndex));
+                    double optimalValueRight = K*std::exp(mesh.getX(xIndex +1));
+                    // find average
+                    earlyExerciseSpotValues(timeIndex) = (optimalValueLeft + optimalValueRight)/ 2.0;
+//                     to print the time in S,t and the early exercise value found
+//                    std::cout << T - 2*mesh.getT(timeIndex)/(sigma*sigma) << "," << earlyExerciseSpotValues(timeIndex) << std::endl;
+                    break;
+                }
+            }
+        }
+        return earlyExerciseSpotValues;
+    }
 };
 
 
