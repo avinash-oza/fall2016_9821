@@ -60,8 +60,8 @@ void hw9()
     double K = 40;
     double T = 0.75;
     double r = 0.04;
-//    double alphatemp = 0.45;
-    double alphatemp = 5.0;
+    double alphatemp = 0.45;
+//    double alphatemp = 5.0;
 
     double P_amer_bin = 4.083817051176386;
 
@@ -73,14 +73,16 @@ void hw9()
     BlackScholesOption option(S0, K, T, q, r, sigma);
     double Vexact = option.putPrice();
 
-    for(int i = 0; i < 4; ++i) {
+    for(int i = 0; i < 1; ++i) {
         M *= 4;
 
         EuropeanPutPDESolver solver(gLeftOption, gRightOption, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp);
+        solver.setUp();
         AmericanPutPDESolver solverAmerican(gLeftAmerican, gRightOption, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp);
+        solverAmerican.setUp();
 
         MatrixXd fEulerEuropean = solver.CrankNicolson(SOR, tol, omega);
-        double VEurApprox = solver.calculateVapprox(S0, fEulerEuropean);
+        double VEurApprox = solver.calculateVapprox(fEulerEuropean);
 //        std::cout << solverAmerican.calculateErrorPointwise(fEulerEuropean, Vexact) << std::endl;
 
 
@@ -90,25 +92,25 @@ void hw9()
 //        MatrixXd fEulerAmerican = solverAmerican.forwardEuler();
 //        std::cout << fEulerAmerican << std::endl;
         std::cout << M <<","
-                  << solverAmerican.calculateErrorPointwise(fEulerAmerican, P_amer_bin)
-                  << ","
-                  << solverAmerican.calculateErrorPointwise2(fEulerAmerican, P_amer_bin)
-                  << ","
+//                  << solverAmerican.calculateErrorPointwise(fEulerAmerican, P_amer_bin)
+//                  << ","
+//                  << solverAmerican.calculateErrorPointwise2(fEulerAmerican, P_amer_bin)
+//                  << ","
 //                  << std::endl;
 //                std::cout << M <<","
-                    << solverAmerican.calculateDelta(fEulerAmerican)
-                    << ","
-                          << solverAmerican.calculateGamma(fEulerAmerican)
-                          << ","
-                          << solverAmerican.calculateTheta(fEulerAmerican)
-//                          << std::endl;
-//            std::cout << M
-//                      << ","
-//                      << solverAmerican.calculateVapprox(S0, fEulerAmerican)
-//                      << ","
-//                      << VEurApprox
+//                    << solverAmerican.calculateDelta(fEulerAmerican)
+//                    << ","
+//                          << solverAmerican.calculateGamma(fEulerAmerican)
+//                          << ","
+//                          << solverAmerican.calculateTheta(fEulerAmerican)
+                          << std::endl;
+            std::cout << M
                       << ","
-//                      << Vexact
+                      << solverAmerican.calculateVapprox(fEulerAmerican)
+                      << ","
+                      << VEurApprox
+                      << ","
+                      << Vexact
                       << solverAmerican.priceVarianceReduction(fEulerAmerican, VEurApprox, Vexact)
                       << ","
                       << solverAmerican.calculateErrorPointWiseVarianceReduction(fEulerAmerican, VEurApprox, Vexact, P_amer_bin)

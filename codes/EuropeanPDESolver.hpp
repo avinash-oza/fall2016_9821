@@ -13,7 +13,11 @@ class EuropeanPutPDESolver : public PDESolver {
 public:
     EuropeanPutPDESolver(uOptionFunction &gLeftFunc, uOptionFunction &gRightFunc, uOptionFunction &f, double t0,
                          double S0, double K, double T, double q, double r, double sigma, int M, double alphatemp) :
-            PDESolver(gLeftFunc, gRightFunc, f, 0, T, 0, 0, M, 0), S0(S0), K(K), T(T), q(q), r(r), sigma(sigma) {
+            PDESolver(gLeftFunc, gRightFunc, f, 0, T, 0, 0, M, 0), S0(S0), K(K), T(T), q(q), r(r), sigma(sigma), alphatemp(alphatemp) { };
+
+    virtual void _setUp()
+    {
+        // do all setup of the class here
         // set  values based on logic required
         set_xLeft(log(S0 / K) + (r - q - sigma * sigma / 2) * T - 3 * sigma * sqrt(T));
         set_xRight(log(S0 / K) + (r - q - sigma * sigma / 2) * T + 3 * sigma * sqrt(T));
@@ -23,7 +27,7 @@ public:
 
         N = std::floor((_xRight-_xLeft)/sqrt(_tFinal/(alphatemp*M)));
         mesh = Mesh(0, _tFinal, _xLeft, _xRight, M, N);
-    };
+    }
 
     double getXCompute()
     {
@@ -204,6 +208,8 @@ public:
     // constants used in calculation of option price
     double a;
     double b;
+    double alphatemp;
+
 
 };
 

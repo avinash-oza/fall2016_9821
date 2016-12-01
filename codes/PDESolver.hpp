@@ -18,14 +18,33 @@ class PDESolver
 public:
     PDESolver(uFunction &gLeftFunc, uFunction &gRightFunc, uFunction &f, double t0, double tFinal, double xLeft, double xRight, int M, int N) :
             _gLeftFunc(gLeftFunc), _gRightFunc(gRightFunc),
-            _f(f), _t0(t0), _tFinal(tFinal), _xLeft(xLeft), _xRight(xRight), M(M), N(N) {
-        mesh = Mesh(0, tFinal, xLeft, xRight, M, N);
-    };
+            _f(f), _t0(t0), _tFinal(tFinal), _xLeft(xLeft), _xRight(xRight), M(M), N(N) { };
 
+    void setUp()
+    {
+        // initalization method for setting values on the class
+        _setUp();
+        setupCalled = true; // to know the class is setup properly
+    }
+
+    virtual void _setUp()
+    {
+        // do all setup of the class here
+        mesh = Mesh(0, _tFinal, _xLeft, _xRight, M, N);
+    }
+
+    void checkSetup() const
+    {
+        if(!setupCalled)
+        {
+            throw std::runtime_error("Setup was not called before using the class.");
+        }
+    }
 
 
     virtual Eigen::MatrixXd forwardEuler()
     {
+        this->checkSetup();
         Eigen::MatrixXd valuesAtNodes = Eigen::MatrixXd::Zero(M + 1, N + 1);
 
         valuesAtNodes(0,0) = _gLeftFunc.evaluate(_xLeft,0);
@@ -72,6 +91,7 @@ public:
 
     MatrixXd backwardEuler(LinearSolveMethod linearSolverMethod, double tol, double omega)
     {
+        this->checkSetup();;
         MatrixXd valuesAtNodes = MatrixXd::Zero(M + 1, N + 1);
 
         long numberTimeSteps = M;
@@ -130,6 +150,7 @@ public:
 
     Eigen::MatrixXd CrankNicolson(LinearSolveMethod linearSolverMethod, double tol, double omega)
     {
+        this->checkSetup();
         Eigen::MatrixXd valuesAtNodes = Eigen::MatrixXd::Zero(M + 1, N + 1);
 
         valuesAtNodes(0,0) = _gLeftFunc.evaluate(_xLeft,0);
@@ -194,6 +215,7 @@ public:
 
     double RootMeanSquaredError(MatrixXd& approximations, uFunction &uExact)
     {
+        this->checkSetup();
         double dx = (_xRight - _xLeft) / N;
         double uExactValue;
 
@@ -209,6 +231,7 @@ public:
     }
 
     double MaxPointwiseApproximationError(MatrixXd &approximations, uFunction& uExact) const {
+        this->checkSetup();
         double dx = (_xRight - _xLeft)/ N;
 
         VectorXd boundaryApproximations = approximations.row(M); // the lower most row of matrix
@@ -226,6 +249,7 @@ public:
     }
 
     double getAlpha() const {
+        this->checkSetup();
         double dx = (_xRight - _xLeft) / N;
         double dt = (_tFinal - _t0) / M;
         double alpha = dt/(dx*dx);
@@ -233,6 +257,7 @@ public:
     }
 
     double get_xLeft() const {
+        this->checkSetup();
         return _xLeft;
     }
 
@@ -375,6 +400,10 @@ public:
     long M;
     long N;
 	Mesh mesh;
+
+protected:
+    // variable to hold value for setup being called or not
+    bool setupCalled = false;
 };
 
 
