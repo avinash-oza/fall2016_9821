@@ -13,7 +13,7 @@ class AmericanPutPDESolver : public EuropeanPutPDESolver
 public:
     /**
      *
-     * @param gLeftFunc : gLeft is hardcoded to the gAmericanLeft function
+     * @param gLeftFunc : Should be gAmericanLeft function unless another function is required
      * @param gRightFunc : right boundary function
      * @param f : boundary at the bottom of the rectangle
      * @param t0 : typically 0
@@ -28,14 +28,7 @@ public:
      */
     AmericanPutPDESolver(uOptionFunction &gLeftFunc, uOptionFunction &gRightFunc, uOptionFunction &f, double t0,
                          double S0, double K, double T, double q, double r, double sigma, int M, double alphatemp) :
-            EuropeanPutPDESolver(gLeftFunc, gRightFunc, f, t0, S0, K, T, q, r, sigma, M, alphatemp)
-    {
-
-        // for the american option we have a constant left boundary:
-        ///////THIS NEEDS TO BE CHECKED!!!!!!!!!!!!!!
-        _gLeftFunc = gAmericanLeftFunc(sigma, S0, q, K, T, r);
-
-    };
+            EuropeanPutPDESolver(gLeftFunc, gRightFunc, f, t0, S0, K, T, q, r, sigma, M, alphatemp) {};
 
     double earlyExercisePremium(double x, double t)
     {
