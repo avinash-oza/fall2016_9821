@@ -96,7 +96,7 @@ std::tuple<double, double, double, double, double> binomialBlackScholes(double S
     double d = 1.0/u;
     double p = (std::exp((r - q)*deltaT) - d)/(u - d);
     std::vector<double> optionPrices(N + 1);
-    BlackScholesOption blackScholesOption(S, K, T, q, r, sigma);
+    BlackScholesPutOption blackScholesOption(S, K, T, q, r, sigma);
 
     double V22_P, V21_P, V20_P, V22_C, V21_C, V20_C, V11_P, V10_P, V11_C, V10_C, V00_P, V00_C;
     V22_P = V21_P = V20_P = V22_C = V21_C = V20_C = V11_P = V10_P = V11_C = V10_C = V00_P = V00_C = 0;
@@ -114,7 +114,7 @@ std::tuple<double, double, double, double, double> binomialBlackScholes(double S
         double SPrice = S* std::pow(u, N - 1 - i) * std::pow(d, i);
         blackScholesOption.setS(SPrice);
         blackScholesOption.setT(deltaT);
-        optionPrices[i] = std::max(intrinsicValue, blackScholesOption.putPrice());
+        optionPrices[i] = std::max(intrinsicValue, blackScholesOption.price());
     }
 
     for (int j = N - 2; j >= 0; j--)
@@ -197,11 +197,11 @@ double calculateTreesForN(int N)
     double q = 0.01;
     double r = 0.03;
     double sigma = 0.3;
-    BlackScholesOption blackScholesOption(S, K, T, q, r, sigma);
+    BlackScholesPutOption blackScholesOption(S, K, T, q, r, sigma);
 
     std::tuple<double, double, double, double, double> binomialTreePrice = binomialTree(S, K, T, q, r, N, sigma);
     double averageBinomialTreePrice = averageBinomialTree(S, K, T, q, r, N, sigma);
-    double blackScholesValue = blackScholesOption.putPrice();
+    double blackScholesValue = blackScholesOption.price();
     double blackScholeswithRichardsonExtrapolation = binomialBlackScholeswithRichardsonExtrapolation(S, K, T, q, r, N, sigma);
     double binomialBlackScholesPrice = std::get<0>(binomialBlackScholes(S, K, T, q, r, N, sigma));
     double richardsonPrice = binomialBlackScholeswithRichardsonExtrapolation(S, K, T, q, r, N, sigma);
@@ -209,7 +209,7 @@ double calculateTreesForN(int N)
     double optionPrice = std::get<0>(binomialTreePrice);
 //    double optionPrice = richardsonPrice;
     double absDiff = std::abs(richardsonPrice - blackScholesValue);
-    double deltaPut = blackScholesOption.putDelta();
+    double deltaPut = blackScholesOption.delta();
 //    std::cout << blackScholesValue << std::endl;
 //    std::cout << std::setprecision(9)
 //              << optionPrice << ","
@@ -308,7 +308,7 @@ std::tuple<double, double, double, double, double> trinomialBlackScholes(double 
     double pm = 2.0/3.0;
     double pu = 1.0/6.0 + (r - q - sigma*sigma/2)*std::sqrt(deltaT/(12.0*sigma*sigma));
     double pd = 1.0/6.0 - (r - q - sigma*sigma/2)*std::sqrt(deltaT/(12.0*sigma*sigma));
-    BlackScholesOption blackScholesOption(0, K, deltaT, q, r, sigma);
+    BlackScholesPutOption blackScholesOption(0, K, deltaT, q, r, sigma);
 
     double S_10, S_11, S_12, S_20, S_22, S_24;
     S_10 = S_11 = S_12 = S_20 = S_22 = S_24 = 0;
@@ -327,7 +327,7 @@ std::tuple<double, double, double, double, double> trinomialBlackScholes(double 
         double SPrice = S* std::pow(u, N - 1 - i);
         blackScholesOption.setS(SPrice);
         blackScholesOption.setT(deltaT);
-        optionPrices[i] = std::max(intrinsicValue, blackScholesOption.putPrice());
+        optionPrices[i] = std::max(intrinsicValue, blackScholesOption.price());
     }
 
     for (int j = N - 2; j >= 0; j--)
@@ -398,14 +398,14 @@ double calculateTrinomialTreesForN(int N)
     double q = 0.01;
     double r = 0.03;
     double sigma = 0.3;
-    BlackScholesOption blackScholesOption(S, K, T, q, r, sigma);
+    BlackScholesPutOption blackScholesOption(S, K, T, q, r, sigma);
 
     std::tuple<double, double, double, double, double> binomialTreePrice = trinomialBlackScholes(S, K, T, q, r, N, sigma);
     double trinomialTreePrice = std::get<0>(binomialTreePrice);
     double deltaTrinomial = std::get<1>(binomialTreePrice);
     double gammaTrinomial = std::get<2>(binomialTreePrice);
     double thetaTrinomial = std::get<3>(binomialTreePrice);
-    double blackScholesValue = blackScholesOption.putPrice();
+    double blackScholesValue = blackScholesOption.price();
 
 //    double optionPrice = std::get<0>(binomialTreePrice);
 //    double optionPrice = richardsonPrice;

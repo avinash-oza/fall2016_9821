@@ -116,7 +116,7 @@ public:
         for(int j = 0; j < N+1; ++j)
         {
             option.setS(S(j));
-            double price = option.putPrice();
+            double price = option.price();
             if(price > 0.00001*S0)
             {
                 ++Nrms;

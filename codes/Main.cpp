@@ -91,8 +91,8 @@ void hw9()
     gAmericanLeftFunc gLeftAmerican(sigma, S0, q, K, T, r);
     hw8gRightOption gRightOption(sigma, S0, q, K, T, r);
 
-    BlackScholesOption option(S0, K, T, q, r, sigma);
-    double Vexact = option.putPrice();
+    BlackScholesPutOption option(S0, K, T, q, r, sigma);
+    double Vexact = option.price();
 
     for(int i = 0; i < 4; ++i) {
         M *= 4;
@@ -173,8 +173,8 @@ void hw8()
     hw8gLeftOption gLeftOption(sigma, S0, q, K, T, r);
     hw8gRightOption gRightOption(sigma, S0, q, K, T, r);
 
-    BlackScholesOption option(S0, K, T, q, r, sigma);
-    double Vexact = option.putPrice();
+    BlackScholesPutOption option(S0, K, T, q, r, sigma);
+    double Vexact = option.price();
 
     for(int i = 0; i < 4; ++i) {
         M *= 4;

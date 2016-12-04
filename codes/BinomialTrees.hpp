@@ -116,7 +116,7 @@ public:
         double d = 1.0/u;
         double p = (std::exp((r - q)*deltaT) - d)/(u - d);
         std::vector<double> optionPrices(N + 1);
-        BlackScholesOption blackScholesOption(S, K, T, q, r, sigma);
+        BlackScholesPutOption blackScholesOption(S, K, T, q, r, sigma);
 
         double V22_P, V21_P, V20_P, V22_C, V21_C, V20_C, V11_P, V10_P, V11_C, V10_C, V00_P, V00_C;
         V22_P = V21_P = V20_P = V22_C = V21_C = V20_C = V11_P = V10_P = V11_C = V10_C = V00_P = V00_C = 0;
@@ -134,7 +134,7 @@ public:
             double SPrice = S* std::pow(u, N - 1 - i) * std::pow(d, i);
             blackScholesOption.setS(SPrice);
             blackScholesOption.setT(deltaT);
-            optionPrices[i] = std::max(intrinsicValue, blackScholesOption.putPrice());
+            optionPrices[i] = std::max(intrinsicValue, blackScholesOption.price());
 
         }
 

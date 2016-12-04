@@ -107,6 +107,7 @@ public:
         return 0; // needs to be implemented...
     }
 
+private:
     double callPrice()
     {
         // Se^(-qT)N(d1) - Ke^(-rT)*N(d2)
@@ -125,6 +126,12 @@ public:
         return putPrice();
     }
 
+    virtual double delta() {
+        return putDelta();
+    }
+
+private:
+
     double putPrice()
     {
         // Se^(-qT)N(d1) - Ke^(-rT)*N(d2)
@@ -133,10 +140,6 @@ public:
         return K*std::exp(-r*T)* normalDist(-d_2) - S*std::exp(-q*T)*normalDist(-d_1);
     }
 
-
-    virtual double delta() {
-        return putDelta();
-    }
 
     double putDelta()
     {

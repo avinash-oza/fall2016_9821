@@ -93,7 +93,7 @@ public:
         double pm = 2.0/3.0;
         double pu = 1.0/6.0 + (r - q - sigma*sigma/2)*std::sqrt(deltaT/(12.0*sigma*sigma));
         double pd = 1.0/6.0 - (r - q - sigma*sigma/2)*std::sqrt(deltaT/(12.0*sigma*sigma));
-        BlackScholesOption blackScholesOption(0, K, deltaT, q, r, sigma);
+        BlackScholesPutOption blackScholesOption(0, K, deltaT, q, r, sigma);
 
         double S_10, S_11, S_12, S_20, S_22, S_24;
         S_10 = S_11 = S_12 = S_20 = S_22 = S_24 = 0;
@@ -112,7 +112,7 @@ public:
             double SPrice = S* std::pow(u, N - 1 - i) ;
             blackScholesOption.setS(SPrice);
             blackScholesOption.setT(deltaT);
-            optionPrices(i) = std::max(intrinsicValue, blackScholesOption.putPrice());
+            optionPrices(i) = std::max(intrinsicValue, blackScholesOption.price());
         }
 
         for (int j = N - 2; j >= 0; j--)
