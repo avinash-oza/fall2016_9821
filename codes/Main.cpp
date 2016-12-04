@@ -15,6 +15,7 @@
 #include "EuropeanPDESolver.hpp"
 #include "AmericanPDESolver.hpp"
 #include "BinomialTrees.hpp"
+#include "TrinomialTrees.hpp"
 
 
 using namespace Eigen;
@@ -47,17 +48,18 @@ int main() {
     double r = 0.03;
     double sigma = 0.3;
 
-    AmericanBinomialTreePricer binomialTreePricer(S, K, T, q, r, sigma);
+    AmericanTrinomialTreePricer trinomialTreePricer(S, K, T, q, r, sigma);
     for (int i = 10; i <= 1280; i *= 2 )
     {
-//        calculateTrinomialTreesForN(i);
-        TREE_RESULT pricerResult = binomialTreePricer.binomialBlackScholeswithRichardsonExtrapolation(i);
 
-        std::cout << binomialTreePricer.extractPrice(pricerResult)
+        TREE_RESULT pricerResult = trinomialTreePricer.calculateTree(i);
+//
+//        std::cout << trinomialTreePricer.extractPrice(pricerResult)
+        std::cout << calculateTrinomialTreesForN(i)
                 << ","
-                  << binomialTreePricer.extractGamma(pricerResult)
+                  << trinomialTreePricer.extractGamma(pricerResult)
                 << ","
-                  << binomialTreePricer.extractTheta(pricerResult)
+                  << trinomialTreePricer.extractTheta(pricerResult)
                   << std::endl;
     }
 

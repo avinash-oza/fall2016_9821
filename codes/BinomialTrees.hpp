@@ -18,7 +18,7 @@ class EuropeanBinomialTreePricer : public TreePricer
 public:
     EuropeanBinomialTreePricer(double S, double K, double T, double q, double r, double sigma) : TreePricer(S, K, T, q, r, sigma)  {};
 
-    TREE_RESULT calculateBinomialTree(long N)
+    virtual TREE_RESULT calculateTree(long N)
     {
         double deltaT = T/N;
         double u = std::exp(sigma* std::sqrt(deltaT));
@@ -92,11 +92,11 @@ public:
         return std::make_tuple(optionPrices[0], Delta_P, Gamma_P, Theta_P, INT_MIN);
     }
 
-    TREE_RESULT averageBinomialTree(long N)
+    virtual  TREE_RESULT averageBinomialTree(long N)
         // N is the upper bound. Ex- input of 1280 will do 1280 and 1281
     {
-        const TREE_RESULT binomialTreeNPlus1 = calculateBinomialTree(N + 1);
-        const TREE_RESULT binomialTreeN = calculateBinomialTree(N);
+        const TREE_RESULT binomialTreeNPlus1 = calculateTree(N + 1);
+        const TREE_RESULT binomialTreeN = calculateTree(N);
 
         // take average of each result
         VectorXd result = VectorXd::Zero(4);
@@ -109,7 +109,7 @@ public:
         return std::make_tuple(result(0), result(1), result(2), result(3), INT_MIN);
     }
 
-    TREE_RESULT binomialBlackScholes(long N)
+    virtual TREE_RESULT calculateTreeBlackScholes(long N)
     {
         double deltaT = T/N;
         double u = std::exp(sigma* std::sqrt(deltaT));
@@ -190,10 +190,10 @@ public:
 
 
 
-    TREE_RESULT binomialBlackScholeswithRichardsonExtrapolation(long N)
+    virtual TREE_RESULT BlackScholesWithRichardsonExtrapolation(long N)
     {
-        auto bbs1 = binomialBlackScholes(N);
-        auto bbshalfN = binomialBlackScholes(N/2.0);
+        auto bbs1 = calculateTreeBlackScholes(N);
+        auto bbshalfN = calculateTreeBlackScholes(N / 2.0);
 
         // take average of each result
         VectorXd result = VectorXd::Zero(4);

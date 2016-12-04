@@ -255,7 +255,7 @@ std::tuple<double, double, double, double, double> trinomialTree(double S, doubl
         for(int i = 0; i < 2*j + 1; i++)
         {
             double riskNeutralDiscountedValue = std::exp(-r*deltaT)* (optionPrices(i) * pu + pm * optionPrices(i+1) + optionPrices(i + 2) * pd);
-            optionPrices[i] = std::max(riskNeutralDiscountedValue, K - S*std::pow(u, j - i)* std::pow(d, i)); // american
+            optionPrices[i] = std::max(riskNeutralDiscountedValue, K - S*std::pow(u, j - i)); // american
 //            optionPrices(i) = riskNeutralDiscountedValue; // european
 
             if (j == 2)
@@ -389,7 +389,7 @@ std::tuple<double, double, double, double, double> trinomialBlackScholeswithRich
 }
 
 
-void calculateTrinomialTreesForN(int N)
+double calculateTrinomialTreesForN(int N)
 {
     double S = 41.0;
     double K = 40.0;
@@ -411,14 +411,15 @@ void calculateTrinomialTreesForN(int N)
 //    double absDiff = std::abs(richardsonPrice - blackScholesValue);
 //    double deltaPut = deltaBSPut(S, K, T, q, r, N, sigma);
 //    std::cout << blackScholesValue << std::endl;
-    std::cout << std::setprecision(12) << trinomialTreePrice << ","
-              << deltaTrinomial << ","
-            << gammaTrinomial << ","
-              << thetaTrinomial << ","
+//    std::cout << std::setprecision(12) << trinomialTreePrice << ","
+//              << deltaTrinomial << ","
+//            << gammaTrinomial << ","
+//              << thetaTrinomial << ","
 //              << absDiff << ","
 //              << N*absDiff << ","
 //              << N*N*absDiff
-              << std::endl;
+//              << std::endl;
+    return trinomialTreePrice;
 
 
 
