@@ -82,11 +82,15 @@ void hw10()
     double B = 45.0;
     //MAKE SURE TO CHANGE PAYOFF FUNCTION
     BarrierOptionBinomialTreePricer barrierOptionBinomialTreePricer(S, K, T, q, r, sigma, B, DOWN_AND_OUT);
+    BarrierTrinomialTreePricer barrierTrinomialTreePricer(S, K, T, q, r, sigma, B, DOWN_AND_OUT);
     BarrierOption barrierOption(S, K, T, q, r, sigma, B);
 
     TREE_RESULT pricerResult = barrierOptionBinomialTreePricer.calculateTree(1000);
+    TREE_RESULT pricerResult2 = barrierTrinomialTreePricer.calculateTree(1000);
 
     std::cout << barrierOptionBinomialTreePricer.extractPrice(pricerResult)
+            <<","
+                << barrierTrinomialTreePricer.extractPrice(pricerResult2)
                <<","
                 << barrierOption.Price()
               << std::endl;
