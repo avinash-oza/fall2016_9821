@@ -84,16 +84,29 @@ void hw10()
     BarrierOptionBinomialTreePricer barrierOptionBinomialTreePricer(S, K, T, q, r, sigma, B, DOWN_AND_OUT, CALL);
     BarrierTrinomialTreePricer barrierTrinomialTreePricer(S, K, T, q, r, sigma, B, DOWN_AND_OUT, CALL);
     BarrierOption barrierOption(S, K, T, q, r, sigma, B);
+    double exactPrice = barrierOption.Price();
 
     TREE_RESULT pricerResult = barrierOptionBinomialTreePricer.calculateTree(1000);
     TREE_RESULT pricerResult2 = barrierTrinomialTreePricer.calculateTree(1000);
 
-    std::cout << barrierOptionBinomialTreePricer.extractPrice(pricerResult)
-            <<","
-                << barrierTrinomialTreePricer.extractPrice(pricerResult2)
-               <<","
-                << barrierOption.Price()
-              << std::endl;
+    for(long i = 10; i <= 1000 ;++i)
+    {
+        TREE_RESULT pricerResult = barrierTrinomialTreePricer.calculateTree(i);
+        double treePrice = barrierTrinomialTreePricer.extractPrice(pricerResult);
+        std::cout << i
+                  << ","
+                << treePrice
+                << ","
+                  << std::abs(treePrice - exactPrice)
+                << std::endl;
+    }
+
+//    std::cout << barrierOptionBinomialTreePricer.extractPrice(pricerResult)
+//            <<","
+//                << barrierTrinomialTreePricer.extractPrice(pricerResult2)
+//               <<","
+//                << barrierOption.Price()
+//              << std::endl;
 }
 
 
