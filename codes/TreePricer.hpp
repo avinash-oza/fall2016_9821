@@ -5,6 +5,7 @@
 #ifndef CPPCODETEST_TREEPRICER_HPP
 #define CPPCODETEST_TREEPRICER_HPP
 typedef std::tuple<double, double, double, double, double> TREE_RESULT;
+enum OPTION_TYPE{CALL, PUT};
 
 #include "BinomialTrees.hpp"
 
@@ -14,8 +15,8 @@ class TreePricer
 {
 
 public:
-    TreePricer(double S, double K, double T, double q, double r, double sigma) : S(S), K(K), T(T), q(q), r(r),
-                                                                                 sigma(sigma) {}
+    TreePricer(double S, double K, double T, double q, double r, double sigma, OPTION_TYPE optionType) : S(S), K(K), T(T), q(q), r(r),
+                                                                                 sigma(sigma), optionType(optionType) {}
 
     double extractPrice(TREE_RESULT binomialTreeResult)
     {
@@ -51,6 +52,13 @@ public:
     virtual const double getFinalOptionPrice(double u, double d, int j, int i, double riskNeutralDiscountedValue) const {
         return riskNeutralDiscountedValue;
     }
+
+    double calculatePayoff(double S) const
+    {
+        return optionType == CALL ? calculateCallPayoff(S) : calculatePutPayoff(S);
+    }
+
+
 protected:
     double S;
     double K;
@@ -58,6 +66,18 @@ protected:
     double q;
     double r;
     double sigma;
+    OPTION_TYPE optionType;
+
+    // simple payoff functions
+    double calculateCallPayoff(double S) const
+    {
+        return std::max(S - K, 0.0);
+    }
+
+    double calculatePutPayoff(double S) const
+    {
+        return std::max(S - K, 0.0);
+    }
 };
 
 

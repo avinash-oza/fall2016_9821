@@ -81,8 +81,8 @@ void hw10()
     double sigma = 0.3;
     double B = 45.0;
     //MAKE SURE TO CHANGE PAYOFF FUNCTION
-    BarrierOptionBinomialTreePricer barrierOptionBinomialTreePricer(S, K, T, q, r, sigma, B, DOWN_AND_OUT);
-    BarrierTrinomialTreePricer barrierTrinomialTreePricer(S, K, T, q, r, sigma, B, DOWN_AND_OUT);
+    BarrierOptionBinomialTreePricer barrierOptionBinomialTreePricer(S, K, T, q, r, sigma, B, DOWN_AND_OUT, CALL);
+    BarrierTrinomialTreePricer barrierTrinomialTreePricer(S, K, T, q, r, sigma, B, DOWN_AND_OUT, CALL);
     BarrierOption barrierOption(S, K, T, q, r, sigma, B);
 
     TREE_RESULT pricerResult = barrierOptionBinomialTreePricer.calculateTree(1000);

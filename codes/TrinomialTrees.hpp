@@ -35,7 +35,7 @@ public:
 
         for (int i = 0 ; i < 2*N + 1; i++)
         {
-            optionPrices(i) = std::max(K - S* std::pow(u, N - i) , 0.0);
+            optionPrices(i) = calculatePayoff(S* std::pow(u, N - i));
         }
 
         for (int j = N - 1; j >= 0; j--)
@@ -43,7 +43,6 @@ public:
             for(int i = 0; i < 2*j + 1; i++)
             {
                 double riskNeutralDiscountedValue = calculateRiskNeutralDiscountedValue(i, j, deltaT, u, d, pu, pm, pd, optionPrices);
-//                optionPrices[i] = std::max(riskNeutralDiscountedValue, K - S*std::pow(u, j - i)* std::pow(d, i)); // american
             optionPrices(i) = riskNeutralDiscountedValue; // european
 
                 if (j == 2)
@@ -120,7 +119,6 @@ public:
             for(int i = 0; i < 2*j + 1; i++)
             {
                 double riskNeutralDiscountedValue = calculateRiskNeutralDiscountedValue(i, j, deltaT, u, d, pu, pm, pd, optionPrices);
-//                optionPrices[i] = std::max(riskNeutralDiscountedValue, K - S*std::pow(u, j - i)* std::pow(d, i)); // american
                 optionPrices(i) = getFinalOptionPrice(u, d, j, i, riskNeutralDiscountedValue);
 
                 if (j == 2)
@@ -176,14 +174,16 @@ public:
     virtual double calculateRiskNeutralDiscountedValue(int i, int j, double deltaT, double u, double d, double pu, double pm, double pd, const VectorXd &optionPrices)
     {
         double europeanPrice = EuropeanTrinomialTreePricer::calculateRiskNeutralDiscountedValue(i, j, deltaT, u, d, pu, pm, pd, optionPrices);
-        double intrinsicValue =  K - S*std::pow(u, j - i);
+//        double intrinsicValue =  K - S*std::pow(u, j - i);
+        double intrinsicValue =  calculatePayoff(S*std::pow(u, j - i));
 
         return std::max(europeanPrice, intrinsicValue);
     }
 
     virtual long double calculateIntrinsicValue(int N, double u, int i, double d)
     {
-        return std::max(K - S* std::pow(u, N - i - 1) , 0.0); // for the european case there is no intrinsic value
+//        return std::max(K - S* std::pow(u, N - i - 1) , 0.0); // for the european case there is no intrinsic value
+        return calculatePayoff(S* std::pow(u, N - i - 1));
     }
 
     virtual const double getFinalOptionPrice(double u, double d, int j, int i, double riskNeutralDiscountedValue) const {
@@ -195,8 +195,8 @@ public:
 class BarrierTrinomialTreePricer : public EuropeanTrinomialTreePricer
 {
 public:
-    BarrierTrinomialTreePricer(double S, double K, double T, double q, double r, double sigma, double B, BARRIER_TYPE barrierType) :
-            EuropeanTrinomialTreePricer(S, K, T, q, r, sigma), barrierType(barrierType), B(B) {};
+    BarrierTrinomialTreePricer(double S, double K, double T, double q, double r, double sigma, double B, BARRIER_TYPE barrierType, OPTION_TYPE optionType) :
+            EuropeanTrinomialTreePricer(S, K, T, q, r, sigma, optionType), barrierType(barrierType), B(B) {};
 
     virtual TREE_RESULT calculateTree(long N)
     {
@@ -221,7 +221,7 @@ public:
         for (int i = 0 ; i < 2*N + 1; i++)
         {
             currentSpot = S* std::pow(u, N - i);
-            double unHitPayoff = std::max(S* std::pow(u, N - i) - K , 0.0);
+            double unHitPayoff = calculatePayoff(currentSpot);
             optionPrices(i) = calculateFinalOptionValue(currentSpot, unHitPayoff);
         }
 

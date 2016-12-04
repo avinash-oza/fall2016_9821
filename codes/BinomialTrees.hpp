@@ -18,7 +18,7 @@ using namespace Eigen;
 class EuropeanBinomialTreePricer : public TreePricer
 {
 public:
-    EuropeanBinomialTreePricer(double S, double K, double T, double q, double r, double sigma) : TreePricer(S, K, T, q, r, sigma)  {};
+    EuropeanBinomialTreePricer(double S, double K, double T, double q, double r, double sigma, OPTION_TYPE optionType) : TreePricer(S, K, T, q, r, sigma, optionType)  {};
 
     virtual TREE_RESULT calculateTree(long N)
     {
@@ -40,7 +40,8 @@ public:
 
         for (int i = 0 ; i < N + 1; i++)
         {
-            optionPrices[i] = std::max(K - S* std::pow(u, N - i) * std::pow(d, i) , 0.0);
+//            optionPrices[i] = std::max(K - S* std::pow(u, N - i) * std::pow(d, i) , 0.0);
+            optionPrices[i] = calculatePayoff(S* std::pow(u, N - i) * std::pow(d, i));
         }
 
         for (int j = N - 1; j >= 0; j--)
@@ -48,7 +49,6 @@ public:
             for(int i = 0; i < j + 1; i++)
             {
                 double riskNeutralDiscountedValue = calculateRiskNeutralDiscountedValue(deltaT, p, optionPrices, i, u , j);
-//            optionPrices[i] = std::max(riskNeutralDiscountedValue, K - S*std::pow(u, j - i)* std::pow(d, i)); // american
                 optionPrices[i] = riskNeutralDiscountedValue; // european
 
                 if (j == 2)
@@ -214,25 +214,26 @@ public:
 class AmericanBinomialTreePricer : public EuropeanBinomialTreePricer
 {
 public:
-    AmericanBinomialTreePricer(double S, double K, double T, double q, double r, double sigma)
-            : EuropeanBinomialTreePricer(S, K, T, q, r, sigma) {}
+    AmericanBinomialTreePricer(double S, double K, double T, double q, double r, double sigma, OPTION_TYPE optionType)
+            : EuropeanBinomialTreePricer(S, K, T, q, r, sigma, optionType) {}
 
     virtual long double
     calculateRiskNeutralDiscountedValue(double deltaT, double p, const std::vector<double> &optionPrices, int i, double u , int j) const {
         long double europeanPrice = TreePricer::calculateRiskNeutralDiscountedValue(deltaT, p, optionPrices, i, u , j);
-        long double intrinsicValue =  K - S*std::pow(u, j - i)* std::pow(1.0/u, i);
+//        long double intrinsicValue =  K - S*std::pow(u, j - i)* std::pow(1.0/u, i);
+        long double intrinsicValue =  calculatePayoff(S*std::pow(u, j - i)* std::pow(1.0/u, i));
 
-        //            optionPrices[i] = std::max(riskNeutralDiscountedValue, K - S*std::pow(u, j - i)* std::pow(d, i)); // american
         return std::max(europeanPrice, intrinsicValue);
     }
 
     virtual long double calculateIntrinsicValue(int N, double u, int i, double d)
     {
-        return std::max(K - S* std::pow(u, N - i - 1) * std::pow(d, i) , 0.0); // for the european case there is no intrinsic value
+        return calculatePayoff(S* std::pow(u, N - i - 1) * std::pow(d, i)); // for the european case there is no intrinsic value
     }
 
     virtual const double getFinalOptionPrice(double u, double d, int j, int i, double riskNeutralDiscountedValue) const {
-        return std::max(riskNeutralDiscountedValue, K - S * pow(u, j - i) * pow(d, i));
+        double payoff = calculatePayoff(S * pow(u, j - i) * pow(d, i));
+        return std::max(riskNeutralDiscountedValue, payoff);
     }
 };
 
@@ -240,8 +241,8 @@ public:
 class BarrierOptionBinomialTreePricer : public EuropeanBinomialTreePricer
 {
 public:
-    BarrierOptionBinomialTreePricer(double S, double K, double T, double q, double r, double sigma, double B, BARRIER_TYPE barrierType)
-            : EuropeanBinomialTreePricer(S, K, T, q, r, sigma), B(B), barrierType(barrierType) {}
+    BarrierOptionBinomialTreePricer(double S, double K, double T, double q, double r, double sigma, double B, BARRIER_TYPE barrierType, OPTION_TYPE optionType)
+            : EuropeanBinomialTreePricer(S, K, T, q, r, sigma, optionType), B(B), barrierType(barrierType) {}
 
     virtual TREE_RESULT calculateTree(long N) {
         double deltaT = T / N;
