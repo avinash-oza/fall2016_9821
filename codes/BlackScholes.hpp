@@ -14,22 +14,8 @@ class BlackScholesOption
         BlackScholesOption(double S, double K, double T, double q, double r, double sigma):
         S(S), K(K), T(T), q(q), r(r), sigma(sigma) {};
 
-        double callPrice()
-        {
-            // Se^(-qT)N(d1) - Ke^(-rT)*N(d2)
-            double d_1= d1(S, K, T, q, r,  sigma);
-            double d_2= d2(S, K, T, q, r, sigma);
-            return S*std::exp(-q*T)*normalDist(d_1) - K*std::exp(-r*T) * normalDist(d_2);
-        }
-
-        double putPrice()
-        {
-            // Se^(-qT)N(d1) - Ke^(-rT)*N(d2)
-            double d_1= d1(S, K, T, q, r, sigma);
-            double d_2= d2(S, K, T, q, r, sigma);
-            return K*std::exp(-r*T)* normalDist(-d_2) - S*std::exp(-q*T)*normalDist(-d_1);
-        }
-
+        virtual double price() = 0;
+        virtual double delta() = 0;
 
         double d1(double S, double K, double T, double q, double r, double sigma)
         {
@@ -47,11 +33,7 @@ class BlackScholesOption
             return boost::math::cdf(normalVariable, d);
         }
 
-        double putDelta()
-        {
-            double d_1 = d1(S, K, T, q, r, sigma);
-            return -1*std::exp(-q*T)*normalDist(-d_1);
-        }
+
 
     double getS() const {
         return S;
@@ -102,7 +84,7 @@ class BlackScholesOption
     }
 
 
-private:
+protected:
     double S;
     double K;
     double T;
@@ -110,6 +92,57 @@ private:
     double r;
     double sigma;
 
+};
+
+class BlackScholesCallOption : public BlackScholesOption
+{
+public:
+    using BlackScholesOption::BlackScholesOption;
+
+    virtual double price() {
+        return callPrice();
+    }
+
+    virtual double delta() {
+        return 0; // needs to be implemented...
+    }
+
+    double callPrice()
+    {
+        // Se^(-qT)N(d1) - Ke^(-rT)*N(d2)
+        double d_1= d1(S, K, T, q, r,  sigma);
+        double d_2= d2(S, K, T, q, r, sigma);
+        return S*std::exp(-q*T)*normalDist(d_1) - K*std::exp(-r*T) * normalDist(d_2);
+    }
+};
+
+class BlackScholesPutOption : public BlackScholesOption
+{
+public:
+    using BlackScholesOption::BlackScholesOption;
+
+    virtual double price() {
+        return putPrice();
+    }
+
+    double putPrice()
+    {
+        // Se^(-qT)N(d1) - Ke^(-rT)*N(d2)
+        double d_1= d1(S, K, T, q, r, sigma);
+        double d_2= d2(S, K, T, q, r, sigma);
+        return K*std::exp(-r*T)* normalDist(-d_2) - S*std::exp(-q*T)*normalDist(-d_1);
+    }
+
+
+    virtual double delta() {
+        return putDelta();
+    }
+
+    double putDelta()
+    {
+        double d_1 = d1(S, K, T, q, r, sigma);
+        return -1*std::exp(-q*T)*normalDist(-d_1);
+    }
 };
 
 #endif //CPPCODETEST_BLACKSCHOLES_HPP
