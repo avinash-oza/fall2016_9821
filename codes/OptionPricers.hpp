@@ -323,10 +323,11 @@ std::tuple<double, double, double, double, double> trinomialBlackScholes(double 
 
     for (int i = 0 ; i < 2*N - 1; i++)
     {
-        double SPrice = S* std::pow(u, N - 1 - i) ;
+        double intrinsicValue = std::max(K - S* std::pow(u, N - i - 1) , 0.0);
+        double SPrice = S* std::pow(u, N - 1 - i);
         blackScholesOption.setS(SPrice);
         blackScholesOption.setT(deltaT);
-        optionPrices(i) = blackScholesOption.putPrice();
+        optionPrices[i] = std::max(intrinsicValue, blackScholesOption.putPrice());
     }
 
     for (int j = N - 2; j >= 0; j--)
@@ -334,7 +335,7 @@ std::tuple<double, double, double, double, double> trinomialBlackScholes(double 
         for(int i = 0; i < 2*j + 1; i++)
         {
             double riskNeutralDiscountedValue = std::exp(-r*deltaT)* (optionPrices(i) * pu + pm * optionPrices(i+1) + optionPrices(i + 2) * pd);
-            optionPrices[i] = std::max(riskNeutralDiscountedValue, K - S*std::pow(u, j - i)* std::pow(d, i)); // american
+            optionPrices[i] = std::max(riskNeutralDiscountedValue, K - S*std::pow(u, j - i)); // american
 //            optionPrices(i) = riskNeutralDiscountedValue; // european
 
             if (j == 2)
@@ -399,7 +400,7 @@ double calculateTrinomialTreesForN(int N)
     double sigma = 0.3;
     BlackScholesOption blackScholesOption(S, K, T, q, r, sigma);
 
-    std::tuple<double, double, double, double, double> binomialTreePrice = trinomialTree(S, K, T, q, r, N, sigma);
+    std::tuple<double, double, double, double, double> binomialTreePrice = trinomialBlackScholes(S, K, T, q, r, N, sigma);
     double trinomialTreePrice = std::get<0>(binomialTreePrice);
     double deltaTrinomial = std::get<1>(binomialTreePrice);
     double gammaTrinomial = std::get<2>(binomialTreePrice);

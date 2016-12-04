@@ -48,14 +48,16 @@ int main() {
     double r = 0.03;
     double sigma = 0.3;
 
-    AmericanTrinomialTreePricer trinomialTreePricer(S, K, T, q, r, sigma);
+    EuropeanTrinomialTreePricer trinomialTreePricer(S, K, T, q, r, sigma);
     for (int i = 10; i <= 1280; i *= 2 )
     {
 
-        TREE_RESULT pricerResult = trinomialTreePricer.calculateTree(i);
+        TREE_RESULT pricerResult = trinomialTreePricer.BlackScholesWithRichardsonExtrapolation(i);
 //
-//        std::cout << trinomialTreePricer.extractPrice(pricerResult)
-        std::cout << calculateTrinomialTreesForN(i)
+        std::cout << trinomialTreePricer.extractPrice(pricerResult) //- calculateTrinomialTreesForN(i)
+//        std::cout << calculateTrinomialTreesForN(i)
+                << ","
+                    << trinomialTreePricer.extractDelta(pricerResult)
                 << ","
                   << trinomialTreePricer.extractGamma(pricerResult)
                 << ","
