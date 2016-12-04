@@ -13,7 +13,7 @@ private:
     double S0, K, B, r, sigma, q,T;
 
 public:
-    BarrierOption(double Spot, double Strike, double Barrier, double Interest, double Volatility, double Dividend, double Maturity)
+    BarrierOption(double Spot, double Strike, double Maturity, double Dividend, double Interest, double Volatility, double Barrier)
             :S0(Spot), K(Strike), B(Barrier), r(Interest), sigma(Volatility), q(Dividend), T(Maturity) {;}
 
     double Price() const

@@ -16,6 +16,7 @@
 #include "AmericanPDESolver.hpp"
 #include "BinomialTrees.hpp"
 #include "TrinomialTrees.hpp"
+#include "BarrierOption.hpp"
 
 
 using namespace Eigen;
@@ -26,6 +27,7 @@ string FILE_ROOT = "/home/avi/";
 void writeCSVMatrix(MatrixXd &matrixToWrite, string fileName);
 void hw8();
 void hw9();
+void hw10();
 
 int main() {
     /// Keep this line to make the decimals always print out
@@ -37,36 +39,59 @@ int main() {
 	*/
 //    hw8();
 //    hw9();
+    hw10();
 //    Question3();
 //    decompositionExamples();
 //    verifyCholeskyDecomposition();
 //    exam2013();
-    double S = 41.0;
-    double K = 40.0;
-    double T = 1.0;
-    double q = 0.01;
-    double r = 0.03;
-    double sigma = 0.3;
-
-    EuropeanTrinomialTreePricer trinomialTreePricer(S, K, T, q, r, sigma);
-    for (int i = 10; i <= 1280; i *= 2 )
-    {
-
-        TREE_RESULT pricerResult = trinomialTreePricer.BlackScholesWithRichardsonExtrapolation(i);
+//    double S = 41.0;
+//    double K = 40.0;
+//    double T = 1.0;
+//    double q = 0.01;
+//    double r = 0.03;
+//    double sigma = 0.3;
 //
-        std::cout << trinomialTreePricer.extractPrice(pricerResult) //- calculateTrinomialTreesForN(i)
+//    EuropeanTrinomialTreePricer trinomialTreePricer(S, K, T, q, r, sigma);
+//    for (int i = 10; i <= 1280; i *= 2 )
+//    {
+//
+//        TREE_RESULT pricerResult = trinomialTreePricer.BlackScholesWithRichardsonExtrapolation(i);
+
+//        std::cout << trinomialTreePricer.extractPrice(pricerResult) //- calculateTrinomialTreesForN(i)
 //        std::cout << calculateTrinomialTreesForN(i)
-                << ","
-                    << trinomialTreePricer.extractDelta(pricerResult)
-                << ","
-                  << trinomialTreePricer.extractGamma(pricerResult)
-                << ","
-                  << trinomialTreePricer.extractTheta(pricerResult)
-                  << std::endl;
-    }
+//                << ","
+//                    << trinomialTreePricer.extractDelta(pricerResult)
+//                << ","
+//                  << trinomialTreePricer.extractGamma(pricerResult)
+//                << ","
+//                  << trinomialTreePricer.extractTheta(pricerResult)
+//                  << std::endl;
+//    }
 
     return 0;
 }
+
+void hw10()
+{
+    double S = 50.0;
+    double K = 48.0;
+    double T = 8.0/12.0; // make sure to do double division
+    double q = 0.01;
+    double r = 0.02;
+    double sigma = 0.3;
+    double B = 45.0;
+    //MAKE SURE TO CHANGE PAYOFF FUNCTION
+    BarrierOptionBinomialTreePricer barrierOptionBinomialTreePricer(S, K, T, q, r, sigma, B, DOWN_AND_OUT);
+    BarrierOption barrierOption(S, K, T, q, r, sigma, B);
+
+    TREE_RESULT pricerResult = barrierOptionBinomialTreePricer.calculateTree(1000);
+
+    std::cout << barrierOptionBinomialTreePricer.extractPrice(pricerResult)
+               <<","
+                << barrierOption.Price()
+              << std::endl;
+}
+
 
 void hw9()
 {
