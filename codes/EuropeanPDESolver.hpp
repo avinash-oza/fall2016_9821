@@ -9,9 +9,9 @@
 #include "PDESolver.hpp"
 #include "BlackScholes.hpp"
 
-class EuropeanPutPDESolver : public PDESolver {
+class EuropeanPDESolver : public PDESolver {
 public:
-    EuropeanPutPDESolver(uOptionFunction &gLeftFunc, uOptionFunction &gRightFunc, uOptionFunction &f, double t0,
+    EuropeanPDESolver(uOptionFunction &gLeftFunc, uOptionFunction &gRightFunc, uOptionFunction &f, double t0,
                          double S0, double K, double T, double q, double r, double sigma, int M, double alphatemp) :
             PDESolver(gLeftFunc, gRightFunc, f, 0, T, 0, 0, M, 0), S0(S0), K(K), T(T), q(q), r(r), sigma(sigma), alphatemp(alphatemp) { };
 

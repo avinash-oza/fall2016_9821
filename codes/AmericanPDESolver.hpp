@@ -8,7 +8,7 @@
 #include "EuropeanPDESolver.hpp"
 #include "uFunctions.hpp"
 
-class AmericanPutPDESolver : public EuropeanPutPDESolver
+class AmericanPDESolver : public EuropeanPDESolver
 {
 public:
     /**
@@ -26,9 +26,9 @@ public:
      * @param M : number of intervals in x
      * @param alphatemp 
      */
-    AmericanPutPDESolver(uOptionFunction &gLeftFunc, uOptionFunction &gRightFunc, uOptionFunction &f, double t0,
+    AmericanPDESolver(uOptionFunction &gLeftFunc, uOptionFunction &gRightFunc, uOptionFunction &f, double t0,
                          double S0, double K, double T, double q, double r, double sigma, int M, double alphatemp) :
-            EuropeanPutPDESolver(gLeftFunc, gRightFunc, f, t0, S0, K, T, q, r, sigma, M, alphatemp) {};
+            EuropeanPDESolver(gLeftFunc, gRightFunc, f, t0, S0, K, T, q, r, sigma, M, alphatemp) {};
 
     double earlyExercisePremium(double x, double t)
     {

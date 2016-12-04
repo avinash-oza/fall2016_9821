@@ -97,9 +97,9 @@ void hw9()
     for(int i = 0; i < 4; ++i) {
         M *= 4;
 
-        EuropeanPutPDESolver solver(gLeftOption, gRightOption, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp);
+        EuropeanPDESolver solver(gLeftOption, gRightOption, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp);
         solver.setUp();
-        AmericanPutPDESolver solverAmerican(gLeftAmerican, gRightOption, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp);
+        AmericanPDESolver solverAmerican(gLeftAmerican, gRightOption, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp);
         solverAmerican.setUp();
 
         MatrixXd fEulerEuropean = solver.CrankNicolson(SOR, tol, omega);
@@ -179,7 +179,8 @@ void hw8()
     for(int i = 0; i < 4; ++i) {
         M *= 4;
 
-        EuropeanPutPDESolver solver(gLeftOption, gRightOption, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp);
+        EuropeanPDESolver solver(gLeftOption, gRightOption, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp);
+        solver.setUp();
         MatrixXd fEulerResult = solver.CrankNicolson(SOR, tol, omega);
 //    std::cout << fEulerResult << std::endl;
         std::cout << solver.calculateErrorPointwise(fEulerResult, Vexact) << std::endl;
