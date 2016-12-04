@@ -42,6 +42,15 @@ public:
         // calculates european value by default
         return exp(-r * deltaT) * (optionPrices[i] * p + optionPrices[i + 1] * (1 - p));
     }
+
+    virtual long double calculateIntrinsicValue(int N, double u, int i, double d)
+    {
+        return 0.0; // for the european case there is no intrinsic value
+    }
+
+    virtual const double getFinalOptionPrice(double u, double d, int j, int i, double riskNeutralDiscountedValue) const {
+        return riskNeutralDiscountedValue;
+    }
 protected:
     double S;
     double K;

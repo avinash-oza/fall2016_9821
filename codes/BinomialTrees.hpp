@@ -130,11 +130,12 @@ public:
 
         for (int i = 0 ; i < N; i++)
         {
-//        optionPrices[i] = std::max(K - S* std::pow(u, N - i) * std::pow(d, i) , 0.0);
+            double intrinsicValue = calculateIntrinsicValue(N, u, i, d); // needed to calculate intrinsic value for american option
             double SPrice = S* std::pow(u, N - 1 - i) * std::pow(d, i);
             blackScholesOption.setS(SPrice);
             blackScholesOption.setT(deltaT);
-            optionPrices[i] = blackScholesOption.putPrice();
+            optionPrices[i] = std::max(intrinsicValue, blackScholesOption.putPrice());
+
         }
 
         for (int j = N - 2; j >= 0; j--)
@@ -142,8 +143,7 @@ public:
             for(int i = 0; i < j + 1; i++)
             {
                 double riskNeutralDiscountedValue = calculateRiskNeutralDiscountedValue(deltaT, p, optionPrices, i, u , j);
-            optionPrices[i] = std::max(riskNeutralDiscountedValue, K - S*std::pow(u, j - i)* std::pow(d, i)); // american
-//                optionPrices[i] = riskNeutralDiscountedValue; // european
+            optionPrices[i] = getFinalOptionPrice(u, d, j, i, riskNeutralDiscountedValue);
 
                 if (j == 2)
                 {
@@ -188,6 +188,8 @@ public:
         return std::make_tuple(optionPrices[0], Delta_P, Gamma_P, Theta_P, INT_MIN);
     }
 
+
+
     TREE_RESULT binomialBlackScholeswithRichardsonExtrapolation(long N)
     {
         auto bbs1 = binomialBlackScholes(N);
@@ -207,21 +209,30 @@ public:
 
 };
 
-//class AmericanBinomialTreePricer : public EuropeanBinomialTreePricer
-//{
-//public:
-//    AmericanBinomialTreePricer(double S, double K, double T, double q, double r, double sigma)
-//            : EuropeanBinomialTreePricer(S, K, T, q, r, sigma) {}
-//
-////    virtual long double
-////    calculateRiskNeutralDiscountedValue(double deltaT, double p, const std::vector<double> &optionPrices, int i, double u , int j) const {
-////        long double europeanPrice = TreePricer::calculateRiskNeutralDiscountedValue(deltaT, p, optionPrices, i, u , j);
-////        long double intrinsicValue =  K - S*std::pow(u, j - i)* std::pow(1.0/u, i);
-////
-////        //            optionPrices[i] = std::max(riskNeutralDiscountedValue, K - S*std::pow(u, j - i)* std::pow(d, i)); // american
-////        return std::max(europeanPrice, intrinsicValue);
-////    }
-//};
+class AmericanBinomialTreePricer : public EuropeanBinomialTreePricer
+{
+public:
+    AmericanBinomialTreePricer(double S, double K, double T, double q, double r, double sigma)
+            : EuropeanBinomialTreePricer(S, K, T, q, r, sigma) {}
+
+    virtual long double
+    calculateRiskNeutralDiscountedValue(double deltaT, double p, const std::vector<double> &optionPrices, int i, double u , int j) const {
+        long double europeanPrice = TreePricer::calculateRiskNeutralDiscountedValue(deltaT, p, optionPrices, i, u , j);
+        long double intrinsicValue =  K - S*std::pow(u, j - i)* std::pow(1.0/u, i);
+
+        //            optionPrices[i] = std::max(riskNeutralDiscountedValue, K - S*std::pow(u, j - i)* std::pow(d, i)); // american
+        return std::max(europeanPrice, intrinsicValue);
+    }
+
+    virtual long double calculateIntrinsicValue(int N, double u, int i, double d)
+    {
+        return std::max(K - S* std::pow(u, N - i - 1) * std::pow(d, i) , 0.0); // for the european case there is no intrinsic value
+    }
+
+    virtual const double getFinalOptionPrice(double u, double d, int j, int i, double riskNeutralDiscountedValue) const {
+        return std::max(riskNeutralDiscountedValue, K - S * pow(u, j - i) * pow(d, i));
+    }
+};
 
 
 #endif //CPPCODETEST_BINOMIALTREES_HPP

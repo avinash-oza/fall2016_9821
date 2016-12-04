@@ -47,13 +47,13 @@ int main() {
     double r = 0.03;
     double sigma = 0.3;
 
-    BinomialTreePricer binomialTreePricer(S, K, T, q, r, sigma);
+    AmericanBinomialTreePricer binomialTreePricer(S, K, T, q, r, sigma);
     for (int i = 10; i <= 1280; i *= 2 )
     {
 //        calculateTrinomialTreesForN(i);
         TREE_RESULT pricerResult = binomialTreePricer.binomialBlackScholeswithRichardsonExtrapolation(i);
 
-        std::cout << binomialTreePricer.extractDelta(pricerResult)
+        std::cout << binomialTreePricer.extractPrice(pricerResult)
                 << ","
                   << binomialTreePricer.extractGamma(pricerResult)
                 << ","
