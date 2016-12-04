@@ -4,40 +4,19 @@
 
 #ifndef CPPCODETEST_BINOMIALTREES_HPP
 #define CPPCODETEST_BINOMIALTREES_HPP
-typedef std::tuple<double, double, double, double, double> TREE_RESULT;
 
 #include <vector>
 #include <cmath>
 #include <Eigen/Dense>
 #include "BlackScholes.hpp"
+#include "TreePricer.hpp"
 
 using namespace Eigen;
 
-class BinomialTreePricer
+class EuropeanBinomialTreePricer : public TreePricer
 {
 public:
-    BinomialTreePricer(double S, double K, double T, double q, double r, double sigma) : S(S), K(K), T(T), q(q), r(r),
-                                                                                   sigma(sigma) {};
-
-    double extractPrice(TREE_RESULT binomialTreeResult)
-    {
-        return std::get<0>(binomialTreeResult);
-    }
-
-    double extractDelta(TREE_RESULT binomialTreeResult)
-    {
-        return std::get<1>(binomialTreeResult);
-    }
-
-    double extractGamma(TREE_RESULT binomialTreeResult)
-    {
-        return std::get<2>(binomialTreeResult);
-    }
-
-    double extractTheta(TREE_RESULT treeResult)
-    {
-        return std::get<3>(treeResult);
-    }
+    EuropeanBinomialTreePricer(double S, double K, double T, double q, double r, double sigma) : TreePricer(S, K, T, q, r, sigma)  {};
 
     TREE_RESULT calculateBinomialTree(long N)
     {
@@ -66,7 +45,7 @@ public:
         {
             for(int i = 0; i < j + 1; i++)
             {
-                double riskNeutralDiscountedValue = std::exp(-r*deltaT)* (optionPrices[i] * p + optionPrices[i + 1] * (1 - p));
+                double riskNeutralDiscountedValue = calculateRiskNeutralDiscountedValue(deltaT, p, optionPrices, i, u , j);
 //            optionPrices[i] = std::max(riskNeutralDiscountedValue, K - S*std::pow(u, j - i)* std::pow(d, i)); // american
                 optionPrices[i] = riskNeutralDiscountedValue; // european
 
@@ -151,7 +130,7 @@ public:
 
         for (int i = 0 ; i < N; i++)
         {
-//        optionPrices[i] = std::max(K - S* std::pow(u, N - i) * std::pow(d, i) , 0.0)
+//        optionPrices[i] = std::max(K - S* std::pow(u, N - i) * std::pow(d, i) , 0.0);
             double SPrice = S* std::pow(u, N - 1 - i) * std::pow(d, i);
             blackScholesOption.setS(SPrice);
             blackScholesOption.setT(deltaT);
@@ -162,9 +141,9 @@ public:
         {
             for(int i = 0; i < j + 1; i++)
             {
-                double riskNeutralDiscountedValue = std::exp(-r*deltaT)* (optionPrices[i] * p + optionPrices[i + 1] * (1 - p));
-//            optionPrices[i] = std::max(riskNeutralDiscountedValue, K - S*std::pow(u, j - i)* std::pow(d, i)); // american
-                optionPrices[i] = riskNeutralDiscountedValue; // european
+                double riskNeutralDiscountedValue = calculateRiskNeutralDiscountedValue(deltaT, p, optionPrices, i, u , j);
+            optionPrices[i] = std::max(riskNeutralDiscountedValue, K - S*std::pow(u, j - i)* std::pow(d, i)); // american
+//                optionPrices[i] = riskNeutralDiscountedValue; // european
 
                 if (j == 2)
                 {
@@ -225,13 +204,24 @@ public:
         return std::make_tuple(result(0), result(1), result(2), result(3), INT_MIN);
     }
 
-private:
-    double S;
-    double K;
-    double T;
-    double q;
-    double r;
-    double sigma;
+
 };
+
+//class AmericanBinomialTreePricer : public EuropeanBinomialTreePricer
+//{
+//public:
+//    AmericanBinomialTreePricer(double S, double K, double T, double q, double r, double sigma)
+//            : EuropeanBinomialTreePricer(S, K, T, q, r, sigma) {}
+//
+////    virtual long double
+////    calculateRiskNeutralDiscountedValue(double deltaT, double p, const std::vector<double> &optionPrices, int i, double u , int j) const {
+////        long double europeanPrice = TreePricer::calculateRiskNeutralDiscountedValue(deltaT, p, optionPrices, i, u , j);
+////        long double intrinsicValue =  K - S*std::pow(u, j - i)* std::pow(1.0/u, i);
+////
+////        //            optionPrices[i] = std::max(riskNeutralDiscountedValue, K - S*std::pow(u, j - i)* std::pow(d, i)); // american
+////        return std::max(europeanPrice, intrinsicValue);
+////    }
+//};
+
 
 #endif //CPPCODETEST_BINOMIALTREES_HPP
