@@ -14,6 +14,7 @@
 #include "PDESolver.hpp"
 #include "EuropeanPDESolver.hpp"
 #include "AmericanPDESolver.hpp"
+#include "BinomialTrees.hpp"
 
 
 using namespace Eigen;
@@ -27,22 +28,38 @@ void hw9();
 
 int main() {
     /// Keep this line to make the decimals always print out
-    std::cout << std::fixed << std::setprecision(9);
+    std::cout << std::fixed << std::setprecision(12);
 	/*
 	std::ofstream myfile("output1.csv");
 	myfile<<(U).format(CSVFormat)<<std::endl;
 	myfile.close();
 	*/
 //    hw8();
-    hw9();
+//    hw9();
 //    Question3();
 //    decompositionExamples();
 //    verifyCholeskyDecomposition();
 //    exam2013();
-//    for (int i = 10; i <= 1280; i *= 2 )
-//    {
+    double S = 41.0;
+    double K = 40.0;
+    double T = 1.0;
+    double q = 0.01;
+    double r = 0.03;
+    double sigma = 0.3;
+
+    BinomialTreePricer binomialTreePricer(S, K, T, q, r, sigma);
+    for (int i = 10; i <= 1280; i *= 2 )
+    {
 //        calculateTrinomialTreesForN(i);
-//    }
+        TREE_RESULT pricerResult = binomialTreePricer.binomialBlackScholeswithRichardsonExtrapolation(i);
+
+        std::cout << binomialTreePricer.extractDelta(pricerResult)
+                << ","
+                  << binomialTreePricer.extractGamma(pricerResult)
+                << ","
+                  << binomialTreePricer.extractTheta(pricerResult)
+                  << std::endl;
+    }
 
     return 0;
 }
@@ -73,7 +90,7 @@ void hw9()
     BlackScholesOption option(S0, K, T, q, r, sigma);
     double Vexact = option.putPrice();
 
-    for(int i = 0; i < 1; ++i) {
+    for(int i = 0; i < 4; ++i) {
         M *= 4;
 
         EuropeanPutPDESolver solver(gLeftOption, gRightOption, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp);
