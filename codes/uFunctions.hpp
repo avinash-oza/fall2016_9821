@@ -172,4 +172,53 @@ public:
 };
 
 
+
+//////////////////////// BARRIER FUNCTIONS /////////////////////////////////
+// The uFunctions related to the barrier options
+class uBarrierOption : public uOptionFunction
+{
+public:
+    uBarrierOption(double _Spot, double _Strike, double _Maturity, double _Interest, double _Volatility,
+                       double _Dividend, double _Barrier)
+            :uOptionFunction(_Volatility, _Spot, _Dividend, _Strike, _Maturity, _Interest), B(_Barrier) {
+        ; }
+
+    double B;
+};
+
+class hw8fBarrierOption : public uBarrierOption
+{
+public:
+    using uBarrierOption::uBarrierOption;
+
+
+    virtual	double evaluate(double x, double t)
+    {
+        return K*exp(a*x)*std::max(exp(x) - 1.0, 0.0);
+    }
+};
+
+class hw8gLeftBarrierOption :public uBarrierOption
+{
+public:
+    using uBarrierOption::uBarrierOption;
+
+
+    virtual double evaluate(double x, double t)
+    {
+        return 0.0;
+    }
+};
+
+class hw8gRightBarrierOption : public hw8fBarrierOption
+{
+public:
+    using hw8fBarrierOption::hw8fBarrierOption;
+    virtual double evaluate(double x, double t)
+    {
+        return K*exp(a*x + b*t)*(exp(x - 2 * q*t / (sigma*sigma)) - exp(-2 * r*t / (sigma*sigma)));
+    }
+};
+
+
 #endif //CPPCODETEST_UFUNCTIONS_HPP

@@ -19,6 +19,7 @@
 #include "BarrierOption.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "MonteCarlo.hpp"
+#include "BarrierPDE.hpp"
 
 using namespace Eigen;
 using namespace std;
@@ -29,6 +30,7 @@ void writeCSVMatrix(MatrixXd &matrixToWrite, string fileName);
 void hw8();
 void hw9();
 void Question3();
+void hw9Barrier();
 
 int main() {
     /// Keep this line to make the decimals always print out
@@ -39,8 +41,9 @@ int main() {
 	myfile.close();
 	*/
 //    hw8();
-    hw9();
+//    hw9();
 //    hw10();
+    hw9Barrier();
 //    Question3();
 //    decompositionExamples();
 //    verifyCholeskyDecomposition();
@@ -70,6 +73,93 @@ int main() {
 //    }
 
     return 0;
+}
+
+
+void hw9Barrier()
+{
+    // Part 1 : Domain Discretization  M = {4, 16, 64, 256} alpha = 0.4
+    //std::cout << "Domain Discretization: alpha_temp = 0.4\n\n";
+    double S0 = 42;
+    double K = 40;
+    double q = 0.03;
+    double Sigma = 0.3;
+    double B = 35;
+    double r = 0.05;
+    double T = 0.5;
+
+    double tol = std::pow(10, -6);
+    double Omega = 1.2;
+    long M = 4;
+
+    hw8fBarrierOption fBarrierOption(S0, K, T, r, Sigma, q, B);
+    hw8gLeftBarrierOption gLeftBarrierOption(S0, K, T, r, Sigma, q, B);
+    hw8gRightBarrierOption gRightBarrierOption(S0, K, T, r, Sigma, q, B);
+    MatrixXd DomainDiscretizationAlpha04 = MatrixXd::Zero(4, 6);
+    double AlphaTemp1 = 0.4;
+
+    for (int i = 1; i <= 4; ++i)
+    {
+    	DownOutCallPDESolver Barrier1(gLeftBarrierOption, gRightBarrierOption, fBarrierOption, 0.0, S0, K, T, q, r,
+                                      Sigma, AlphaTemp1, pow(M, i), B);
+    	Barrier1.setUp();
+    	DomainDiscretizationAlpha04(i - 1, 0) = Barrier1.get_Alpha();
+    	DomainDiscretizationAlpha04(i - 1, 1) = Barrier1.get_xLeft();
+    	DomainDiscretizationAlpha04(i - 1, 2) = Barrier1.get_xRight();
+    	DomainDiscretizationAlpha04(i - 1, 3) = Barrier1.get_N();
+    	DomainDiscretizationAlpha04(i - 1, 4) = Barrier1.get_delta_x();
+    	DomainDiscretizationAlpha04(i - 1, 5) = Barrier1.get_delta_tau();
+    }
+
+    MatrixXd ForwardEulerAlpha04 = MatrixXd::Zero(4, 6);
+    double AlphaTemp3 = 0.4;
+
+    for (int i = 1; i <= 4; ++i)
+    {
+    	DownOutCallPDESolver Barrier1(gLeftBarrierOption, gRightBarrierOption, fBarrierOption, 0.0, S0, K, T, q, r, Sigma, AlphaTemp3, pow(M, i), B);
+    	Barrier1.setUp();
+//        DownOutCallPDESolver(uBarrierOption &LeftFunction, uBarrierOption &RightFunction, uBarrierOption &f, double t0,
+//                double Spot, double Strike, double Maturity, double Dividend, double Interest,
+//                double Volatility, double AlphaTemp, double M, double Barrier)
+    	BarrierOption BarrierOption(S0, K, T, q, r, Sigma, B);
+
+    	auto ApproxMatrix = Barrier1.forwardEuler();
+    	double ExactPrice = BarrierOption.Price();
+    	int N_left = Barrier1.get_N_left();
+        std::cout << pow(M, i) << std::endl;
+    	ForwardEulerAlpha04(i - 1, 0) = ApproxMatrix(pow(M, i), N_left);	// The value of the option is in last raw of each, first column of each approximation matrix
+    	ForwardEulerAlpha04(i - 1, 1) = Barrier1.calculateVApprox1(ApproxMatrix);
+    	ForwardEulerAlpha04(i - 1, 2) = Barrier1.calculateErrorPointwise(ApproxMatrix, ExactPrice);
+    	ForwardEulerAlpha04(i - 1, 3) = Barrier1.calculateDelta(ApproxMatrix);
+    	ForwardEulerAlpha04(i - 1, 4) = Barrier1.calculateGamma(ApproxMatrix);
+    	ForwardEulerAlpha04(i - 1, 5) = Barrier1.calculateTheta(ApproxMatrix);
+    }
+
+//    std::cout << ForwardEulerAlpha04 << std::endl;
+
+    // Part 6: Crank Nicolson with SOR, alpha = 0.4
+    MatrixXd CrankNicolsonSORAlpha04 = MatrixXd::Zero(4, 6);
+    double AlphaTemp6 = 0.4;
+
+    for (int i = 1; i <= 4; ++i)
+    {
+        DownOutCallPDESolver Barrier1(gLeftBarrierOption, gRightBarrierOption, fBarrierOption, 0.0, S0, K, T, q, r, Sigma, AlphaTemp6, pow(M, i), B);
+        BarrierOption BarrierOption(S0, K, T, q, r, Sigma, B);
+    	Barrier1.setUp();
+
+    	auto ApproxMatrix = Barrier1.CrankNicolson(SOR, tol, Omega);
+        double ExactPrice = BarrierOption.Price();
+    	int N_left = Barrier1.get_N_left();
+
+    	CrankNicolsonSORAlpha04(i - 1, 0) = ApproxMatrix(pow(M, i), N_left);	// The value of the option is in last raw of each, first column of each approximation matrix
+    	CrankNicolsonSORAlpha04(i - 1, 1) = Barrier1.calculateVApprox1(ApproxMatrix);
+    	CrankNicolsonSORAlpha04(i - 1, 2) = Barrier1.calculateErrorPointwise(ApproxMatrix, ExactPrice);
+    	CrankNicolsonSORAlpha04(i - 1, 3) = Barrier1.calculateDelta(ApproxMatrix);
+    	CrankNicolsonSORAlpha04(i - 1, 4) = Barrier1.calculateGamma(ApproxMatrix);
+    	CrankNicolsonSORAlpha04(i - 1, 5) = Barrier1.calculateTheta(ApproxMatrix);
+    }
+
+    std::cout << CrankNicolsonSORAlpha04 << std::endl;
 }
 
 void hw10()

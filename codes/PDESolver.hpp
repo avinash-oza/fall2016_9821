@@ -267,7 +267,6 @@ public:
     }
 
     double get_xLeft() const {
-        this->checkSetup();
         return _xLeft;
     }
 

@@ -128,7 +128,7 @@ public:
         return sqrt(sum/Nrms);
     }
 
-    double calculateDelta(MatrixXd &approximations)
+    virtual double calculateDelta(MatrixXd &approximations)
     {
         int i = getxComputeLowerBound();
         VectorXd Vapprox = calculateVApproxVector(approximations);
@@ -137,7 +137,7 @@ public:
         return (Vapprox(i+1) - Vapprox(i))/(S(i+1) - S(i));
     }
 
-    double calculateGamma(MatrixXd &approximations)
+    virtual double calculateGamma(MatrixXd &approximations)
     {
         int i = getxComputeLowerBound();
         VectorXd Vapprox = calculateVApproxVector(approximations);
@@ -148,7 +148,7 @@ public:
         return (delta2-delta0)/((S(i+2)+S(i+1)-S(i)-S(i-1))/2);
     }
 
-    double calculateVApprox1(MatrixXd &approximations)
+    virtual double calculateVApprox1(MatrixXd &approximations)
     {
         VectorXd boundaryApproximations = approximations.row(M); // the last row of the matrix
         int i = getxComputeLowerBound();
@@ -161,14 +161,14 @@ public:
 
     }
 
-    double calculateVApprox2(MatrixXd &approximations)
+    virtual double calculateVApprox2(MatrixXd &approximations)
     {
         double xComputeLowerBoundValue = getXCompute();
         double uApprox = calculateVapproxLinearInterpolation(approximations);
         return std::exp(-a*xComputeLowerBoundValue-b*_tFinal)*uApprox;
     }
 
-    double calculateTheta(MatrixXd &approximations)
+    virtual double calculateTheta(MatrixXd &approximations)
     {
         int i = getxComputeLowerBound();
         VectorXd priorboundaryApproximations = approximations.row(M - 1); // the 2nd to last row of the matrix
@@ -187,12 +187,12 @@ public:
         return -1 * (Vappro1 - Vt)/dT;
     }
 
-    double calculateErrorPointwise(MatrixXd &approximations, double Vexact)
+    virtual double calculateErrorPointwise(MatrixXd &approximations, double Vexact)
     {
         return std::abs(calculateVApprox1(approximations) - Vexact);
     }
 
-    double calculateErrorPointwise2(MatrixXd &approximations, double Vexact)
+    virtual double calculateErrorPointwise2(MatrixXd &approximations, double Vexact)
     {
         return std::abs(calculateVApprox2(approximations) - Vexact);
     }
