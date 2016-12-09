@@ -37,9 +37,9 @@ int main() {
 	myfile<<(U).format(CSVFormat)<<std::endl;
 	myfile.close();
 	*/
-//    hw8();
+    hw8();
 //    hw9();
-    hw10();
+//    hw10();
 //    Question3();
 //    decompositionExamples();
 //    verifyCholeskyDecomposition();
@@ -80,9 +80,11 @@ void hw10()
     double r = 0.02;
     double sigma = 0.3;
     double B = 45.0;
+    BARRIER_TYPE barrierType = DOWN_AND_OUT;
+    OPTION_TYPE optionType = PUT;
     //MAKE SURE TO CHANGE PAYOFF FUNCTION
-    BarrierOptionBinomialTreePricer barrierOptionBinomialTreePricer(S, K, T, q, r, sigma, B, DOWN_AND_OUT);
-    BarrierTrinomialTreePricer barrierTrinomialTreePricer(S, K, T, q, r, sigma, B, DOWN_AND_OUT);
+    BarrierOptionBinomialTreePricer barrierOptionBinomialTreePricer(S, K, T, q, r, sigma, B, barrierType, optionType);
+    BarrierTrinomialTreePricer barrierTrinomialTreePricer(S, K, T, q, r, sigma, B, barrierType, optionType);
     BarrierOption barrierOption(S, K, T, q, r, sigma, B);
 
     TREE_RESULT pricerResult = barrierOptionBinomialTreePricer.calculateTree(1000);
@@ -211,7 +213,7 @@ void hw8()
         EuropeanPDESolver solver(gLeftOption, gRightOption, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp);
         solver.setUp();
         MatrixXd fEulerResult = solver.CrankNicolson(SOR, tol, omega);
-//    std::cout << fEulerResult << std::endl;
+    std::cout << M << std::endl;
         std::cout << solver.calculateErrorPointwise(fEulerResult, Vexact) << std::endl;
 //        std::cout << solver.calculateErrorPointwise2(fEulerResult, Vexact) << std::endl;
     }

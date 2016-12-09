@@ -5,7 +5,7 @@
 
 #ifndef CPPCODETEST_PDEMESH_HPP
 #define CPPCODETEST_PDEMESH_HPP
-
+using namespace Eigen;
 
 class Mesh
 {

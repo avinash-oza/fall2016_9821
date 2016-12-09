@@ -2,11 +2,16 @@
 // Created by avi on 11/14/16.
 //
 
-#ifndef CPPCODETEST_FINITEDIFFERENCEMETHODS_HPP
-#define CPPCODETEST_FINITEDIFFERENCEMETHODS_HPP
 #include <Eigen/Dense>
 #include "PDEMesh.hpp"
 #include "uFunctions.hpp"
+#include "Solvers.hpp"
+#include "IterativeMethods.hpp"
+#include "StoppingCriterionSolvers.hpp"
+
+#ifndef CPPCODETEST_FINITEDIFFERENCEMETHODS_HPP
+#define CPPCODETEST_FINITEDIFFERENCEMETHODS_HPP
+
 
 using namespace Eigen;
 enum LinearSolveMethod {LU, SOR}; // define enum for linear solve
