@@ -37,8 +37,8 @@ int main() {
 	myfile<<(U).format(CSVFormat)<<std::endl;
 	myfile.close();
 	*/
-    hw8();
-//    hw9();
+//    hw8();
+    hw9();
 //    hw10();
 //    Question3();
 //    decompositionExamples();
@@ -138,35 +138,35 @@ void hw9()
 //        std::cout << solverAmerican.calculateErrorPointwise(fEulerEuropean, Vexact) << std::endl;
 
 
-        MatrixXd fEulerAmerican = solverAmerican.CrankNicolson(SOR, tol, omega);
+//        MatrixXd fEulerAmerican = solverAmerican.CrankNicolson(SOR, tol, omega);
 //        VectorXd t = solverAmerican.findSEarlyExerciseSoptimal(fEulerAmerican);
 //        writeCSVMatrix(fEulerAmerican, "forward_euler_american_crank.csv");
-//        MatrixXd fEulerAmerican = solverAmerican.forwardEuler();
+        MatrixXd fEulerAmerican = solverAmerican.forwardEuler();
 //        std::cout << fEulerAmerican << std::endl;
         std::cout << M <<","
-//                  << solverAmerican.calculateErrorPointwise(fEulerAmerican, P_amer_bin)
-//                  << ","
-//                  << solverAmerican.calculateErrorPointwise2(fEulerAmerican, P_amer_bin)
-//                  << ","
-//                  << std::endl;
+                  << solverAmerican.calculateErrorPointwise(fEulerAmerican, P_amer_bin)
+                  << ","
+                  << solverAmerican.calculateErrorPointwise2(fEulerAmerican, P_amer_bin)
+                  << ","
+                  << std::endl;
 //                std::cout << M <<","
 //                    << solverAmerican.calculateDelta(fEulerAmerican)
 //                    << ","
 //                          << solverAmerican.calculateGamma(fEulerAmerican)
 //                          << ","
 //                          << solverAmerican.calculateTheta(fEulerAmerican)
-                          << std::endl;
-            std::cout << M
-                      << ","
-                      << solverAmerican.calculateVapprox(fEulerAmerican)
-                      << ","
-                      << VEurApprox
-                      << ","
-                      << Vexact
-                      << solverAmerican.priceVarianceReduction(fEulerAmerican, VEurApprox, Vexact)
-                      << ","
-                      << solverAmerican.calculateErrorPointWiseVarianceReduction(fEulerAmerican, VEurApprox, Vexact, P_amer_bin)
-                      << std::endl;
+//                          << std::endl;
+//            std::cout << M
+//                      << ","
+//                      << solverAmerican.calculateVapprox(fEulerAmerican)
+//                      << ","
+//                      << VEurApprox
+//                      << ","
+//                      << Vexact
+//                      << solverAmerican.priceVarianceReduction(fEulerAmerican, VEurApprox, Vexact)
+//                      << ","
+//                      << solverAmerican.calculateErrorPointWiseVarianceReduction(fEulerAmerican, VEurApprox, Vexact, P_amer_bin)
+//                      << std::endl;
 
 //    writeCSVMatrix(fEulerAmerican, "forward_euler_american.csv");
 
