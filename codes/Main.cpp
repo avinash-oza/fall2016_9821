@@ -39,9 +39,9 @@ int main() {
 	myfile.close();
 	*/
 //    hw8();
-//    hw9();
+    hw9();
 //    hw10();
-    Question3();
+//    Question3();
 //    decompositionExamples();
 //    verifyCholeskyDecomposition();
 //    exam2013();
@@ -130,28 +130,28 @@ void hw9()
     AmericanPDESolver solverAmerican(gAmericanLeftFunc, gEuropeanRight, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp);
     solverAmerican.setUp();
 
+    MatrixXd fEulerResultEuropean = solver.forwardEuler();
+    double fEulerEuropeanResult = solver.calculateVapprox(fEulerResultEuropean);
 
     MatrixXd fEulerResult = solverAmerican.forwardEuler();
     MatrixXd CNResult = solverAmerican.CrankNicolson(SOR, tol, omega);
 
-    double forwardEulerVApproxEuropean = solver.calculateVapprox(fEulerResult);
-    double CNVApproxEuropean = solver.calculateVapprox(CNResult);
-//            std::cout << M
-//                      << ","
-//                      << solverAmerican.calculateVapprox(fEulerAmerican)
-//                      << ","
+    double forwardEulerVApproxEuropean = solver.calculateVapprox(fEulerResultEuropean);
+            std::cout << M
+                      << ","
+                      << solverAmerican.calculateVapprox(fEulerResult)
+                      << ","
 //                      << VEurApprox
 //                      << ","
-//                      << Vexact
-//                      << solverAmerican.priceVarianceReduction(fEulerAmerican, VEurApprox, Vexact)
-//                      << ","
-//                      << solverAmerican.calculateErrorPointWiseVarianceReduction(fEulerAmerican, VEurApprox, Vexact, P_amer_bin)
-//                      << std::endl;
+                      << Vexact
+                      << solverAmerican.priceVarianceReduction(fEulerResult, forwardEulerVApproxEuropean, Vexact)
+                      << ","
+                      << solverAmerican.calculateErrorPointWiseVarianceReduction(fEulerResult, forwardEulerVApproxEuropean, Vexact, P_amer_bin)
+                      << std::endl;
 
 //    writeCSVMatrix(fEulerAmerican, "forward_euler_american.csv");
 
 //    writeCSVMatrix(fEulerResult, "/home/avi/forwardEuler.csv");
-    }
 }
 
 void hw8()

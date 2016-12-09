@@ -97,34 +97,33 @@ TEST(FiniteDifferenceTests, FiniteDifferenceTests_AmericanPutPricing_Test)
         AmericanPDESolver solverAmerican(gAmericanLeftFunc, gEuropeanRight, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp);
         solverAmerican.setUp();
 
+        MatrixXd fEulerEuropean = solver.forwardEuler();
+        MatrixXd fEulerAmerican = solverAmerican.forwardEuler();
 
-        MatrixXd fEulerResult = solverAmerican.forwardEuler();
-        MatrixXd CNResult = solverAmerican.CrankNicolson(SOR, tol, omega);
+        MatrixXd CNResultAmerican = solverAmerican.CrankNicolson(SOR, tol, omega);
+        MatrixXd CNResultEuropean = solver.CrankNicolson(SOR, tol, omega);
 
-        double forwardEulerVApproxEuropean = solver.calculateVapprox(fEulerResult);
-        double CNVApproxEuropean = solver.calculateVapprox(CNResult);
-
+        double forwardEulerVApproxEuropean = solver.calculateVapprox(fEulerEuropean);
+        double CNVApproxEuropean = solver.calculateVapprox(CNResultEuropean);
 
     // forward euler values
-    ASSERT_NEAR(solverAmerican.calculateErrorPointwise(fEulerResult, P_amer_bin), 0.017420108129288, TOL2);
-    ASSERT_NEAR(solverAmerican.calculateErrorPointwise2(fEulerResult, P_amer_bin), 0.016680703725282, TOL2);
-    ASSERT_NEAR(solverAmerican.calculateDelta(fEulerResult), -0.379022202454181, TOL2);
-    ASSERT_NEAR(solverAmerican.calculateGamma(fEulerResult), 0.030667406086139, TOL2);
-    ASSERT_NEAR(solverAmerican.calculateTheta(fEulerResult), -2.76313760830757, TOL2);
-//    ASSERT_NEAR(solverAmerican.priceVarianceReduction(fEulerResult, forwardEulerVApproxEuropean, P_amer_bin), 4.08513491516998, TOL2);
-//    ASSERT_NEAR(solverAmerican.calculateErrorPointWiseVarianceReduction(fEulerResult, forwardEulerVApproxEuropean, Vexact, P_amer_bin),
-//                0.00131786399359, TOL2);
+    ASSERT_NEAR(solverAmerican.calculateErrorPointwise(fEulerAmerican, P_amer_bin), 0.017420108129288, TOL2);
+    ASSERT_NEAR(solverAmerican.calculateErrorPointwise2(fEulerAmerican, P_amer_bin), 0.016680703725282, TOL2);
+    ASSERT_NEAR(solverAmerican.calculateDelta(fEulerAmerican), -0.379022202454181, TOL2);
+    ASSERT_NEAR(solverAmerican.calculateGamma(fEulerAmerican), 0.030667406086139, TOL2);
+    ASSERT_NEAR(solverAmerican.calculateTheta(fEulerAmerican), -2.76313760830757, TOL2);
+    ASSERT_NEAR(solverAmerican.priceVarianceReduction(fEulerAmerican, forwardEulerVApproxEuropean, Vexact), 4.08513491516998, TOL2);
+    ASSERT_NEAR(solverAmerican.calculateErrorPointWiseVarianceReduction(fEulerAmerican, forwardEulerVApproxEuropean, Vexact, P_amer_bin), 0.00131786399359, TOL2);
 
 
     // crank nicolson values
-    ASSERT_NEAR(solverAmerican.calculateErrorPointwise(CNResult, P_amer_bin), 0.005435222342801, TOL2);
-    ASSERT_NEAR(solverAmerican.calculateErrorPointwise2(CNResult, P_amer_bin), 0.004696240280308, TOL2);
-    ASSERT_NEAR(solverAmerican.calculateDelta(CNResult), -0.378724733614418, TOL2);
-    ASSERT_NEAR(solverAmerican.calculateGamma(CNResult), 0.030833522375094, TOL2);
-    ASSERT_NEAR(solverAmerican.calculateTheta(CNResult), -2.77039243739341, TOL2);
-//    ASSERT_NEAR(solverAmerican.priceVarianceReduction(CNResult, CNVApproxEuropean, P_amer_bin), 4.08203056760127, TOL2);
-//    ASSERT_NEAR(solverAmerican.calculateErrorPointWiseVarianceReduction(CNResult, CNVApproxEuropean, Vexact, P_amer_bin),
-//                0.001786483575114, TOL2);
+    ASSERT_NEAR(solverAmerican.calculateErrorPointwise(CNResultAmerican, P_amer_bin), 0.005435222342801, TOL2);
+    ASSERT_NEAR(solverAmerican.calculateErrorPointwise2(CNResultAmerican, P_amer_bin), 0.004696240280308, TOL2);
+    ASSERT_NEAR(solverAmerican.calculateDelta(CNResultAmerican), -0.378724733614418, TOL2);
+    ASSERT_NEAR(solverAmerican.calculateGamma(CNResultAmerican), 0.030833522375094, TOL2);
+    ASSERT_NEAR(solverAmerican.calculateTheta(CNResultAmerican), -2.77039243739341, TOL2);
+    ASSERT_NEAR(solverAmerican.priceVarianceReduction(CNResultAmerican, CNVApproxEuropean, Vexact), 4.08203056760127, TOL2);
+    ASSERT_NEAR(solverAmerican.calculateErrorPointWiseVarianceReduction(CNResultAmerican, CNVApproxEuropean, Vexact, P_amer_bin), 0.001786483575114, TOL2);
 
 }
 
