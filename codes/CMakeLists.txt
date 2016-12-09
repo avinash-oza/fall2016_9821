@@ -33,7 +33,7 @@ include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 # Unit Tests
 ################################
 # Add test cpp file
-add_executable( runUnitTests tests/treetests.cpp tests/finitedifferencetests.cpp tests/constants.hpp)
+add_executable( runUnitTests tests/treetests.cpp tests/finitedifferencetests.cpp tests/constants.hpp tests/montecarlotests.cpp)
 # Link test executable against gtest & gtest_main
 target_link_libraries(runUnitTests gtest gtest_main)
 add_test( runUnitTests runUnitTests )

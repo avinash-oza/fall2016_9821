@@ -17,7 +17,8 @@
 #include "BinomialTrees.hpp"
 #include "TrinomialTrees.hpp"
 #include "BarrierOption.hpp"
-
+#include "RandomNumberGenerator.hpp"
+#include "MonteCarlo.hpp"
 
 using namespace Eigen;
 using namespace std;
@@ -27,7 +28,7 @@ string FILE_ROOT = "/home/avi/";
 void writeCSVMatrix(MatrixXd &matrixToWrite, string fileName);
 void hw8();
 void hw9();
-void hw10();
+void Question3();
 
 int main() {
     /// Keep this line to make the decimals always print out
@@ -38,9 +39,9 @@ int main() {
 	myfile.close();
 	*/
 //    hw8();
-    hw9();
+//    hw9();
 //    hw10();
-//    Question3();
+    Question3();
 //    decompositionExamples();
 //    verifyCholeskyDecomposition();
 //    exam2013();
@@ -218,6 +219,34 @@ void hw8()
 //        std::cout << solver.calculateErrorPointwise2(fEulerResult, Vexact) << std::endl;
     }
 //    writeCSVMatrix(fEulerResult, "/home/avi/forwardEuler.csv");
+}
+
+void Question3()
+{
+    // Calculating the option price.
+    double spot, strike, interest, vol, maturity, div;
+    spot = 50; strike = 55; interest = 0.04; vol = 0.3; maturity = 0.5; div = 0;
+    BlackScholesPutOption option(spot, strike, maturity, div, interest, vol);
+    double price;
+
+    price = option.price();
+
+    // Creating the vector containing the value for the number of random variables.
+    int N_vector_size = 10;
+//    int N_vector_size = 1;
+    Eigen::VectorXi N_vector = Eigen::VectorXi::Zero(N_vector_size);
+    N_vector << 1, 2, 4, 8, 16, 32, 64, 128, 256, 512;
+//    N_vector << 1;
+    N_vector *= 10000;
+
+
+    // Part a: Iverse Transform Method
+    BoxMullerMethod inverseTransformMethod;
+    LinearCongruentialGenerator uniformMethod;
+    AntitheticMonteCarloMethod monteCarloPricer;
+
+    MatrixXd results = monteCarloPricer.runMonteCarloForPaths(spot, strike, interest, vol, div, maturity, N_vector, inverseTransformMethod, uniformMethod, price);
+    std::cout << results << std::endl;
 }
 
 void writeCSVMatrix(MatrixXd &matrixToWrite, string fileName)
