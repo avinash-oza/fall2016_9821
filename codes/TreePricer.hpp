@@ -8,6 +8,7 @@ typedef std::tuple<double, double, double, double, double> TREE_RESULT;
 enum OPTION_TYPE{CALL, PUT};
 
 #include "BinomialTrees.hpp"
+using namespace Eigen;
 
 
 class TreePricer
@@ -134,7 +135,7 @@ protected:
 
     double calculatePutPayoff(double S) const
     {
-        return std::max(S - K, 0.0);
+        return std::max(K - S, 0.0);
     }
 };
 
