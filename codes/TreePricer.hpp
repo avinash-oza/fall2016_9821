@@ -117,6 +117,26 @@ public:
         return optionType == CALL ? calculateCallPayoff(S) : calculatePutPayoff(S);
     }
 
+    double varianceReductionPrice(TREE_RESULT americanTreeResult, TREE_RESULT  europeanTreeResult, BlackScholesOption &blackScholesOption)
+    {
+        return extractPrice(americanTreeResult) - extractPrice(europeanTreeResult) + blackScholesOption.price();
+    }
+
+    double varianceReductionDelta(TREE_RESULT americanTreeResult, TREE_RESULT  europeanTreeResult, BlackScholesOption &blackScholesOption)
+    {
+        return extractDelta(americanTreeResult) - extractDelta(europeanTreeResult) + blackScholesOption.delta();
+    }
+
+    double varianceReductionGamma(TREE_RESULT americanTreeResult, TREE_RESULT  europeanTreeResult, BlackScholesOption &blackScholesOption)
+    {
+        return extractGamma(americanTreeResult) - extractGamma(europeanTreeResult) + blackScholesOption.gamma();
+    }
+
+    double varianceReductionTheta(TREE_RESULT americanTreeResult, TREE_RESULT  europeanTreeResult, BlackScholesOption &blackScholesOption)
+    {
+        return extractTheta(americanTreeResult) - extractTheta(europeanTreeResult) + blackScholesOption.theta();
+    }
+
 
 protected:
     double S;

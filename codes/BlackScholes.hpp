@@ -8,6 +8,9 @@
 #include <cmath>
 #include <boost/math/distributions/normal.hpp>
 
+boost::math::normal_distribution<> myStandard(0.0, 1.0);	// Standard normal
+const long double PI = 3.14159265358979323846;
+
 class BlackScholesOption
 {
     public:
@@ -32,6 +35,19 @@ class BlackScholesOption
             boost::math::normal_distribution<double> normalVariable;
             return boost::math::cdf(normalVariable, d);
         }
+
+    virtual double theta() = 0;
+
+
+    // Calculating the gamma of the call
+    double gamma()
+    {
+        double temp, d_1;
+        temp = sigma*sqrt(T);
+        d_1 = d1(S, K, T, q, r, sigma);
+        temp = pow(2 * PI, -0.5)*exp(-d_1*d_1 / 2.0) / (S*temp);
+        return temp;
+    }
 
 
 
@@ -107,6 +123,20 @@ public:
         return 0; // needs to be implemented...
     }
 
+    // Calculating the theta of the call
+    virtual double theta()
+    {
+        double temp = sigma*sqrt(T);
+        double d_1, d2;
+        d_1 = d1(S, K, T, q, r, sigma);
+        d2 = d_1 - temp;
+        double term1 = r*normalDist(d2)+sigma*pdf(myStandard,d2)/(2.0*sqrt(T));
+        double term2 = K*exp(-r*T);
+
+        double term3 = q*S*exp(-q*T)*cdf(myStandard, d_1);
+        return term3 - term1 * term2;
+    }
+
 private:
     double callPrice()
     {
@@ -129,6 +159,21 @@ public:
     virtual double delta() {
         return putDelta();
     }
+
+    virtual double theta()
+    {
+        double temp = sigma*sqrt(T);
+        double d1, d2;
+        d1 = (log(S / K) + (r - q + pow(sigma, 2.0) / 2.0)*T) / temp;
+        d2 = d1 - temp;
+        double term1 = -exp(-q*T)*S*sigma*pdf(myStandard, d1) / (2.0*sqrt(T));
+        double term2 = r*K*exp(-r*T)*cdf(myStandard, -d2);
+        double term3 = q*S*exp(-q*T)*cdf(myStandard, -d1);
+        return term1 + term2 + term3;
+    }
+
+
+
 
 private:
 
