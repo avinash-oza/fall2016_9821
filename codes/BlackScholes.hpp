@@ -42,11 +42,10 @@ class BlackScholesOption
     // Calculating the gamma of the call
     double gamma()
     {
+
         double temp, d_1;
-        temp = sigma*sqrt(T);
         d_1 = d1(S, K, T, q, r, sigma);
-        temp = pow(2 * PI, -0.5)*exp(-d_1*d_1 / 2.0) / (S*temp);
-        return temp;
+        return exp(-q*(T))*exp(-0.5*pow(d_1, 2))*1.0 / (S*sigma*sqrt((T) * 2 * PI));;
     }
 
 

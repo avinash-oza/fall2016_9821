@@ -31,6 +31,7 @@ void hw8();
 void hw9();
 void Question3();
 void hw9Barrier();
+void hw10();
 
 int main() {
     /// Keep this line to make the decimals always print out
@@ -42,8 +43,8 @@ int main() {
 	*/
 //    hw8();
 //    hw9();
-//    hw10();
-    hw9Barrier();
+    hw10();
+//    hw9Barrier();
 //    Question3();
 //    decompositionExamples();
 //    verifyCholeskyDecomposition();
@@ -123,28 +124,32 @@ void hw9Barrier()
 
 void hw10()
 {
-    double S = 50.0;
-    double K = 48.0;
-    double T = 8.0/12.0; // make sure to do double division
+    double S = 41.0;
+    double K = 40.0;
+    double T = 1.0; // make sure to do double division
     double q = 0.01;
-    double r = 0.02;
+    double r = 0.03;
     double sigma = 0.3;
+    OPTION_TYPE optionType = PUT;
     double B = 45.0;
     BARRIER_TYPE barrierType = DOWN_AND_OUT;
-    OPTION_TYPE optionType = PUT;
     //MAKE SURE TO CHANGE PAYOFF FUNCTION
-    BarrierOptionBinomialTreePricer barrierOptionBinomialTreePricer(S, K, T, q, r, sigma, B, barrierType, optionType);
-    BarrierTrinomialTreePricer barrierTrinomialTreePricer(S, K, T, q, r, sigma, B, barrierType, optionType);
-    BarrierOption barrierOption(S, K, T, q, r, sigma, B);
+    AmericanBinomialTreePricer americanBinomialTreePricer(S, K, T, q, r, sigma, optionType);
+    EuropeanBinomialTreePricer europeanBinomialTreePricer(S, K, T, q, r, sigma, optionType);
+    BlackScholesPutOption blackScholesPutOption(S, K, T, q, r, sigma);
 
-    TREE_RESULT pricerResult = barrierOptionBinomialTreePricer.calculateTree(1000);
-    TREE_RESULT pricerResult2 = barrierTrinomialTreePricer.calculateTree(1000);
+    TREE_RESULT pricerResult = americanBinomialTreePricer.calculateTree(20);
+    TREE_RESULT europeanPricerResult = europeanBinomialTreePricer.calculateTree(20);
 
-    std::cout << barrierOptionBinomialTreePricer.extractPrice(pricerResult)
-            <<","
-                << barrierTrinomialTreePricer.extractPrice(pricerResult2)
-               <<","
-                << barrierOption.Price()
+//    TREE_RESULT pricerResult2 = barrierTrinomialTreePricer.calculateTree(1000);
+
+//    std::cout << blackScholesPutOption.gamma() << std::endl;
+
+    std::cout << europeanBinomialTreePricer.varianceReductionGamma(pricerResult, europeanPricerResult, blackScholesPutOption)
+//            <<","
+//                << barrierTrinomialTreePricer.extractPrice(pricerResult2)
+//               <<","
+//                << blackScholesPutOption.Price()
               << std::endl;
 }
 
