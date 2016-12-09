@@ -7,7 +7,7 @@
 #include "gtest/gtest.h"
 #include "../AmericanPDESolver.hpp"
 
-double TOL2 = std::pow(10, -10);
+double TOL2 = std::pow(10, -9);
 
 TEST(FiniteDifferenceTests, FiniteDifferenceTests_EuropeanPutPricing_Test)
 {
