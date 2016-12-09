@@ -18,3 +18,22 @@ set(SOURCE_FILES
         MonteCarlo.hpp RandomNumberGenerator.hpp PDESolver.hpp PDEMesh.hpp EuropeanPDESolver.hpp AmericanPDESolver.hpp BarrierPDE.hpp BinomialTrees.hpp BarrierOption.hpp)
 
 add_executable(cppcodetest ${SOURCE_FILES})
+
+
+################################
+# GTest
+################################
+ADD_SUBDIRECTORY (googletest)
+enable_testing()
+include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+
+
+
+################################
+# Unit Tests
+################################
+# Add test cpp file
+add_executable( runUnitTests tests/treetests.cpp)
+# Link test executable against gtest & gtest_main
+target_link_libraries(runUnitTests gtest gtest_main)
+add_test( runUnitTests runUnitTests )

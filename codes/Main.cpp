@@ -80,30 +80,20 @@ void hw10()
     double r = 0.02;
     double sigma = 0.3;
     double B = 45.0;
-    OPTION_TYPE optionType = CALL;
-    BARRIER_TYPE barrierType = DOWN_AND_OUT;
-
-    // setup the iteration counts
-    long startN = 10;
-    long endN = 20; // number of iterations end
-    long numberOfIterations = endN - startN;
-
     //MAKE SURE TO CHANGE PAYOFF FUNCTION
-    // setup the pricer objects
-    BarrierOptionBinomialTreePricer barrierOptionBinomialTreePricer(S, K, T, q, r, sigma, B, barrierType, optionType);
-    BarrierTrinomialTreePricer barrierTrinomialTreePricer(S, K, T, q, r, sigma, B, barrierType, optionType);
+    BarrierOptionBinomialTreePricer barrierOptionBinomialTreePricer(S, K, T, q, r, sigma, B, DOWN_AND_OUT);
+    BarrierTrinomialTreePricer barrierTrinomialTreePricer(S, K, T, q, r, sigma, B, DOWN_AND_OUT);
+    BarrierOption barrierOption(S, K, T, q, r, sigma, B);
 
-    // setup the analytical function
-    BarrierOption barrierOption(S, K, T, q, r, sigma, B); // construct option for pricing
-    double exactPrice = barrierOption.Price();
+    TREE_RESULT pricerResult = barrierOptionBinomialTreePricer.calculateTree(1000);
+    TREE_RESULT pricerResult2 = barrierTrinomialTreePricer.calculateTree(1000);
 
-
-    // get results for all iterations
-//    TREE_RESULT oneResult  = barrierOptionBinomialTreePricer.calculateTree(1000); // calculate for 1 iteration
-    MatrixXd results  = barrierOptionBinomialTreePricer.calculateTreeforNInterations(startN, endN, exactPrice);
-    // given the results, find the min approx error of them and print it out
-    barrierOptionBinomialTreePricer.calculateMinApproximationErrors(results, exactPrice, startN, endN);
-
+    std::cout << barrierOptionBinomialTreePricer.extractPrice(pricerResult)
+            <<","
+                << barrierTrinomialTreePricer.extractPrice(pricerResult2)
+               <<","
+                << barrierOption.Price()
+              << std::endl;
 }
 
 
