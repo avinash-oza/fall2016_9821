@@ -29,9 +29,9 @@ TEST(FiniteDifferenceTests, FiniteDifferenceTests_EuropeanPutPricing_Test)
     double r = 0.04;
     double alphatemp = 0.45;
 
-    hw8fOption fOption(sigma, S0, q, K, T, r);
-    hw8gLeftOption gLeftOption(sigma, S0, q, K, T, r);
-    hw8gRightOption gRightOption(sigma, S0, q, K, T, r);
+    fOption fOption(sigma, S0, q, K, T, r);
+    gEuropeanLeft gLeftOption(sigma, S0, q, K, T, r);
+    gAmericanRight gRightOption(sigma, S0, q, K, T, r);
 
     BlackScholesPutOption option(S0, K, T, q, r, sigma);
     double Vexact = option.price();
@@ -83,17 +83,18 @@ TEST(FiniteDifferenceTests, FiniteDifferenceTests_AmericanPutPricing_Test)
 
     double P_amer_bin = 4.083817051176386;
 
-    hw8fOption fOption(sigma, S0, q, K, T, r);
-    hw8gLeftOption gLeftOption(sigma, S0, q, K, T, r);
-    gAmericanLeftFunc gLeftAmerican(sigma, S0, q, K, T, r);
-    hw8gRightOption gRightOption(sigma, S0, q, K, T, r);
+    fOption fOption(sigma, S0, q, K, T, r);
+    gEuropeanLeft gLeftEuropeanFunc(sigma, S0, q, K, T, r);
+    gAmericanLeftFunc gAmericanLeftFunc(sigma, S0, q, K, T, r);
+    gAmericanRight gRightOption(sigma, S0, q, K, T, r);
+    gEuropeanRight gEuropeanRight(sigma, S0, q, K, T, r);
 
     BlackScholesPutOption option(S0, K, T, q, r, sigma);
     double Vexact = option.price();
 
-        EuropeanPDESolver solver(gLeftOption, gRightOption, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp);
+        EuropeanPDESolver solver(gLeftEuropeanFunc, gRightOption, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp);
         solver.setUp();
-        AmericanPDESolver solverAmerican(gLeftAmerican, gRightOption, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp);
+        AmericanPDESolver solverAmerican(gAmericanLeftFunc, gEuropeanRight, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp);
         solverAmerican.setUp();
 
 

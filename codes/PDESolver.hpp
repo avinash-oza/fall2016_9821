@@ -28,6 +28,11 @@ public:
     void setUp()
     {
         // initalization method for setting values on the class
+        // call setup for all the functions
+        _gLeftFunc.setUp();
+        _gRightFunc.setUp();
+        _f.setUp();
+        //
         _setUp();
         setupCalled = true; // to know the class is setup properly
     }

@@ -102,8 +102,7 @@ void hw10()
 
 void hw9()
 {
-    long M = 1;
-    cout << setprecision(16);
+    long M = 64;
     double tol = std::pow(10, -6);
     double omega = 1.2;
 
@@ -114,49 +113,29 @@ void hw9()
     double T = 0.75;
     double r = 0.04;
     double alphatemp = 0.45;
-//    double alphatemp = 5.0;
 
     double P_amer_bin = 4.083817051176386;
 
-    hw8fOption fOption(sigma, S0, q, K, T, r);
-    hw8gLeftOption gLeftOption(sigma, S0, q, K, T, r);
-    gAmericanLeftFunc gLeftAmerican(sigma, S0, q, K, T, r);
-    hw8gRightOption gRightOption(sigma, S0, q, K, T, r);
+    fOption fOption(sigma, S0, q, K, T, r);
+    gEuropeanLeft gLeftEuropeanFunc(sigma, S0, q, K, T, r);
+    gAmericanLeftFunc gAmericanLeftFunc(sigma, S0, q, K, T, r);
+    gAmericanRight gRightOption(sigma, S0, q, K, T, r);
+    gEuropeanRight gEuropeanRight(sigma, S0, q, K, T, r);
 
     BlackScholesPutOption option(S0, K, T, q, r, sigma);
     double Vexact = option.price();
 
-    for(int i = 0; i < 4; ++i) {
-        M *= 4;
-
-        EuropeanPDESolver solver(gLeftOption, gRightOption, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp);
-        solver.setUp();
-        AmericanPDESolver solverAmerican(gLeftAmerican, gRightOption, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp);
-        solverAmerican.setUp();
-
-        MatrixXd fEulerEuropean = solver.CrankNicolson(SOR, tol, omega);
-        double VEurApprox = solver.calculateVapprox(fEulerEuropean);
-//        std::cout << solverAmerican.calculateErrorPointwise(fEulerEuropean, Vexact) << std::endl;
+    EuropeanPDESolver solver(gLeftEuropeanFunc, gRightOption, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp);
+    solver.setUp();
+    AmericanPDESolver solverAmerican(gAmericanLeftFunc, gEuropeanRight, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp);
+    solverAmerican.setUp();
 
 
-//        MatrixXd fEulerAmerican = solverAmerican.CrankNicolson(SOR, tol, omega);
-//        VectorXd t = solverAmerican.findSEarlyExerciseSoptimal(fEulerAmerican);
-//        writeCSVMatrix(fEulerAmerican, "forward_euler_american_crank.csv");
-        MatrixXd fEulerAmerican = solverAmerican.forwardEuler();
-//        std::cout << fEulerAmerican << std::endl;
-        std::cout << M <<","
-                  << solverAmerican.calculateErrorPointwise(fEulerAmerican, P_amer_bin)
-                  << ","
-                  << solverAmerican.calculateErrorPointwise2(fEulerAmerican, P_amer_bin)
-                  << ","
-                  << std::endl;
-//                std::cout << M <<","
-//                    << solverAmerican.calculateDelta(fEulerAmerican)
-//                    << ","
-//                          << solverAmerican.calculateGamma(fEulerAmerican)
-//                          << ","
-//                          << solverAmerican.calculateTheta(fEulerAmerican)
-//                          << std::endl;
+    MatrixXd fEulerResult = solverAmerican.forwardEuler();
+    MatrixXd CNResult = solverAmerican.CrankNicolson(SOR, tol, omega);
+
+    double forwardEulerVApproxEuropean = solver.calculateVapprox(fEulerResult);
+    double CNVApproxEuropean = solver.calculateVapprox(CNResult);
 //            std::cout << M
 //                      << ","
 //                      << solverAmerican.calculateVapprox(fEulerAmerican)
@@ -201,9 +180,9 @@ void hw8()
 	double r = 0.04;
 	double alphatemp = 0.45;
 
-    hw8fOption fOption(sigma, S0, q, K, T, r);
-    hw8gLeftOption gLeftOption(sigma, S0, q, K, T, r);
-    hw8gRightOption gRightOption(sigma, S0, q, K, T, r);
+    fOption fOption(sigma, S0, q, K, T, r);
+    gEuropeanLeft gLeftOption(sigma, S0, q, K, T, r);
+    gAmericanRight gRightOption(sigma, S0, q, K, T, r);
 
     BlackScholesPutOption option(S0, K, T, q, r, sigma);
     double Vexact = option.price();

@@ -20,6 +20,20 @@ class uFunction
      * @return
      */
         virtual double evaluate(double x, double t) = 0;
+    virtual void setUp()
+    {
+        if (!isSetUp)
+        {
+            _setUp();
+            isSetUp = true;
+        }
+
+    }
+
+    virtual void _setUp() {};
+
+protected:
+    bool isSetUp = false;
 
 };
 /**
@@ -31,9 +45,13 @@ class uOptionFunction : public uFunction
 public:
     uOptionFunction(double _sigma, double _S0, double _q, double _K, double _T, double _r):
             sigma(_sigma), S0(_S0), q(_q), K(_K), T(_T), r(_r)
+    { }
+
+    virtual void _setUp()
     {
         seta();
         setb();
+
     }
 
     double evaluate(double x, double t)
@@ -41,12 +59,12 @@ public:
         return K * exp(a * x) * std::max(1 - exp(x), 0.0);
     }
 
-    void seta()
+    virtual void seta()
     {
         a = (r-q)/(sigma*sigma) - 0.5;
     }
 
-    void setb()
+    virtual void setb()
     {
         b = pow((r-q)/(sigma*sigma) + 0.5, 2) + 2*q/(sigma*sigma);
     }
@@ -75,7 +93,7 @@ class hw8f : public uFunction
 
 };
 
-class hw8fOption : public uOptionFunction
+class fOption : public uOptionFunction
 {
 	public:
         using uOptionFunction::uOptionFunction;
@@ -96,7 +114,7 @@ class hw8gLeft : public uFunction
 
 };
 
-class hw8gLeftOption : public uOptionFunction
+class gEuropeanLeft : public uOptionFunction
 {
 	public:
         using uOptionFunction::uOptionFunction;
@@ -126,7 +144,7 @@ class hw8gRight : public uFunction
 
 };
 
-class hw8gRightOption : public uOptionFunction
+class gAmericanRight : public uOptionFunction
 {
 	public:
         using uOptionFunction::uOptionFunction;
@@ -136,6 +154,12 @@ class hw8gRightOption : public uOptionFunction
         }
 };
 
+class gEuropeanRight : public uOptionFunction
+{
+public:
+    using uOptionFunction::uOptionFunction;
+};
+
 class gAmericanLeftFunc : public uOptionFunction
 {
 public:
@@ -143,6 +167,7 @@ public:
     double evaluate(double x, double t)
     {
         return K*std::exp(a*x + b*t) * (1.0 - std::exp(x));
+//        return K*std::exp(a*x + b*t) * (std::exp(x) - 1.0); // CALL
     }
 };
 
