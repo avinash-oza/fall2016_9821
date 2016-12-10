@@ -5,11 +5,11 @@
 #ifndef CPPCODETEST_BLACKSCHOLES_HPP
 #define CPPCODETEST_BLACKSCHOLES_HPP
 
+
+#define _USE_MATH_DEFINES
 #include <cmath>
 #include <boost/math/distributions/normal.hpp>
-
-boost::math::normal_distribution<> myStandard(0.0, 1.0);	// Standard normal
-const long double PI = 3.14159265358979323846;
+#include <math.h>
 
 class BlackScholesOption
 {
@@ -45,7 +45,7 @@ class BlackScholesOption
 
         double temp, d_1;
         d_1 = d1(S, K, T, q, r, sigma);
-        return exp(-q*(T))*exp(-0.5*pow(d_1, 2))*1.0 / (S*sigma*sqrt((T) * 2 * PI));;
+        return exp(-q*(T))*exp(-0.5*pow(d_1, 2))*1.0 / (S*sigma*sqrt((T) * 2 * M_PI));
     }
 
 
@@ -125,6 +125,7 @@ public:
     // Calculating the theta of the call
     virtual double theta()
     {
+        boost::math::normal_distribution<> myStandard(0.0, 1.0);	// Standard normal
         double temp = sigma*sqrt(T);
         double d_1, d2;
         d_1 = d1(S, K, T, q, r, sigma);
@@ -161,6 +162,7 @@ public:
 
     virtual double theta()
     {
+        boost::math::normal_distribution<> myStandard(0.0, 1.0);	// Standard normal
         double temp = sigma*sqrt(T);
         double d1, d2;
         d1 = (log(S / K) + (r - q + pow(sigma, 2.0) / 2.0)*T) / temp;

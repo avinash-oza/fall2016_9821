@@ -13,6 +13,6 @@ int main()
     std::cout << std::endl << std::endl;
     Exam2015::Question2::Question2Part5();
     std::cout << std::endl << std::endl;
-    Exam2015::Question3::Question3Part1();
+//    Exam2015::Question3::Question3Part1();
 
 }
