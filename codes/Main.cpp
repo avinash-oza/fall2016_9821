@@ -19,7 +19,8 @@
 #include "BarrierOption.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "MonteCarlo.hpp"
-#include "BarrierPDE.hpp"
+//#include "BarrierPDE.hpp"
+#include "Exams.hpp"
 
 using namespace Eigen;
 using namespace std;

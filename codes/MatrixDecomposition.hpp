@@ -6,6 +6,7 @@
 #include <vector>
 
 using namespace Eigen;
+using namespace std;
 
 using LU_tuple = std::tuple< MatrixXd, MatrixXd>;
 /* LU decomposition without pivoting

@@ -63,7 +63,7 @@ public:
 
         // create initial vector
         long size = N - 1;
-        double deltaX = (_xRight - _xLeft) / N;
+        double deltaX = getDeltaX();
 
         VectorXd U = generateInitalUMatrix(size);
         MatrixXd A = generateForwardEulerMatrix(size);
@@ -97,6 +97,7 @@ public:
         return valuesAtNodes;
     }
 
+    double getDeltaX() const { return (_xRight - _xLeft) / N; }
 
 
     MatrixXd backwardEuler(LinearSolveMethod linearSolverMethod, double tol, double omega)
@@ -261,10 +262,12 @@ public:
     double getAlpha() const {
         this->checkSetup();
         double dx = (_xRight - _xLeft) / N;
-        double dt = (_tFinal - _t0) / M;
+        double dt = getDeltaTau();
         double alpha = dt/(dx*dx);
         return alpha;
     }
+
+    double getDeltaTau() const { return (_tFinal - _t0) / M; }
 
     double get_xLeft() const {
         return _xLeft;
@@ -405,6 +408,11 @@ public:
     double _t0;
     double _tFinal;
     double _xLeft;
+
+    double get_tFinal() const {
+        return _tFinal;
+    }
+
     double _xRight;
     long M;
     long N;

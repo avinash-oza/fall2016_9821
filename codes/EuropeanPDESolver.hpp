@@ -36,13 +36,14 @@ public:
 
     int getxComputeLowerBound() {
         double valueToFind = getXCompute();
-        int i = 0;
-        for (i; i < N + 1; ++i)
+        int k;
+        for (int i =0; i < N + 1; ++i)
         {
             if (valueToFind < mesh.getX(i))
+                k=i;
                 break;
         }
-        return i - 1;
+        return k - 1;
     }
 
     double calculateVapprox(MatrixXd &approximations)

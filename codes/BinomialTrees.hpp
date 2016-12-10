@@ -91,6 +91,15 @@ public:
         Theta_P = (V21_P - V00_P) / (2.0 * deltaT);
         //        Theta_C = (V21_C - V00_C) / (2 * deltaT);
 
+
+
+        //----- To print Tree
+
+        /*std::cout << V22_P <<" " << V21_P << " " << V20_P << std::endl;
+        std::cout << V11_P << " " << V10_P << " " << std::endl;
+        std::cout << V00_P << std::endl;*/
+
+
         return std::make_tuple(optionPrices[0], Delta_P, Gamma_P, Theta_P, INT_MIN);
     }
 
@@ -311,6 +320,7 @@ public:
         //        Gamma_C = ((V20_C - V21_C) / (S20 - S21) - (V21_C - V22_C) / (S21 - S22)) / ((S20 - S22) / 2);
         Theta_P = (V21_P - V00_P) / (2.0 * deltaT);
         //        Theta_C = (V21_C - V00_C) / (2 * deltaT);
+
 
         return std::make_tuple(optionPrices[0], Delta_P, Gamma_P, Theta_P, INT_MIN);
     }
