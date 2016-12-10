@@ -29,7 +29,7 @@ public:
         std::vector<double> optionPrices(N + 1);
 
         double V22_P, V21_P, V20_P, V22_C, V21_C, V20_C, V11_P, V10_P, V11_C, V10_C, V00_P, V00_C;
-        V22_P = V21_P = V20_P = V22_C = V21_C = V20_C = V11_P = V10_P = V11_C = V10_C = V00_P = V00_C = 0;
+        V22_P = V21_P = V20_P = V11_P = V10_P = V00_P = 0;
         double S11, S10, S22, S21, S20;
         double Delta_P, Delta_C, Gamma_P, Gamma_C, Theta_C, Theta_P;
 
@@ -40,7 +40,6 @@ public:
 
         for (int i = 0 ; i < N + 1; i++)
         {
-//            optionPrices[i] = std::max(K - S* std::pow(u, N - i) * std::pow(d, i) , 0.0);
             optionPrices[i] = calculatePayoff(S* std::pow(u, N - i) * std::pow(d, i));
         }
 
@@ -57,23 +56,16 @@ public:
                     V21_P = optionPrices[1];
                     V20_P = optionPrices[2];
 
-//                V22_C = v_call(0);
-//                V21_C = v_call(1);
-//                V20_C = v_call(2);
                 }
                 else if (j == 1)
                 {
                     V11_P = optionPrices[0];
                     V10_P = optionPrices[1];
 
-//                V11_C = v_call(0);
-//                V10_C = v_call(1);
                 }
                 else if (j == 0)
                 {
                     V00_P = optionPrices[0];
-
-//                V00_C = v_call(1);
                 }
             }
 
@@ -85,11 +77,8 @@ public:
         S20 = d*d*S;
 
         Delta_P = (V10_P - V11_P) / (S10 - S11);
-        //        Delta_C = (V10_C - V11_C) / (S10 - S11);
         Gamma_P = ((V20_P - V21_P) / (S20 - S21) - (V21_P - V22_P) / (S21 - S22)) / ((S20 - S22) / 2.0);
-        //        Gamma_C = ((V20_C - V21_C) / (S20 - S21) - (V21_C - V22_C) / (S21 - S22)) / ((S20 - S22) / 2);
         Theta_P = (V21_P - V00_P) / (2.0 * deltaT);
-        //        Theta_C = (V21_C - V00_C) / (2 * deltaT);
 
 
 
@@ -130,7 +119,7 @@ public:
         BlackScholesPutOption blackScholesOption(S, K, T, q, r, sigma);
 
         double V22_P, V21_P, V20_P, V22_C, V21_C, V20_C, V11_P, V10_P, V11_C, V10_C, V00_P, V00_C;
-        V22_P = V21_P = V20_P = V22_C = V21_C = V20_C = V11_P = V10_P = V11_C = V10_C = V00_P = V00_C = 0;
+        V22_P = V21_P = V20_P = V11_P = V10_P = V00_P = 0;
         double S11, S10, S22, S21, S20;
         double Delta_P, Delta_C, Gamma_P, Gamma_C, Theta_C, Theta_P;
 
@@ -162,23 +151,16 @@ public:
                     V21_P = optionPrices[1];
                     V20_P = optionPrices[2];
 
-//                V22_C = v_call(0);
-//                V21_C = v_call(1);
-//                V20_C = v_call(2);
                 }
                 else if (j == 1)
                 {
                     V11_P = optionPrices[0];
                     V10_P = optionPrices[1];
 
-//                V11_C = v_call(0);
-//                V10_C = v_call(1);
                 }
                 else if (j == 0)
                 {
                     V00_P = optionPrices[0];
-
-//                V00_C = v_call(1);
                 }
 
             }
@@ -191,11 +173,8 @@ public:
         S20 = d*d*S;
 
         Delta_P = (V10_P - V11_P) / (S10 - S11);
-        //        Delta_C = (V10_C - V11_C) / (S10 - S11);
         Gamma_P = ((V20_P - V21_P) / (S20 - S21) - (V21_P - V22_P) / (S21 - S22)) / ((S20 - S22) / 2);
-        //        Gamma_C = ((V20_C - V21_C) / (S20 - S21) - (V21_C - V22_C) / (S21 - S22)) / ((S20 - S22) / 2);
         Theta_P = (V21_P - V00_P) / (2 * deltaT);
-        //        Theta_C = (V21_C - V00_C) / (2 * deltaT);
         return std::make_tuple(optionPrices[0], Delta_P, Gamma_P, Theta_P, INT_MIN);
     }
 
