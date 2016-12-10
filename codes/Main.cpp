@@ -21,6 +21,7 @@
 #include "MonteCarlo.hpp"
 //#include "BarrierPDE.hpp"
 #include "Exams.hpp"
+#include "BarrierPDE.hpp"
 
 using namespace Eigen;
 using namespace std;
@@ -44,8 +45,8 @@ int main() {
 	*/
 //    hw8();
 //    hw9();
-    hw10();
-//    hw9Barrier();
+//    hw10();
+    hw9Barrier();
 //    Question3();
 //    decompositionExamples();
 //    verifyCholeskyDecomposition();
