@@ -7,5 +7,5 @@
 int main()
 {
     std::cout.precision(9);
-    Exam2015::Question2::Question2Part1();
+    Exam2015::Question2::Question2Part3();
 }

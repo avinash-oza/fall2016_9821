@@ -36,14 +36,13 @@ public:
 
     int getxComputeLowerBound() {
         double valueToFind = getXCompute();
-        int k;
-        for (int i =0; i < N + 1; ++i)
+        int i=0;
+        for (i = 0; i < N + 1; ++i)
         {
             if (valueToFind < mesh.getX(i))
-                k=i;
                 break;
         }
-        return k - 1;
+        return i - 1;
     }
 
     double calculateVapprox(MatrixXd &approximations)
@@ -135,7 +134,9 @@ public:
         VectorXd Vapprox = calculateVApproxVector(approximations);
         VectorXd S = calculateSpotPrices();
 
+
         return (Vapprox(i+1) - Vapprox(i))/(S(i+1) - S(i));
+
     }
 
     virtual double calculateGamma(MatrixXd &approximations)
@@ -146,7 +147,20 @@ public:
 
         double delta2 = (Vapprox(i+2) - Vapprox(i+1))/(S(i+2) - S(i+1));
         double delta0 = (Vapprox(i) - Vapprox(i-1))/(S(i) - S(i-1));
+
+
+        //--------printing v(i+1), v(i+2), v(i) and v(i-1)
+        //printing from i-1 to i+2
+        std::cout << "printing from V(i-1,0) to V(i+2,0)" << std::endl;
+        std::cout << Vapprox(i-1) << "\t" << Vapprox(i) << "\t" << Vapprox(i+1) << "\t" <<
+            Vapprox(i+2) << std::endl;
+
+
+
+
         return (delta2-delta0)/((S(i+2)+S(i+1)-S(i)-S(i-1))/2);
+
+
     }
 
     virtual double calculateVApprox1(MatrixXd &approximations)
@@ -155,10 +169,17 @@ public:
         int i = getxComputeLowerBound();
         double S2 = K*exp(mesh.getX(i+1));
         double S1 = K*exp(mesh.getX(i));
-        double V1 = boundaryApproximations(i)*exp(-a*mesh.getX(i)-b*_tFinal);
-        double V2 = boundaryApproximations(i+1)*exp(-a*mesh.getX(i+1)-b*_tFinal);
+        double Vi_delta_t = boundaryApproximations(i)*exp(-a*mesh.getX(i)-b*_tFinal);
+        double Vi_plus_1_delta_t = boundaryApproximations(i+1)*exp(-a*mesh.getX(i+1)-b*_tFinal);
 
-        return ((S2-S0)*V1 + (S0-S1)*V2)/(S2-S1);
+
+        //-----"printing from V(i+1,delta t) to V(i,delta t)"
+        std::cout << "printing from V(i,delta t) to V(i+1,delta t)" << std::endl;
+        std::cout << Vi_delta_t << "\t" << Vi_plus_1_delta_t << std::endl;
+
+
+
+        return ((S2-S0)*Vi_delta_t + (S0-S1)*Vi_plus_1_delta_t)/(S2-S1);
 
     }
 
@@ -185,6 +206,9 @@ public:
         double V1dT = priorboundaryApproximations(i)*exp(-a*mesh.getX(i)-b*mesh.getT(M-1));
         double V2dT = priorboundaryApproximations(i+1)*exp(-a*mesh.getX(i+1)-b*mesh.getT(M-1));
         double Vt = ((S2-S0)*V1dT + (S0-S1)*V2dT)/(S2-S1);
+
+
+
         return -1 * (Vappro1 - Vt)/dT;
     }
 

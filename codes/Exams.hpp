@@ -95,10 +95,10 @@ namespace Exam2015
 
                 for (int i = 1; i <= 4; ++i)
                 {
-                    M = pow(4,i);
+
                     AmericanPDESolver solverAmerican(gAmericanLeftFunc, gEuropeanRight, fOption, 0.0, S0, K, T, q, r,
                                                      sigma,
-                                                     M, alphatemp);
+                                                     pow(M,i), alphatemp);
                     solverAmerican.setUp();
                     std::cout << M << "\t" << alphatemp << "\t" << solverAmerican.getAlpha() << "\t "
                               << solverAmerican.getN() << "\t" <<
@@ -110,8 +110,44 @@ namespace Exam2015
         void Question2Part2()
         {
 
+            fOption fOption(sigma, S0, q, K, T, r);
+            gEuropeanLeft gLeftEuropeanFunc(sigma, S0, q, K, T, r);
+            gAmericanLeftFunc gAmericanLeftFunc(sigma, S0, q, K, T, r);
+            gAmericanRight gRightOption(sigma, S0, q, K, T, r);
+            gEuropeanRight gEuropeanRight(sigma, S0, q, K, T, r);
+
+            AmericanPDESolver solverAmerican(gAmericanLeftFunc, gEuropeanRight, fOption, 0.0, S0, K, T, q, r,
+                                             sigma,
+                                             M, alphatemp);
+            solverAmerican.setUp();
+            MatrixXd fEulerResult = solverAmerican.forwardEuler();
+            std::cout << fEulerResult << std::endl;
+            //std::cout << gAmericanLeftFunc.b << std::endl;
+        }
+        void Question2Part3()
+        {
+            fOption fOption(sigma, S0, q, K, T, r);
+            gEuropeanLeft gLeftEuropeanFunc(sigma, S0, q, K, T, r);
+            gAmericanLeftFunc gAmericanLeftFunc(sigma, S0, q, K, T, r);
+            gAmericanRight gRightOption(sigma, S0, q, K, T, r);
+            gEuropeanRight gEuropeanRight(sigma, S0, q, K, T, r);
+
+            AmericanPDESolver solverAmerican(gAmericanLeftFunc, gEuropeanRight, fOption, 0.0, S0, K, T, q, r,
+                                             sigma,
+                                             M, alphatemp);
+            solverAmerican.setUp();
+            MatrixXd fEulerResult = solverAmerican.forwardEuler();
+
+            double gamma = solverAmerican.calculateGamma(fEulerResult); // needed to print V(i's)
+            double delta = solverAmerican.calculateDelta(fEulerResult);
+            double theta = solverAmerican.calculateTheta(fEulerResult);
+            std::cout << "delta is:" << delta << std::endl;
+            std::cout << "gamma is:" << gamma << std::endl;
+            std::cout << "theta is:" << theta << std::endl;
+
         }
         }
+
     }
 
 
