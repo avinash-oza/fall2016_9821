@@ -129,24 +129,97 @@ namespace Exam2015
             fOption fOption(sigma, S0, q, K, T, r);
             gEuropeanLeft gLeftEuropeanFunc(sigma, S0, q, K, T, r);
             gAmericanLeftFunc gAmericanLeftFunc(sigma, S0, q, K, T, r);
-            gAmericanRight gRightOption(sigma, S0, q, K, T, r);
-            gEuropeanRight gEuropeanRight(sigma, S0, q, K, T, r);
+            gAmericanRight gAmericanRight(sigma, S0, q, K, T, r);
+           // gEuropeanRight gEuropeanRight(sigma, S0, q, K, T, r);
 
-            AmericanPDESolver solverAmerican(gAmericanLeftFunc, gEuropeanRight, fOption, 0.0, S0, K, T, q, r,
+            AmericanPDESolver solverAmerican(gAmericanLeftFunc, gAmericanRight, fOption, 0.0, S0, K, T, q, r,
                                              sigma,
                                              M, alphatemp);
             solverAmerican.setUp();
             MatrixXd fEulerResult = solverAmerican.forwardEuler();
 
+            //gamma is printing V(i's,0)
+            //solver.VApprox1 is printing V(i's,deltas)
+
             double gamma = solverAmerican.calculateGamma(fEulerResult); // needed to print V(i's)
             double delta = solverAmerican.calculateDelta(fEulerResult);
             double theta = solverAmerican.calculateTheta(fEulerResult);
+            std::cout << "Vapprox is " <<  solverAmerican.calculateVApprox1(fEulerResult) << std::endl;
             std::cout << "delta is:" << delta << std::endl;
             std::cout << "gamma is:" << gamma << std::endl;
             std::cout << "theta is:" << theta << std::endl;
 
         }
+
+        void Question2Part4()
+        {
+            fOption fOption(sigma, S0, q, K, T, r);
+            gEuropeanLeft gLeftEuropeanFunc(sigma, S0, q, K, T, r);
+            gEuropeanRight gRightEuropeanFunc(sigma, S0, q, K, T, r);
+
+           EuropeanPDESolver solverEuropean(gLeftEuropeanFunc, gRightEuropeanFunc, fOption, 0.0, S0, K, T, q, r,
+                                             sigma,
+                                             M, alphatemp);
+            solverEuropean.setUp();
+            MatrixXd fEulerResult = solverEuropean.forwardEuler();
+
+            //gamma is printing V(i's,0)
+            //solver.VApprox1 is printing V(i's,deltas)
+
+            double gamma = solverEuropean.calculateGamma(fEulerResult); // needed to print V(i's)
+            double delta = solverEuropean.calculateDelta(fEulerResult);
+            double theta = solverEuropean.calculateTheta(fEulerResult);
+            std::cout << "Vapprox is " <<  solverEuropean.calculateVApprox1(fEulerResult) << std::endl;
+            std::cout << "delta is:" << delta << std::endl;
+            std::cout << "gamma is:" << gamma << std::endl;
+            std::cout << "theta is:" << theta << std::endl;
         }
+
+        void Question2Part5()
+        {
+            BlackScholesPutOption blackScholesPutOption(S0,K,T,q,r,sigma);
+            double BS_price = blackScholesPutOption.price();
+            double BS_delta = blackScholesPutOption.delta();
+
+            fOption fOption(sigma, S0, q, K, T, r);
+            gAmericanLeftFunc gAmericanLeftFunc(sigma, S0, q, K, T, r);
+            gAmericanRight gAmericanRight(sigma, S0, q, K, T, r);
+
+            AmericanPDESolver solverAmerican(gAmericanLeftFunc, gAmericanRight, fOption, 0.0, S0, K, T, q, r,
+                                             sigma,
+                                             M, alphatemp);
+            solverAmerican.setUp();
+            MatrixXd fEulerResultAmerican = solverAmerican.forwardEuler();
+
+            gEuropeanLeft gLeftEuropeanFunc(sigma, S0, q, K, T, r);
+            gEuropeanRight gRightEuropeanFunc(sigma, S0, q, K, T, r);
+
+            EuropeanPDESolver solverEuropean(gLeftEuropeanFunc, gRightEuropeanFunc, fOption, 0.0, S0, K, T, q, r,
+                                             sigma,
+                                             M, alphatemp);
+            solverEuropean.setUp();
+            MatrixXd fEulerResultEuropean = solverEuropean.forwardEuler();
+            double europeadFDPrice = solverEuropean.calculateVApprox1(fEulerResultEuropean);
+            double varReductionPrice = solverAmerican.priceVarianceReduction(fEulerResultAmerican,europeadFDPrice,BS_price);
+
+            std::cout << varReductionPrice << std::endl;
+
+            //print greeks here
+            std::cout << solverAmerican.calculateDelta(fEulerResultAmerican) - solverEuropean.calculateDelta(fEulerResultEuropean)
+                      + BS_delta << std::endl;
+
+            //print other greeks
+
+        }
+        }
+    namespace Question3
+    {
+        void Question3part1()
+        {
+
+        }
+
+    }
 
     }
 
