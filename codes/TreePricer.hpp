@@ -137,6 +137,41 @@ public:
         return extractTheta(americanTreeResult) - extractTheta(europeanTreeResult) + blackScholesOption.theta();
     }
 
+    /**
+     *
+     * @param optimalN : optimal N found from somewhere else
+     *@param x00: Initial guess left
+     * @param x0 : initial guess right
+     * @param consecutiveApproximation the tolerance between 2 approximations to consider it as converged
+     * @return
+     */
+    double calculateImpliedVolatilityViaSecantMethod(long optimalN, double x00, double x0,
+                                                     double consecutiveApproximation)
+    {
+        double optimalNPrice = extractPrice(calculateTree(optimalN)); // The option price at the optimial N value
+
+        double xNew = x0;
+        double xOld = x00;
+        double xOldest = 0;
+
+        double xOldVolatilityPrice = calculateTreeForNandSigma(optimalN, xOld );
+        double xOldestVolatilityPrice = calculateTreeForNandSigma(optimalN, xOldest);
+
+        while(std::abs(xNew - xOld) > consecutiveApproximation)
+        {
+            xOldest = xOld;
+            xOld = xNew;
+            // update the prices for the next iteration
+            xOldVolatilityPrice = calculateTreeForNandSigma(optimalN, xOld );
+            xOldestVolatilityPrice = calculateTreeForNandSigma(optimalN, xOldest);
+            // calculate next xNew
+            xNew = xOld - (xOldVolatilityPrice - optimalNPrice) * (xOld -xOldest) / (xOldVolatilityPrice - xOldestVolatilityPrice);
+            std::cout << "Guess is " << xNew << std::endl;
+        }
+
+        return xNew;
+    }
+
 
 protected:
     double S;
@@ -157,6 +192,24 @@ protected:
     {
         return std::max(K - S, 0.0);
     }
+
+    /**
+    * Helps to calculate option price for a sigma and N
+    * @param N
+    * @param sigma
+    * @return double
+    */
+    double calculateTreeForNandSigma(long N, double _sigma)
+    {
+        double oldSigma = sigma; // store old sigma
+        sigma = _sigma; // overwrite to ours
+        TREE_RESULT treeResult = calculateTree(N);
+        double price = extractPrice(treeResult);
+        //restore back the old sigma
+        sigma = oldSigma;
+        return price;
+    }
+
 };
 
 
