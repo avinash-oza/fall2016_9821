@@ -16,7 +16,7 @@ set(SOURCE_FILES
     Solvers.hpp
     IterativeMethods.hpp StoppingCriterionSolvers.hpp Examples.hpp OptionPricers.hpp BlackScholes.hpp
         MonteCarlo.hpp RandomNumberGenerator.hpp PDESolver.hpp PDEMesh.hpp EuropeanPDESolver.hpp AmericanPDESolver.hpp BarrierPDE.hpp BinomialTrees.hpp BarrierOption.hpp
-        uFunctions.hpp)
+        uFunctions.hpp TreePricer.hpp)
 
 add_executable(cppcodetest ${SOURCE_FILES})
 
