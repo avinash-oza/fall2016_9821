@@ -90,6 +90,7 @@ TEST(BinomialTest, BinomialTest_EuropeanOption_Test)
     EXPECT_NEAR(europeanBinomialTreePricer.extractDelta(oneResult) , -0.378699586000, TOL );
     EXPECT_NEAR(europeanBinomialTreePricer.extractGamma(oneResult) , 0.030610531000, TOL );
     EXPECT_NEAR(europeanBinomialTreePricer.extractTheta(oneResult) , -1.887709740000, TOL );
+    EXPECT_EQ(europeanBinomialTreePricer.calculateOptimalN(1, 1000, 0.0001), 331);
 
 }
 
