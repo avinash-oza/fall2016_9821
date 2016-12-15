@@ -6,6 +6,8 @@
 #include "../EuropeanPDESolver.hpp"
 #include "gtest/gtest.h"
 #include "../AmericanPDESolver.hpp"
+#include "../BarrierOption.hpp"
+#include "../BarrierPDE.hpp"
 
 double TOL2 = std::pow(10, -9);
 
@@ -126,4 +128,59 @@ TEST(FiniteDifferenceTests, FiniteDifferenceTests_AmericanPutPricing_Test)
     ASSERT_NEAR(solverAmerican.calculateErrorPointWiseVarianceReduction(CNResultAmerican, CNVApproxEuropean, Vexact, P_amer_bin), 0.001786483575114, TOL2);
 
 }
+
+
+TEST(FiniteDifferenceTests, FiniteDifferenceTests_DownAndOutBarrierOption_Test)
+{
+
+    // Part 1 : Domain Discretization  M = {4, 16, 64, 256} alpha = 0.4
+    //std::cout << "Domain Discretization: alpha_temp = 0.4\n\n";
+    double S0 = 42;
+    double K = 40;
+    double q = 0.03;
+    double Sigma = 0.3;
+    double B = 35;
+    double r = 0.05;
+    double T = 0.5;
+
+    double tol = std::pow(10, -6);
+    double Omega = 1.2;
+    long M = 16;
+
+    hw8fBarrierOption fBarrierOption(S0, K, T, r, Sigma, q, B);
+    hw8gLeftBarrierOption gLeftBarrierOption(S0, K, T, r, Sigma, q, B);
+    hw8gRightBarrierOption gRightBarrierOption(S0, K, T, r, Sigma, q, B);
+
+    BarrierOption barrierOption(S0, K, T, q, r, Sigma, B);
+    double exactPrice = barrierOption.Price();
+    MatrixXd outputMatrix = MatrixXd::Zero(4, 6);
+    double AlphaTemp1 = 0.4;
+
+    DownOutCallPDESolver downOutCallPDESolver(gLeftBarrierOption, gRightBarrierOption, fBarrierOption, 0.0, S0, K, T, q, r,
+                                  Sigma, AlphaTemp1, M, B);
+    downOutCallPDESolver.setUp();
+    long N_left = downOutCallPDESolver.get_N_left();
+    std::cout << M << std::endl;
+
+    auto fEulerAmerican = downOutCallPDESolver.forwardEuler();
+    auto fEulerCN = downOutCallPDESolver.CrankNicolson(SOR, tol, Omega);
+
+    // forward euler values
+    ASSERT_NEAR(downOutCallPDESolver.calculateDelta(fEulerAmerican), 0.707288582514209, TOL2);
+    ASSERT_NEAR(downOutCallPDESolver.calculateGamma(fEulerAmerican), 0.024436109375867, TOL2);
+    ASSERT_NEAR(downOutCallPDESolver.calculateTheta(fEulerAmerican), -2.45879570557505, TOL2);
+    ASSERT_NEAR(downOutCallPDESolver.calculateVApprox1(fEulerAmerican), 4.46444038054815, TOL2);
+
+
+    // crank nicolson values
+    ASSERT_NEAR(downOutCallPDESolver.calculateDelta(fEulerCN), 0.707582938228157, TOL2);
+    ASSERT_NEAR(downOutCallPDESolver.calculateGamma(fEulerCN), 0.025856537817444, TOL2);
+    ASSERT_NEAR(downOutCallPDESolver.calculateTheta(fEulerCN), -2.50666267382413, TOL2);
+    ASSERT_NEAR(downOutCallPDESolver.calculateVApprox1(fEulerCN), 4.42851597070506, TOL2);
+
+}
+
+
+
+
 

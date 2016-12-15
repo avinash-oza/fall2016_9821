@@ -26,7 +26,8 @@ public:
         double u = std::exp(sigma* std::sqrt(deltaT));
         double d = 1/u;
         double p = (std::exp((r - q)*deltaT) - d)/(u - d);
-        std::vector<double> optionPrices(N + 1);
+        Eigen::VectorXd optionPrices  = VectorXd::Zero(N + 1);
+
 
         double V22_P, V21_P, V20_P, V22_C, V21_C, V20_C, V11_P, V10_P, V11_C, V10_C, V00_P, V00_C;
         V22_P = V21_P = V20_P = V11_P = V10_P = V00_P = 0;
@@ -88,8 +89,7 @@ public:
         std::cout << V11_P << " " << V10_P << " " << std::endl;
         std::cout << V00_P << std::endl;*/
 
-
-        return std::make_tuple(optionPrices[0], Delta_P, Gamma_P, Theta_P, INT_MIN);
+        return std::make_tuple(optionPrices[0], Delta_P, Gamma_P, Theta_P, INT_MIN, optionPrices);
     }
 
     virtual  TREE_RESULT averageBinomialTree(long N)
@@ -105,8 +105,10 @@ public:
         result(1) = (std::get<1>(binomialTreeNPlus1) + std::get<1>(binomialTreeN)) / 2.0;
         result(2) = (std::get<2>(binomialTreeNPlus1) + std::get<2>(binomialTreeN)) / 2.0;
         result(3) = (std::get<3>(binomialTreeNPlus1) + std::get<3>(binomialTreeN)) / 2.0;
+        VectorXd leftNTree = std::get<5>(binomialTreeNPlus1); // returns dummy value
+        std::cout << "AVERAGE BINOMIAL TREE optionPrices is only of N+1" << std::endl;
 
-        return std::make_tuple(result(0), result(1), result(2), result(3), INT_MIN);
+        return std::make_tuple(result(0), result(1), result(2), result(3), INT_MIN, leftNTree);
     }
 
     virtual TREE_RESULT calculateTreeBlackScholes(long N)
@@ -115,7 +117,7 @@ public:
         double u = std::exp(sigma* std::sqrt(deltaT));
         double d = 1.0/u;
         double p = (std::exp((r - q)*deltaT) - d)/(u - d);
-        std::vector<double> optionPrices(N + 1);
+        Eigen::VectorXd optionPrices  = VectorXd::Zero(N + 1);
         BlackScholesPutOption blackScholesOption(S, K, T, q, r, sigma);
 
         double V22_P, V21_P, V20_P, V22_C, V21_C, V20_C, V11_P, V10_P, V11_C, V10_C, V00_P, V00_C;
@@ -123,10 +125,6 @@ public:
         double S11, S10, S22, S21, S20;
         double Delta_P, Delta_C, Gamma_P, Gamma_C, Theta_C, Theta_P;
 
-        for (int i = 0; i< N; i++)
-        {
-            optionPrices[i] = 0.0;
-        }
 
         for (int i = 0 ; i < N; i++)
         {
@@ -175,7 +173,7 @@ public:
         Delta_P = (V10_P - V11_P) / (S10 - S11);
         Gamma_P = ((V20_P - V21_P) / (S20 - S21) - (V21_P - V22_P) / (S21 - S22)) / ((S20 - S22) / 2);
         Theta_P = (V21_P - V00_P) / (2 * deltaT);
-        return std::make_tuple(optionPrices[0], Delta_P, Gamma_P, Theta_P, INT_MIN);
+        return std::make_tuple(optionPrices[0], Delta_P, Gamma_P, Theta_P, INT_MIN, optionPrices);
     }
 
 
@@ -193,9 +191,11 @@ public:
         result(2) = 2.0*(std::get<2>(bbs1)) - std::get<2>(bbshalfN);
         result(3) = 2.0*(std::get<3>(bbs1)) - std::get<3>(bbshalfN);
 
-        return std::make_tuple(result(0), result(1), result(2), result(3), INT_MIN);
-    }
+        VectorXd leftNTree = std::get<5>(bbs1); // returns dummy value
+        std::cout << "BlackScholesWithRichardsonExtrapolation optionPrices is only of N+1" << std::endl;
 
+        return std::make_tuple(result(0), result(1), result(2), result(3), INT_MIN, leftNTree);
+    }
 
 };
 
@@ -206,7 +206,7 @@ public:
             : EuropeanBinomialTreePricer(S, K, T, q, r, sigma, optionType) {}
 
     virtual long double
-    calculateRiskNeutralDiscountedValue(double deltaT, double p, const std::vector<double> &optionPrices, int i, double u , int j) const {
+    calculateRiskNeutralDiscountedValue(double deltaT, double p, const VectorXd &optionPrices, int i, double u , int j) const {
         long double europeanPrice = TreePricer::calculateRiskNeutralDiscountedValue(deltaT, p, optionPrices, i, u , j);
 //        long double intrinsicValue =  K - S*std::pow(u, j - i)* std::pow(1.0/u, i);
         long double intrinsicValue =  calculatePayoff(S*std::pow(u, j - i)* std::pow(1.0/u, i));
@@ -237,16 +237,14 @@ public:
         double u = std::exp(sigma * std::sqrt(deltaT));
         double d = 1 / u;
         double p = (std::exp((r - q) * deltaT) - d) / (u - d);
-        std::vector<double> optionPrices(N + 1);
+        Eigen::VectorXd optionPrices  = VectorXd::Zero(N + 1);
+
 
         double V22_P, V21_P, V20_P, V22_C, V21_C, V20_C, V11_P, V10_P, V11_C, V10_C, V00_P, V00_C;
         V22_P = V21_P = V20_P = V22_C = V21_C = V20_C = V11_P = V10_P = V11_C = V10_C = V00_P = V00_C = 0;
         double S11, S10, S22, S21, S20;
         double Delta_P, Delta_C, Gamma_P, Gamma_C, Theta_C, Theta_P;
 
-        for (int i = 0; i < N; i++) {
-            optionPrices[i] = 0.0;
-        }
 
         double payoff;
         double currentSpot;
@@ -300,8 +298,7 @@ public:
         Theta_P = (V21_P - V00_P) / (2.0 * deltaT);
         //        Theta_C = (V21_C - V00_C) / (2 * deltaT);
 
-
-        return std::make_tuple(optionPrices[0], Delta_P, Gamma_P, Theta_P, INT_MIN);
+        return std::make_tuple(optionPrices[0], Delta_P, Gamma_P, Theta_P, INT_MIN, optionPrices);
     }
 
     double calculateFinalOptionValue(double currentSpot, double unHitPayoff) const {

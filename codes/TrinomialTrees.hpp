@@ -81,7 +81,8 @@ public:
         Theta_P = (importantValues(1, 1) - importantValues(0, 0)) / deltaT;
         //        Theta_C = (V21_C - V00_C) / (2 * deltaT);
 
-        return std::make_tuple(optionPrices(0), Delta_P, Gamma_P, Theta_P, INT_MIN);
+
+        return std::make_tuple(optionPrices(0), Delta_P, Gamma_P, Theta_P, INT_MIN, optionPrices);
     }
 
     virtual TREE_RESULT calculateTreeBlackScholes(long N)
@@ -157,7 +158,7 @@ public:
         Theta_P = (importantValues(1, 1) - importantValues(0, 0)) / deltaT;
         //        Theta_C = (V21_C - V00_C) / (2 * deltaT);
 
-        return std::make_tuple(optionPrices(0), Delta_P, Gamma_P, Theta_P, INT_MIN);
+        return std::make_tuple(optionPrices(0), Delta_P, Gamma_P, Theta_P, INT_MIN, optionPrices);
     };
 
     virtual double calculateRiskNeutralDiscountedValue(int i, int j, double deltaT, double u ,double d, double pu, double pm, double pd, const VectorXd &optionPrices)
@@ -215,8 +216,8 @@ public:
         importantValues.setZero();
         double Delta_P, Delta_C, Gamma_P, Gamma_C, Theta_C, Theta_P;
 
-        Eigen::VectorXd optionPrices(2*N + 1);
-        optionPrices.setZero();
+        Eigen::VectorXd optionPrices  = VectorXd::Zero(2*N + 1);
+
         double currentSpot;
         for (int i = 0 ; i < 2*N + 1; i++)
         {
@@ -270,7 +271,7 @@ public:
         Theta_P = (importantValues(1, 1) - importantValues(0, 0)) / deltaT;
         //        Theta_C = (V21_C - V00_C) / (2 * deltaT);
 
-        return std::make_tuple(optionPrices(0), Delta_P, Gamma_P, Theta_P, INT_MIN);
+        return std::make_tuple(optionPrices(0), Delta_P, Gamma_P, Theta_P, INT_MIN, optionPrices);
     }
 
     double calculateFinalOptionValue(double currentSpot, double unHitPayoff) const {

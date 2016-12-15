@@ -125,7 +125,7 @@ public:
         V_delta = exp(-a*x_zero - b*(_tFinal - delta_tau))*priorBoundaryApproximations(N_left);
         V_zero = calculateVApprox1(approximations);
 
-        return (V_zero - V_delta) / delta_tau;
+        return -(V_zero - V_delta) / get_dt();
     }
 
 
@@ -157,6 +157,10 @@ public:
     long get_N_left() const
     {
         return N_left;
+    }
+
+    double get_dt() const {
+        return 2.0*delta_tau/(sigma*sigma);
     }
 public:
     double B;
