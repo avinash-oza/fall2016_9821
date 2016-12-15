@@ -105,7 +105,7 @@ void hw9Barrier()
     MatrixXd outputMatrix = MatrixXd::Zero(4, 6);
     double AlphaTemp1 = 0.4;
 
-    for (int i = 0; i < 4; ++i)
+    for (int i = 0; i < 1; ++i)
     {
         M *= 4;
     	DownOutCallPDESolver Barrier1(gLeftBarrierOption, gRightBarrierOption, fBarrierOption, 0.0, S0, K, T, q, r,
@@ -159,7 +159,7 @@ void hw10()
 
 void hw9()
 {
-    long M = 64;
+    long M = 4;
     double tol = std::pow(10, -6);
     double omega = 1.2;
 
@@ -187,24 +187,25 @@ void hw9()
     AmericanPDESolver solverAmerican(gAmericanLeftFunc, gEuropeanRight, fOption, 0, S0, K, T, q, r, sigma, M, alphatemp);
     solverAmerican.setUp();
 
-    MatrixXd fEulerResultEuropean = solver.forwardEuler();
-    double fEulerEuropeanResult = solver.calculateVapprox(fEulerResultEuropean);
-
-    MatrixXd fEulerResult = solverAmerican.forwardEuler();
-    MatrixXd CNResult = solverAmerican.CrankNicolson(SOR, tol, omega);
-
-    double forwardEulerVApproxEuropean = solver.calculateVapprox(fEulerResultEuropean);
-            std::cout << M
-                      << ","
-                      << solverAmerican.calculateVapprox(fEulerResult)
-                      << ","
+    MatrixXd fEulerResultEuropean = solverAmerican.forwardEuler();
+    std::cout << fEulerResultEuropean << std::endl;
+//    double fEulerEuropeanResult = solver.calculateVApprox(fEulerResultEuropean);
+//
+//    MatrixXd fEulerResult = solverAmerican.forwardEuler();
+//    MatrixXd CNResult = solverAmerican.CrankNicolson(SOR, tol, omega);
+//
+//    double forwardEulerVApproxEuropean = solver.calculateVApprox(fEulerResultEuropean);
+//            std::cout << M
+//                      << ","
+//                      << solverAmerican.calculateVApprox(fEulerResult)
+//                      << ","
 //                      << VEurApprox
 //                      << ","
-                      << Vexact
-                      << solverAmerican.priceVarianceReduction(fEulerResult, forwardEulerVApproxEuropean, Vexact)
-                      << ","
-                      << solverAmerican.calculateErrorPointWiseVarianceReduction(fEulerResult, forwardEulerVApproxEuropean, Vexact, P_amer_bin)
-                      << std::endl;
+//                      << Vexact
+//                      << solverAmerican.priceVarianceReduction(fEulerResult, forwardEulerVApproxEuropean, Vexact)
+//                      << ","
+//                      << solverAmerican.calculateErrorPointWiseVarianceReduction(fEulerResult, forwardEulerVApproxEuropean, Vexact, P_amer_bin)
+//                      << std::endl;
 
 //    writeCSVMatrix(fEulerAmerican, "forward_euler_american.csv");
 

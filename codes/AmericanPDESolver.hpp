@@ -47,7 +47,7 @@ public:
 
     double priceVarianceReduction(MatrixXd &approximations, double europeanFDPrice, double blackScholesPrice)
     {
-        return calculateVapprox(approximations) + (blackScholesPrice - europeanFDPrice);
+        return calculateVApprox(approximations) + (blackScholesPrice - europeanFDPrice);
     }
 
     double calculateErrorPointWiseVarianceReduction(MatrixXd &approximations, double europeanFDPrice, double blackScholesPrice, double P_american_bin)
