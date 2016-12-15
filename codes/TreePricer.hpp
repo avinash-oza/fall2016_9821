@@ -4,12 +4,12 @@
 
 #ifndef CPPCODETEST_TREEPRICER_HPP
 #define CPPCODETEST_TREEPRICER_HPP
-typedef std::tuple<double, double, double, double, double> TREE_RESULT;
-enum OPTION_TYPE{CALL, PUT};
 
 #include "BinomialTrees.hpp"
 using namespace Eigen;
 
+typedef std::tuple<double, double, double, double, double, Eigen::VectorXd> TREE_RESULT;
+enum OPTION_TYPE{CALL, PUT};
 
 class TreePricer
 
@@ -67,7 +67,7 @@ public:
     virtual TREE_RESULT calculateTree(long N)
     {
         // dummy function that is overridden
-        return std::make_tuple(0.0, 0.0,0.0, 0.0, 0.0);
+        return std::make_tuple(0.0, 0.0,0.0, 0.0, 0.0, VectorXd::Zero(10));
     }
 
 
@@ -98,7 +98,7 @@ public:
     }
 
     virtual long double
-    calculateRiskNeutralDiscountedValue(double deltaT, double p, const std::vector<double> &optionPrices, int i, double u, int j) const {
+    calculateRiskNeutralDiscountedValue(double deltaT, double p, const VectorXd &optionPrices, int i, double u, int j) const {
         // calculates european value by default
         return exp(-r * deltaT) * (optionPrices[i] * p + optionPrices[i + 1] * (1 - p));
     }
