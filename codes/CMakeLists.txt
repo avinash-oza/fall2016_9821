@@ -8,8 +8,7 @@ set(CMAKE_BUILD_TYPE, "Debug")
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 
-INCLUDE_DIRECTORIES("/usr/local/Cellar/boost/1.62.0/include")
-include_directories("/usr/local/Cellar/eigen/3.3.1/include/eigen3")
+include_directories("/usr/include/eigen3")
 
 set(SOURCE_FILES
     FinalMain.cpp

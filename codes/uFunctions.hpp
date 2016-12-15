@@ -194,8 +194,8 @@ public:
 
     virtual	double evaluate(double x, double t)
     {
-        //return K*exp(a*x)*std::max(exp(x) - 1.0, 0.0); //this is for call option
-       return K*exp(a*x)*std::max(1.0-exp(x), 0.0); //this is for put option
+        return K*exp(a*x)*std::max(exp(x) - 1.0, 0.0); //this is for call option
+//       return K*exp(a*x)*std::max(1.0-exp(x), 0.0); //this is for put option
     }
 };
 
@@ -217,8 +217,8 @@ public:
     using uBarrierOption::uBarrierOption;
     virtual double evaluate(double x, double t)
     {
-        //return K*exp(a*x + b*t)*(exp(x - 2 * q*t / (sigma*sigma)) - exp(-2 * r*t / (sigma*sigma)));
-        return 0; //for up and in and for double barrier
+        return K*exp(a*x + b*t)*(exp(x - 2 * q*t / (sigma*sigma)) - exp(-2 * r*t / (sigma*sigma)));
+//        return 0; //for up and in and for double barrier
     }
 };
 
