@@ -221,6 +221,7 @@ public:
 
     virtual const double getFinalOptionPrice(double u, double d, int j, int i, double riskNeutralDiscountedValue) const {
         double payoff = calculatePayoff(S * pow(u, j - i) * pow(d, i));
+
         return std::max(riskNeutralDiscountedValue, payoff);
     }
 };

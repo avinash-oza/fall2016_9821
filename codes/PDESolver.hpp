@@ -97,7 +97,7 @@ public:
         return valuesAtNodes;
     }
 
-    double getDeltaX() const { return (_xRight - _xLeft) / N; }
+    virtual double getDeltaX() const { return (_xRight - _xLeft) / N; }
 
 
     MatrixXd backwardEuler(LinearSolveMethod linearSolverMethod, double tol, double omega)

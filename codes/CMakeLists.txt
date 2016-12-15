@@ -7,16 +7,18 @@ set(CMAKE_BUILD_TYPE, "Debug")
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
-include_directories("/usr/include/eigen3")
-include_directories("/usr/include")
+
+INCLUDE_DIRECTORIES("/usr/local/Cellar/boost/1.62.0/include")
+include_directories("/usr/local/Cellar/eigen/3.3.1/include/eigen3")
 
 set(SOURCE_FILES
-    Main.cpp
+    FinalMain.cpp
     MatrixDecomposition.hpp
+        BarrierPDE.hpp
     Solvers.hpp
     IterativeMethods.hpp StoppingCriterionSolvers.hpp Examples.hpp OptionPricers.hpp BlackScholes.hpp
-        MonteCarlo.hpp RandomNumberGenerator.hpp PDESolver.hpp PDEMesh.hpp EuropeanPDESolver.hpp AmericanPDESolver.hpp BarrierPDE.hpp BinomialTrees.hpp BarrierOption.hpp
-        uFunctions.hpp TreePricer.hpp)
+        MonteCarlo.hpp RandomNumberGenerator.hpp PDESolver.hpp PDEMesh.hpp EuropeanPDESolver.hpp AmericanPDESolver.hpp  BinomialTrees.hpp BarrierOption.hpp
+        uFunctions.hpp Exams.hpp FinalMain.cpp)
 
 add_executable(cppcodetest ${SOURCE_FILES})
 
@@ -34,7 +36,7 @@ include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 # Unit Tests
 ################################
 # Add test cpp file
-add_executable( runUnitTests tests/treetests.cpp tests/finitedifferencetests.cpp tests/constants.hpp tests/montecarlotests.cpp)
+add_executable( runUnitTests tests/finitedifferencetests.cpp)
 # Link test executable against gtest & gtest_main
 target_link_libraries(runUnitTests gtest gtest_main)
 add_test( runUnitTests runUnitTests )

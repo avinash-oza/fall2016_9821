@@ -174,20 +174,22 @@ public:
      * @param consecutiveApproximation the tolerance between 2 approximations to consider it as converged
      * @return
      */
-    double calculateImpliedVolatilityViaSecantMethod(long optimalN, double x00, double x0,
+    double calculateImpliedVolatilityViaSecantMethod(long optimalN, double marketPrice, double x00, double x0,
                                                      double consecutiveApproximation)
     {
-        double optimalNPrice = extractPrice(calculateTree(optimalN)); // The option price at the optimial N value
+        double optimalNPrice = marketPrice;
 
         double xNew = x0;
         double xOld = x00;
         double xOldest = 0;
+        int count = 1;
 
         double xOldVolatilityPrice = calculateTreeForNandSigma(optimalN, xOld );
         double xOldestVolatilityPrice = calculateTreeForNandSigma(optimalN, xOldest);
-
+        std::cout << count << "\t" << xOld << std::endl;
         while(std::abs(xNew - xOld) > consecutiveApproximation)
         {
+            ++count;
             xOldest = xOld;
             xOld = xNew;
             // update the prices for the next iteration
@@ -195,7 +197,8 @@ public:
             xOldestVolatilityPrice = calculateTreeForNandSigma(optimalN, xOldest);
             // calculate next xNew
             xNew = xOld - (xOldVolatilityPrice - optimalNPrice) * (xOld -xOldest) / (xOldVolatilityPrice - xOldestVolatilityPrice);
-            std::cout << "Guess is " << xNew << std::endl;
+
+            std::cout << count << "\t" << xOld << std::endl;
         }
 
         return xNew;
