@@ -1,6 +1,6 @@
 //
 // Created by Tushar Chawla on 12/9/16.
-//
+// fork yes
 
 #ifndef CPPCODETEST_EXAMS_HPP
 #define CPPCODETEST_EXAMS_HPP
@@ -8,10 +8,10 @@
 #include <iostream>
 #include "BinomialTrees.hpp"
 #include "AmericanPDESolver.hpp"
+#include "BarrierOption.hpp"
+#include "BarrierPDE.hpp"
 
-namespace Exam2015
-
-{
+namespace Exam2015 {
     namespace Question1 {
 
 
@@ -67,8 +67,7 @@ namespace Exam2015
         }
     }
 
-    namespace Question2
-    {
+    namespace Question2 {
 
         double S0 = 27.0;
         double K = 30.0;
@@ -84,31 +83,29 @@ namespace Exam2015
         double omega = 1.2;
         double alphatemp = 0.5;
 
-            void Question2Part1()
-            {
-                fOption fOption(sigma, S0, q, K, T, r);
-                gEuropeanLeft gLeftEuropeanFunc(sigma, S0, q, K, T, r);
-                gAmericanLeftFunc gAmericanLeftFunc(sigma, S0, q, K, T, r);
-                gAmericanRight gRightOption(sigma, S0, q, K, T, r);
-                gEuropeanRight gEuropeanRight(sigma, S0, q, K, T, r);
+        void Question2Part1() {
+            fOption fOption(sigma, S0, q, K, T, r);
+            gEuropeanLeft gLeftEuropeanFunc(sigma, S0, q, K, T, r);
+            gAmericanLeftFunc gAmericanLeftFunc(sigma, S0, q, K, T, r);
+            gAmericanRight gRightOption(sigma, S0, q, K, T, r);
+            gEuropeanRight gEuropeanRight(sigma, S0, q, K, T, r);
 
 
-                for (int i = 1; i <= 4; ++i)
-                {
+            for (int i = 1; i <= 4; ++i) {
 
-                    AmericanPDESolver solverAmerican(gAmericanLeftFunc, gEuropeanRight, fOption, 0.0, S0, K, T, q, r,
-                                                     sigma,
-                                                     pow(M,i), alphatemp);
-                    solverAmerican.setUp();
-                    std::cout << M << "\t" << alphatemp << "\t" << solverAmerican.getAlpha() << "\t "
-                              << solverAmerican.getN() << "\t" <<
-                              solverAmerican.get_xLeft() << "\t" << solverAmerican.get_xRight() << "\t"
-                              << solverAmerican.getXCompute() <<  "\t" << solverAmerican.get_tFinal() <<
-                              "\t" << solverAmerican.getDeltaTau() << "\t" << solverAmerican.getDeltaX() << std::endl;
-                }
+                AmericanPDESolver solverAmerican(gAmericanLeftFunc, gEuropeanRight, fOption, 0.0, S0, K, T, q, r,
+                                                 sigma,
+                                                 pow(M, i), alphatemp);
+                solverAmerican.setUp();
+                std::cout << M << "\t" << alphatemp << "\t" << solverAmerican.getAlpha() << "\t "
+                          << solverAmerican.getN() << "\t" <<
+                          solverAmerican.get_xLeft() << "\t" << solverAmerican.get_xRight() << "\t"
+                          << solverAmerican.getXCompute() << "\t" << solverAmerican.get_tFinal() <<
+                          "\t" << solverAmerican.getDeltaTau() << "\t" << solverAmerican.getDeltaX() << std::endl;
             }
-        void Question2Part2()
-        {
+        }
+
+        void Question2Part2() {
 
             fOption fOption(sigma, S0, q, K, T, r);
             gEuropeanLeft gLeftEuropeanFunc(sigma, S0, q, K, T, r);
@@ -124,13 +121,13 @@ namespace Exam2015
             std::cout << fEulerResult << std::endl;
             //std::cout << gAmericanLeftFunc.b << std::endl;
         }
-        void Question2Part3()
-        {
+
+        void Question2Part3() {
             fOption fOption(sigma, S0, q, K, T, r);
             gEuropeanLeft gLeftEuropeanFunc(sigma, S0, q, K, T, r);
             gAmericanLeftFunc gAmericanLeftFunc(sigma, S0, q, K, T, r);
             gAmericanRight gAmericanRight(sigma, S0, q, K, T, r);
-           // gEuropeanRight gEuropeanRight(sigma, S0, q, K, T, r);
+            // gEuropeanRight gEuropeanRight(sigma, S0, q, K, T, r);
 
             AmericanPDESolver solverAmerican(gAmericanLeftFunc, gAmericanRight, fOption, 0.0, S0, K, T, q, r,
                                              sigma,
@@ -144,20 +141,19 @@ namespace Exam2015
             double gamma = solverAmerican.calculateGamma(fEulerResult); // needed to print V(i's)
             double delta = solverAmerican.calculateDelta(fEulerResult);
             double theta = solverAmerican.calculateTheta(fEulerResult);
-            std::cout << "Vapprox is " <<  solverAmerican.calculateVApprox1(fEulerResult) << std::endl;
+            std::cout << "Vapprox is " << solverAmerican.calculateVApprox1(fEulerResult) << std::endl;
             std::cout << "delta is:" << delta << std::endl;
             std::cout << "gamma is:" << gamma << std::endl;
             std::cout << "theta is:" << theta << std::endl;
 
         }
 
-        void Question2Part4()
-        {
+        void Question2Part4() {
             fOption fOption(sigma, S0, q, K, T, r);
             gEuropeanLeft gLeftEuropeanFunc(sigma, S0, q, K, T, r);
             gEuropeanRight gRightEuropeanFunc(sigma, S0, q, K, T, r);
 
-           EuropeanPDESolver solverEuropean(gLeftEuropeanFunc, gRightEuropeanFunc, fOption, 0.0, S0, K, T, q, r,
+            EuropeanPDESolver solverEuropean(gLeftEuropeanFunc, gRightEuropeanFunc, fOption, 0.0, S0, K, T, q, r,
                                              sigma,
                                              M, alphatemp);
             solverEuropean.setUp();
@@ -169,15 +165,14 @@ namespace Exam2015
             double gamma = solverEuropean.calculateGamma(fEulerResult); // needed to print V(i's)
             double delta = solverEuropean.calculateDelta(fEulerResult);
             double theta = solverEuropean.calculateTheta(fEulerResult);
-            std::cout << "Vapprox is " <<  solverEuropean.calculateVApprox1(fEulerResult) << std::endl;
+            std::cout << "Vapprox is " << solverEuropean.calculateVApprox1(fEulerResult) << std::endl;
             std::cout << "delta is:" << delta << std::endl;
             std::cout << "gamma is:" << gamma << std::endl;
             std::cout << "theta is:" << theta << std::endl;
         }
 
-        void Question2Part5()
-        {
-            BlackScholesPutOption blackScholesPutOption(S0,K,T,q,r,sigma);
+        void Question2Part5() {
+            BlackScholesPutOption blackScholesPutOption(S0, K, T, q, r, sigma);
             double BS_price = blackScholesPutOption.price();
             double BS_delta = blackScholesPutOption.delta();
 
@@ -200,28 +195,61 @@ namespace Exam2015
             solverEuropean.setUp();
             MatrixXd fEulerResultEuropean = solverEuropean.forwardEuler();
             double europeadFDPrice = solverEuropean.calculateVApprox1(fEulerResultEuropean);
-            double varReductionPrice = solverAmerican.priceVarianceReduction(fEulerResultAmerican,europeadFDPrice,BS_price);
+            double varReductionPrice = solverAmerican.priceVarianceReduction(fEulerResultAmerican, europeadFDPrice,
+                                                                             BS_price);
 
             std::cout << varReductionPrice << std::endl;
 
             //print greeks here
-            std::cout << solverAmerican.calculateDelta(fEulerResultAmerican) - solverEuropean.calculateDelta(fEulerResultEuropean)
-                      + BS_delta << std::endl;
+            std::cout << solverAmerican.calculateDelta(fEulerResultAmerican) -
+                         solverEuropean.calculateDelta(fEulerResultEuropean)
+                         + BS_delta << std::endl;
 
             //print other greeks
 
         }
-        }
-    namespace Question3
-    {
-        void Question3part1()
-        {
+    }
+    namespace Question3 {
+        long M = 1;
+        double S0 = 52.0;
+        double K = 55.0;
+        double Lowerarrier = 45.0;
+        double UpperBarrier = 62.0;
+        double T = 5.0 / 12.0; // make sure to do double division
+        double q = 0.005;
+        double r = 0.02;
+        double sigma = 0.25;
+        double alphatemp = 0.5;
+
+        void Question3part1() {
+            hw8fBarrierOption fBarrierOption(S0, K, T, r, sigma, q, Lowerarrier);
+            hw8gLeftBarrierOption gLeftBarrierOption(S0, K, T, r, sigma, q, Lowerarrier);
+            hw8gRightBarrierOption gRightBarrierOption(S0, K, T, r, sigma, q, Lowerarrier);
+
+            BarrierOption barrierOption(S0, K, T, q, r, sigma, Lowerarrier);
+
+            double exactPrice = barrierOption.Price();
+            MatrixXd outputMatrix = MatrixXd::Zero(4, 6);
+            double AlphaTemp1 = 0.5;
+
+            for (int i = 0; i < 4; ++i) {
+                M *= 4;
+                DoubleBarrierPDESolver solverAmerican(gLeftBarrierOption, gRightBarrierOption, fBarrierOption, 0.0, S0,
+                                                      K, T, q, r,
+                                                      sigma, AlphaTemp1, M, Lowerarrier, UpperBarrier);
+                solverAmerican.setUp();
+                std::cout << M << "\t" << alphatemp << "\t" << solverAmerican.getAlpha() << "\t "
+                          << solverAmerican.getN() << "\t" <<
+                          solverAmerican.get_xLeft() << "\t" << solverAmerican.get_xRight() << "\t"
+                          << solverAmerican.getXCompute() << "\t" << solverAmerican.get_tFinal() <<
+                          "\t" << solverAmerican.getDeltaTau() << "\t" << solverAmerican.getDeltaX() << std::endl;
+
+            }
 
         }
 
     }
-
-    }
+}
 
 
 

@@ -210,10 +210,10 @@ public:
     }
 };
 
-class hw8gRightBarrierOption : public hw8fBarrierOption
+class hw8gRightBarrierOption : public uBarrierOption
 {
 public:
-    using hw8fBarrierOption::hw8fBarrierOption;
+    using uBarrierOption::uBarrierOption;
     virtual double evaluate(double x, double t)
     {
         return K*exp(a*x + b*t)*(exp(x - 2 * q*t / (sigma*sigma)) - exp(-2 * r*t / (sigma*sigma)));

@@ -20,7 +20,7 @@ public:
     }
     virtual void _setUp()
     {
-        set_xLeft(log(B / K));
+        set_xLeft(calculateXLeft());
         a = (r - q) / (sigma*sigma) - 0.5;
         b = pow((r - q) / (sigma*sigma) + 0.5, 2.0) + 2 * q / (sigma*sigma);
         _tFinal = T*sigma*sigma / 2.0;
@@ -37,10 +37,21 @@ public:
         int N_right = ceil((x_right_temp - getXCompute()) / delta_x);
 
         N = N_left + N_right;
-        set_xRight(getXCompute() + N_right*delta_x);
+        set_xRight(calculateXRight(N_right));
 
         mesh = Mesh(0, _tFinal, _xLeft, _xRight, M, N);
     }
+
+    virtual double calculateXRight(int N_right) { return getXCompute() + N_right * delta_x; }
+
+    virtual int getNRight() {
+        double x_right_temp = log(S0 / K) + (r - q - sigma * sigma / 2.0) * T + 3 * sigma * sqrt(T);
+        double xr = log(S0 / K) + (r - q - sigma * sigma / 2.0) * T + 3 * sigma * sqrt(T);
+        int N_right = ceil((x_right_temp - getXCompute()) / delta_x);
+        return N_right;
+    }
+
+    virtual double calculateXLeft() const { return log(B / K); }
 
     // Approximate function
     double calculateVApprox1(MatrixXd &approximations)
@@ -159,6 +170,24 @@ private:
     double delta_tau;
     double alpha;
     long N_left;
+};
+
+class DoubleBarrierPDESolver : public DownOutCallPDESolver
+{
+public:
+    DoubleBarrierPDESolver(uBarrierOption &LeftFunction, uBarrierOption &RightFunction, uBarrierOption &f, double t0,
+                           double Spot, double Strike, double Maturity, double Dividend, double Interest,
+                           double Volatility, double AlphaTemp, double M, double Barrier, double upperBarrier) : DownOutCallPDESolver(
+            LeftFunction, RightFunction, f, t0, Spot, Strike, Maturity, Dividend, Interest, Volatility, AlphaTemp, M,
+            Barrier), upperBarrier(upperBarrier) {}
+
+    double calculateXRight(int N_right) override {
+        return log(upperBarrier/K);
+    }
+
+protected:
+    double upperBarrier;
+
 };
 
 #endif
