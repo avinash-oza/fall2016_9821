@@ -105,8 +105,8 @@ TEST(FiniteDifferenceTests, FiniteDifferenceTests_AmericanPutPricing_Test)
         MatrixXd CNResultAmerican = solverAmerican.CrankNicolson(SOR, tol, omega);
         MatrixXd CNResultEuropean = solver.CrankNicolson(SOR, tol, omega);
 
-        double forwardEulerVApproxEuropean = solver.calculateVapprox(fEulerEuropean);
-        double CNVApproxEuropean = solver.calculateVapprox(CNResultEuropean);
+        double forwardEulerVApproxEuropean = solver.calculateVApprox(fEulerEuropean);
+        double CNVApproxEuropean = solver.calculateVApprox(CNResultEuropean);
 
     // forward euler values
     ASSERT_NEAR(solverAmerican.calculateErrorPointwise(fEulerAmerican, P_amer_bin), 0.017420108129288, TOL2);
