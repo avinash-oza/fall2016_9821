@@ -59,7 +59,7 @@ namespace Exam2015
                 }
 
                 previousValue = currentValue;
-                std::cout << previousValue << std::endl;
+//                std::cout << previousValue << std::endl;
                 n = i;
             }
             std::cout << n << std::endl;

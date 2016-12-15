@@ -168,15 +168,14 @@ TEST(FiniteDifferenceTests, FiniteDifferenceTests_DownAndOutBarrierOption_Test)
     // forward euler values
     ASSERT_NEAR(downOutCallPDESolver.calculateDelta(fEulerAmerican), 0.707288582514209, TOL2);
     ASSERT_NEAR(downOutCallPDESolver.calculateGamma(fEulerAmerican), 0.024436109375867, TOL2);
-    ASSERT_NEAR(downOutCallPDESolver.calculateTheta(fEulerAmerican), 54.6399045683345, TOL2);
-    ASSERT_NEAR(downOutCallPDESolver.calculateTheta(fEulerAmerican), 54.6399045683345, TOL2);
+    ASSERT_NEAR(downOutCallPDESolver.calculateTheta(fEulerAmerican), -2.45879570557505, TOL2);
     ASSERT_NEAR(downOutCallPDESolver.calculateVApprox1(fEulerAmerican), 4.46444038054815, TOL2);
 
 
-    // forward euler values
+    // crank nicolson values
     ASSERT_NEAR(downOutCallPDESolver.calculateDelta(fEulerCN), 0.707582938228157, TOL2);
     ASSERT_NEAR(downOutCallPDESolver.calculateGamma(fEulerCN), 0.025856537817444, TOL2);
-    ASSERT_NEAR(downOutCallPDESolver.calculateTheta(fEulerCN), 55.7036149738684, TOL2);
+    ASSERT_NEAR(downOutCallPDESolver.calculateTheta(fEulerCN), -2.50666267382413, TOL2);
     ASSERT_NEAR(downOutCallPDESolver.calculateVApprox1(fEulerCN), 4.42851597070506, TOL2);
 
 }
