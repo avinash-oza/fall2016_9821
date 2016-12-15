@@ -239,6 +239,20 @@ protected:
         return price;
     }
 
+    virtual TREE_RESULT calculateTreeBlackScholes(long N)
+    {
+        // dummy function that is overridden
+        return std::make_tuple(0.0, 0.0,0.0, 0.0, 0.0, VectorXd::Zero(10));
+    }
+
+
+
+    virtual TREE_RESULT BlackScholesWithRichardsonExtrapolation(long N)
+    {
+        // dummy function that is overridden
+        return std::make_tuple(0.0, 0.0,0.0, 0.0, 0.0, VectorXd::Zero(10));
+    }
+
 };
 
 
