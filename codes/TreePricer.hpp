@@ -63,6 +63,35 @@ public:
         }
         std::cout << "END MIN APPROX ERRORS" << std::endl;
     }
+    /**
+     * MAKE SURE TO CHANGE TREE CALC METHOD IF IT IS FOR ANOTHER TREE TYPE
+     * @param startN
+     * @param endN
+     * @param consecutiveTolApprox
+     * @return
+     */
+
+    long calculateOptimalN(long startN, long endN, double consecutiveTolApprox)
+    {
+        long i = startN;
+        long n = 0;
+        double previousValue = 0.0;
+
+        for (; i < endN; ++i) {
+            TREE_RESULT treeResult = calculateTree(i);
+
+            double currentValue = extractPrice(treeResult);
+            if (std::abs(currentValue - previousValue) < consecutiveTolApprox)
+            {
+                n += 1; // increment by 1 as the optimial iteration is the one greater than this
+                break;
+            }
+
+            previousValue = currentValue;
+            n = i;
+        }
+        return n;
+    }
 
     virtual TREE_RESULT calculateTree(long N)
     {
