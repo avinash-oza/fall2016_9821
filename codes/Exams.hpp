@@ -48,10 +48,15 @@ namespace Exam2015
                 TREE_RESULT american_tree_result = americanBinomialTreePricer.calculateTree(i);
                 TREE_RESULT european_tree_result = europeanBinomialTreePricer.calculateTree(i);
 
-                double currentValue = americanBinomialTreePricer.varianceReductionPrice(american_tree_result,
-                                                                                        european_tree_result,
-                                                                                        blackScholesPutOption);
-                if (std::abs(currentValue - previousValue) < 0.0001) break;
+//                double currentValue = americanBinomialTreePricer.varianceReductionPrice(american_tree_result,
+//                                                                                        european_tree_result,
+//                                                                                        blackScholesPutOption);
+                double currentValue = europeanBinomialTreePricer.extractPrice(american_tree_result);
+                if (std::abs(currentValue - previousValue) < 0.0001)
+                {
+                    n += 1; // increment by 1 as the optimial iteration is the one greater than this
+                    break;
+                }
 
                 previousValue = currentValue;
                 std::cout << previousValue << std::endl;
