@@ -1,6 +1,6 @@
 //
 // Created by Tushar Chawla on 12/9/16.
-// fork yes
+// for
 
 #ifndef CPPCODETEST_EXAMS_HPP
 #define CPPCODETEST_EXAMS_HPP
