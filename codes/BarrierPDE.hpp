@@ -165,7 +165,7 @@ public:
 public:
     double B;
 
-private:
+protected:
     double a;
     double b;
 
@@ -186,12 +186,28 @@ public:
             Barrier), upperBarrier(upperBarrier) {}
 
     double calculateXRight(int N_right) override {
-        return log(upperBarrier/K);
+        return log(upperBarrier / K);
     }
+    virtual void _setUp() override
+    {
+        set_xLeft(calculateXLeft());
+        a = (r - q) / (sigma*sigma) - 0.5;
+        b = pow((r - q) / (sigma*sigma) + 0.5, 2.0) + 2 * q / (sigma*sigma);
+        _tFinal = T*sigma*sigma / 2.0;
 
+        delta_tau = _tFinal / (M + 0.0);
+        double delta_xTemp = sqrt(delta_tau / alphatemp);
+
+        N_left = floor((getXCompute() - get_xLeft()) / delta_xTemp);
+
+        int dummy_n = 1;	// This n will not be used. It is included because of the function structure.
+        set_xRight(calculateXRight(dummy_n));
+        N = (get_xRight() - get_xLeft()) / delta_xTemp;
+
+        mesh = Mesh(0, _tFinal, _xLeft, _xRight, M, N);
+    }
 protected:
     double upperBarrier;
 
 };
-
 #endif

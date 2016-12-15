@@ -1,6 +1,6 @@
 //
 // Created by Tushar Chawla on 12/9/16.
-// for
+//
 
 #ifndef CPPCODETEST_EXAMS_HPP
 #define CPPCODETEST_EXAMS_HPP
@@ -10,6 +10,8 @@
 #include "AmericanPDESolver.hpp"
 #include "BarrierOption.hpp"
 #include "BarrierPDE.hpp"
+#include "MonteCarlo.hpp"
+#include <fstream>
 
 namespace Exam2015 {
     namespace Question1 {
@@ -23,52 +25,102 @@ namespace Exam2015 {
         double sigma = 0.25;
         OPTION_TYPE optionType = PUT;
 
+
         void Question1Part1() {
 
 
             AmericanBinomialTreePricer americanBinomialTreePricer(S, K, T, q, r, sigma, optionType);
-            TREE_RESULT tree_result = americanBinomialTreePricer.calculateTree(9);
+            TREE_RESULT tree_result = americanBinomialTreePricer.calculateTree(200);
+            std::cout << americanBinomialTreePricer.extractPrice(tree_result) << "\t";
             std::cout << americanBinomialTreePricer.extractDelta(tree_result) << "\t";
             std::cout << americanBinomialTreePricer.extractGamma(tree_result) << "\t";
             std::cout << americanBinomialTreePricer.extractTheta(tree_result);
+
+            //this will print tree as well. prinitng for both american and european options is in european class
+            //in BinomialTree.hpp file on page 86.
+
 
         }
 
         void Question1Part2() {
 
 
+            /* AmericanBinomialTreePricer americanBinomialTreePricer(S, K, T, q, r, sigma, optionType);
+             EuropeanBinomialTreePricer europeanBinomialTreePricer(S, K, T, q, r, sigma, optionType);
+             BlackScholesPutOption blackScholesPutOption(S, K, T, q, r, sigma);
+             double previousValue = 0.0;
+
+             int n = 0;
+
+             for (int i = 1; i < 1000; ++i) {
+                 TREE_RESULT american_tree_result = americanBinomialTreePricer.calculateTree(i);
+                 TREE_RESULT european_tree_result = europeanBinomialTreePricer.calculateTree(i);
+
+                 double currentValue = americanBinomialTreePricer.varianceReductionPrice(american_tree_result,
+                                                                                         european_tree_result,
+                                                                                         blackScholesPutOption);
+                 if (std::abs(currentValue - previousValue) < 0.0001) break;
+
+                 previousValue = currentValue;
+                 std::cout << previousValue << std::endl;
+                 n = i;
+             }
+             std::cout << n << std::endl;*/
+
             AmericanBinomialTreePricer americanBinomialTreePricer(S, K, T, q, r, sigma, optionType);
-            EuropeanBinomialTreePricer europeanBinomialTreePricer(S, K, T, q, r, sigma, optionType);
-            BlackScholesPutOption blackScholesPutOption(S, K, T, q, r, sigma);
-            double previousValue = 0.0;
+            TREE_RESULT tree_result = americanBinomialTreePricer.calculateTree(1);
+            double previousValue = 0;
+            double currentvalue = previousValue;
 
-            int n = 0;
+            double k = 1;
+            long N = 1;
+            while (k > 0.0001) {
+                N++;
+                TREE_RESULT tree_result1 = americanBinomialTreePricer.calculateTree(N);
+                currentvalue = americanBinomialTreePricer.extractPrice(tree_result1);
+                k = abs(previousValue - currentvalue);
+                previousValue = currentvalue;
+                //std::cout << N << "\t" << currentvalue << std::endl;
 
-            for (int i = 1; i < 1000; ++i) {
-                TREE_RESULT american_tree_result = americanBinomialTreePricer.calculateTree(i);
-                TREE_RESULT european_tree_result = europeanBinomialTreePricer.calculateTree(i);
 
-//                double currentValue = americanBinomialTreePricer.varianceReductionPrice(american_tree_result,
-//                                                                                        european_tree_result,
-//                                                                                        blackScholesPutOption);
-                double currentValue = europeanBinomialTreePricer.extractPrice(american_tree_result);
-                if (std::abs(currentValue - previousValue) < 0.0001)
-                {
-                    n += 1; // increment by 1 as the optimial iteration is the one greater than this
-                    break;
-                }
-
-                previousValue = currentValue;
-//                std::cout << previousValue << std::endl;
-                n = i;
             }
-            std::cout << n << std::endl;
+
+
+            //ignore the previous trees
+            std::cout << "The optimal value of N is: ";
+            std::cout << N << std::endl;
+            TREE_RESULT tree_result2 = americanBinomialTreePricer.calculateTree(N);
+            std::cout << americanBinomialTreePricer.extractPrice(tree_result2) << "\t";
+            std::cout << americanBinomialTreePricer.extractDelta(tree_result2) << "\t";
+            std::cout << americanBinomialTreePricer.extractGamma(tree_result2) << "\t";
+            std::cout << americanBinomialTreePricer.extractTheta(tree_result2);
+
 
         }
 
         void Question1Part3() {
+            //check the value of optimal N from above
+            long optimalN = 191;
             EuropeanBinomialTreePricer europeanBinomialTreePricer(S, K, T, q, r, sigma, optionType);
-            //TREE_RESULT european_tree_result = europeanBinomialTreePricer.calculateTree()
+            TREE_RESULT european_tree_result = europeanBinomialTreePricer.calculateTree(optimalN);
+            AmericanBinomialTreePricer americanBinomialTreePricer(S, K, T, q, r, sigma, optionType);
+            TREE_RESULT america_tree_result = americanBinomialTreePricer.calculateTree(optimalN);
+            BlackScholesPutOption blackScholesPutOption(S, K, T, q, r, sigma);
+
+            std::cout << europeanBinomialTreePricer.extractPrice(european_tree_result) << std::endl;
+            // std::cout << europeanBinomialTreePricer.extractDelta(european_tree_result) << std:: endl;
+            //std::cout << europeanBinomialTreePricer.extractGamma(european_tree_result)<< std::endl;
+            //std::cout << europeanBinomialTreePricer.extractTheta(european_tree_result)<< std:: endl;
+
+
+            /* std::cout << "Now printing the variance reduction American call price " << std::endl;
+             std::cout << americanBinomialTreePricer.varianceReductionPrice(america_tree_result,european_tree_result,blackScholesPutOption) << std:: endl;
+             std::cout << americanBinomialTreePricer.varianceReductionDelta(america_tree_result,european_tree_result,blackScholesPutOption) << std:: endl;
+             std::cout << americanBinomialTreePricer.varianceReductionGamma(america_tree_result,european_tree_result,blackScholesPutOption) << std:: endl;
+             std::cout << americanBinomialTreePricer.varianceReductionTheta(america_tree_result,european_tree_result,blackScholesPutOption) << std:: endl;
+             */
+
+
         }
     }
 
@@ -90,15 +142,15 @@ namespace Exam2015 {
 
         void Question2Part1() {
             fOption fOption(sigma, S0, q, K, T, r);
-            gEuropeanLeft gLeftEuropeanFunc(sigma, S0, q, K, T, r);
+            //gEuropeanLeft gLeftEuropeanFunc(sigma, S0, q, K, T, r);
             gAmericanLeftFunc gAmericanLeftFunc(sigma, S0, q, K, T, r);
             gAmericanRight gRightOption(sigma, S0, q, K, T, r);
-            gEuropeanRight gEuropeanRight(sigma, S0, q, K, T, r);
+            //gEuropeanRight gEuropeanRight(sigma, S0, q, K, T, r);
 
 
             for (int i = 1; i <= 4; ++i) {
 
-                AmericanPDESolver solverAmerican(gAmericanLeftFunc, gEuropeanRight, fOption, 0.0, S0, K, T, q, r,
+                AmericanPDESolver solverAmerican(gAmericanLeftFunc, gRightOption, fOption, 0.0, S0, K, T, q, r,
                                                  sigma,
                                                  pow(M, i), alphatemp);
                 solverAmerican.setUp();
@@ -123,13 +175,17 @@ namespace Exam2015 {
                                              M, alphatemp);
             solverAmerican.setUp();
             MatrixXd fEulerResult = solverAmerican.forwardEuler();
-            std::cout << fEulerResult << std::endl;
+            fstream outfile;
+            outfile.open("/Users/tusharchawla/Desktop/fall2016_9821/codes/results.txt");
+            outfile.precision(9);
+
+            outfile << fEulerResult << std::endl;
             //std::cout << gAmericanLeftFunc.b << std::endl;
         }
 
         void Question2Part3() {
             fOption fOption(sigma, S0, q, K, T, r);
-            gEuropeanLeft gLeftEuropeanFunc(sigma, S0, q, K, T, r);
+            //gEuropeanLeft gLeftEuropeanFunc(sigma, S0, q, K, T, r);
             gAmericanLeftFunc gAmericanLeftFunc(sigma, S0, q, K, T, r);
             gAmericanRight gAmericanRight(sigma, S0, q, K, T, r);
             // gEuropeanRight gEuropeanRight(sigma, S0, q, K, T, r);
@@ -143,13 +199,10 @@ namespace Exam2015 {
             //gamma is printing V(i's,0)
             //solver.VApprox1 is printing V(i's,deltas)
 
-            double gamma = solverAmerican.calculateGamma(fEulerResult); // needed to print V(i's)
-            double delta = solverAmerican.calculateDelta(fEulerResult);
-            double theta = solverAmerican.calculateTheta(fEulerResult);
-            std::cout << "Vapprox is " << solverAmerican.calculateVApprox1(fEulerResult) << std::endl;
-            std::cout << "delta is:" << delta << std::endl;
-            std::cout << "gamma is:" << gamma << std::endl;
-            std::cout << "theta is:" << theta << std::endl;
+            //Printing of V(i's) are in EuropeanPDESolver.hpp on line 150
+
+
+            solverAmerican.printFDTree(fEulerResult);
 
         }
 
@@ -180,6 +233,8 @@ namespace Exam2015 {
             BlackScholesPutOption blackScholesPutOption(S0, K, T, q, r, sigma);
             double BS_price = blackScholesPutOption.price();
             double BS_delta = blackScholesPutOption.delta();
+            double BS_gamma = blackScholesPutOption.gamma();
+            double BS_theta = blackScholesPutOption.theta();
 
             fOption fOption(sigma, S0, q, K, T, r);
             gAmericanLeftFunc gAmericanLeftFunc(sigma, S0, q, K, T, r);
@@ -199,16 +254,27 @@ namespace Exam2015 {
                                              M, alphatemp);
             solverEuropean.setUp();
             MatrixXd fEulerResultEuropean = solverEuropean.forwardEuler();
-            double europeadFDPrice = solverEuropean.calculateVApprox1(fEulerResultEuropean);
+
+            double europeadFDPrice = solverEuropean.calculateVApprox1(fEulerResultEuropean); //in here use VApprox1
             double varReductionPrice = solverAmerican.priceVarianceReduction(fEulerResultAmerican, europeadFDPrice,
                                                                              BS_price);
 
+
             std::cout << varReductionPrice << std::endl;
 
-            //print greeks here
+            std::cout << "print greeks here" << std::endl;
+
             std::cout << solverAmerican.calculateDelta(fEulerResultAmerican) -
                          solverEuropean.calculateDelta(fEulerResultEuropean)
                          + BS_delta << std::endl;
+
+            std::cout << solverAmerican.calculateGamma(fEulerResultAmerican) - //turn off printing in gamma function
+                         solverEuropean.calculateGamma(fEulerResultEuropean)
+                         + BS_gamma << std::endl;
+
+            std::cout << solverAmerican.calculateTheta(fEulerResultAmerican) -
+                         solverEuropean.calculateTheta(fEulerResultEuropean)
+                         + BS_theta << std::endl;
 
             //print other greeks
 
@@ -226,15 +292,17 @@ namespace Exam2015 {
         double sigma = 0.25;
         double alphatemp = 0.5;
 
-        void Question3part1() {
-            hw8fBarrierOption fBarrierOption(S0, K, T, r, sigma, q, Lowerarrier);
-            hw8gLeftBarrierOption gLeftBarrierOption(S0, K, T, r, sigma, q, Lowerarrier);
-            hw8gRightBarrierOption gRightBarrierOption(S0, K, T, r, sigma, q, Lowerarrier);
+        // The functions
+        hw8fBarrierOption fBarrierOption(S0, K, T, r, sigma, q, Lowerarrier);
+        hw8gLeftBarrierOption gLeftBarrierOption(S0, K, T, r, sigma, q, Lowerarrier);
+        hw8gRightBarrierOption gRightBarrierOption(S0, K, T, r, sigma, q, Lowerarrier);
 
-            BarrierOption barrierOption(S0, K, T, q, r, sigma, Lowerarrier);
+        BarrierOption barrierOption(S0, K, T, q, r, sigma, Lowerarrier);
+
+        void Question3Part1() {
 
             double exactPrice = barrierOption.Price();
-            MatrixXd outputMatrix = MatrixXd::Zero(4, 6);
+            MatrixXd outputMatrix = MatrixXd::Zero(4, 10);
             double AlphaTemp1 = 0.5;
 
             for (int i = 0; i < 4; ++i) {
@@ -242,19 +310,62 @@ namespace Exam2015 {
                 DoubleBarrierPDESolver solverAmerican(gLeftBarrierOption, gRightBarrierOption, fBarrierOption, 0.0, S0,
                                                       K, T, q, r,
                                                       sigma, AlphaTemp1, M, Lowerarrier, UpperBarrier);
+
                 solverAmerican.setUp();
-                std::cout << M << "\t" << alphatemp << "\t" << solverAmerican.getAlpha() << "\t "
-                          << solverAmerican.getN() << "\t" <<
-                          solverAmerican.get_xLeft() << "\t" << solverAmerican.get_xRight() << "\t"
-                          << solverAmerican.getXCompute() << "\t" << solverAmerican.get_tFinal() <<
-                          "\t" << solverAmerican.getDeltaTau() << "\t" << solverAmerican.getDeltaX() << std::endl;
-
+                outputMatrix(i, 0) = M;
+                outputMatrix(i, 1) = alphatemp;
+                outputMatrix(i, 2) = solverAmerican.getAlpha();
+                outputMatrix(i, 3) = solverAmerican.getN();
+                outputMatrix(i, 4) = solverAmerican.get_xLeft();
+                outputMatrix(i, 5) = solverAmerican.get_xRight();
+                outputMatrix(i, 6) = solverAmerican.getXCompute();
+                outputMatrix(i, 7) = solverAmerican.get_tFinal();
+                outputMatrix(i, 8) = solverAmerican.getDeltaTau();
+                outputMatrix(i, 9) = solverAmerican.getDeltaX();
             }
+            std::cout << outputMatrix << std::endl;
+        }
+        // For this part reset M = 4
 
+        void Question3Part2() {
+            M = 4;
+            double AlphaTemp2 = 0.5;
+            DoubleBarrierPDESolver solverAmerican(gLeftBarrierOption, gRightBarrierOption, fBarrierOption, 0.0, S0,
+                                                  K, T, q, r,
+                                                  sigma, AlphaTemp2, M, Lowerarrier, UpperBarrier);
+            solverAmerican.setUp();
+
+            MatrixXd outputMatrix = solverAmerican.forwardEuler();
+            std::cout << outputMatrix << std::endl;
         }
 
+        void Question3Part3() {
+            M = 4;
+            double AlphaTemp3 = 0.5;
+            DoubleBarrierPDESolver solverAmerican(gLeftBarrierOption, gRightBarrierOption, fBarrierOption, 0.0, S0,
+                                                  K, T, q, r,
+                                                  sigma, AlphaTemp3, M, Lowerarrier, UpperBarrier);
+            solverAmerican.setUp();
+
+            MatrixXd forwardSolution = solverAmerican.forwardEuler();
+
+            double Price, Delta, Gamma, Theta;
+            Price = solverAmerican.calculateVApprox(forwardSolution);
+            std::cout << Price << std::endl;
+
+            Delta = solverAmerican.calculateDelta(forwardSolution);
+            std::cout << Delta << std::endl;
+
+            Gamma = solverAmerican.calculateGamma(forwardSolution);
+            std::cout << Gamma << std::endl;
+
+            Theta = solverAmerican.calculateTheta(forwardSolution);
+            std::cout << Theta << std::endl;
+        }
     }
+
 }
+
 
 
 

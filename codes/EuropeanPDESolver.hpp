@@ -151,15 +151,49 @@ public:
 
         //--------printing v(i+1), v(i+2), v(i) and v(i-1)
         //printing from i-1 to i+2
-        std::cout << "printing from V(i-1,0) to V(i+2,0)" << std::endl;
+        /*std::cout << "printing from V(i-1,0) to V(i+2,0)" << std::endl;
         std::cout << Vapprox(i-1) << "\t" << Vapprox(i) << "\t" << Vapprox(i+1) << "\t" <<
-            Vapprox(i+2) << std::endl;
+            Vapprox(i+2) << std::endl;*/
 
 
 
 
         return (delta2-delta0)/((S(i+2)+S(i+1)-S(i)-S(i-1))/2);
 
+
+    }
+
+    virtual void printFDTree(MatrixXd &approximations)
+    {
+
+
+        VectorXd boundaryApproximations = approximations.row(M); // the last row of the matrix
+        int i = getxComputeLowerBound();
+        double S2 = K*exp(mesh.getX(i+1));
+        double S1 = K*exp(mesh.getX(i));
+        double Vi_delta_t = boundaryApproximations(i)*exp(-a*mesh.getX(i)-b*_tFinal);
+        double Vi_plus_1_delta_t = boundaryApproximations(i+1)*exp(-a*mesh.getX(i+1)-b*_tFinal);
+        Eigen::VectorXd Vapprox = calculateVApproxVector(approximations);
+
+
+        double gamma = calculateGamma(approximations);
+        double delta = calculateDelta(approximations);
+        double theta = calculateTheta(approximations);
+        std::cout << "Vapprox is " << calculateVApprox1(approximations) << std::endl;
+        std::cout << "delta is:" << delta << std::endl;
+        std::cout << "gamma is:" << gamma << std::endl;
+        std::cout << "theta is:" << theta << std::endl;
+
+        std::cout << std::endl;
+        std::cout << "printing the tree" << std::endl;
+
+
+        std::cout <<  "Vapprox(i-1,0): "<< Vapprox(i-1) << std::endl
+                  <<"Vapprox(i,0): " << Vapprox(i) << std::endl
+                  << "Vapprox(i+1,0): " << Vapprox(i+1) <<std::endl
+                  << "Vapprox(i+2,0): " << Vapprox(i+2) << std::endl
+                  << "Vapprox(i,dt): " << Vi_delta_t << std::endl
+                  << "Vapprox(i+1,dt): " << Vi_plus_1_delta_t << std::endl;
 
     }
 
@@ -174,8 +208,8 @@ public:
 
 
         //-----"printing from V(i+1,delta t) to V(i,delta t)"
-        std::cout << "printing from V(i,delta t) to V(i+1,delta t)" << std::endl;
-        std::cout << Vi_delta_t << "\t" << Vi_plus_1_delta_t << std::endl;
+        /*std::cout << "printing from V(i,delta t) to V(i+1,delta t)" << std::endl;
+        std::cout << Vi_delta_t << "\t" << Vi_plus_1_delta_t << std::endl;*/
 
 
 
