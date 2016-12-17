@@ -166,9 +166,6 @@ public:
     double B;
 
 protected:
-    double a;
-    double b;
-
     // Constants to be reported for homework 9
     double delta_x;
     double delta_tau;
