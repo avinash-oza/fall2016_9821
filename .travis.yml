@@ -1,6 +1,3 @@
 language: cpp 
 script: ./travis.sh
-addons:
-    apt:
-        packages:
-            - gcc-4.8
+compiler: gcc
