@@ -4,17 +4,3 @@ addons:
     apt:
         - libeigen3-dev
         - libboost-all-dev
-script:
-    - cd codes/
-    - cmake .
-    - make
-    - ./runUnitTests
-# Handle git submodules yourself
-git:
-    submodules: false
-    #         # Use sed to replace the SSH URL with the public URL, then initialize submodules
-    before_install:
-        - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
-        - git submodule update --init --recursive
-    compiler:
-        - gcc
