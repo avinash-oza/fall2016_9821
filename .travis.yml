@@ -1,3 +1,2 @@
 language: cpp 
-install: make
 script: ./travis.sh
