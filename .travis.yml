@@ -1,10 +1,11 @@
 language: cpp 
 script: ./travis.sh
 compiler: gcc
-sudo: required
-dist: trusty
+#sudo: required
+#dist: trusty
 addons:
     apt:
         packages:
             - libeigen3-dev
             - libboost-all-dev
+            - gcc-6
