@@ -25,7 +25,7 @@ add_executable(cppcodetest ${SOURCE_FILES})
 ################################
 # GTest
 ################################
-ADD_SUBDIRECTORY (googletest)
+ADD_SUBDIRECTORY (externals/googletest)
 enable_testing()
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 

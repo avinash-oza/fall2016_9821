@@ -1,6 +1,3 @@
 language: cpp 
 install: make
-addons:
-    apt:
-        - libeigen3-dev
-        - libboost-all-dev
+script: ./travis.sh
